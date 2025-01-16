@@ -14,28 +14,28 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-// @EnableWebSecurity
+@EnableWebSecurity
 public class SecurityConfig {
-    // private final NeoUserDetailService neoUserDetailService;
+     private final NeoUserDetailService neoUserDetailService;
 
-    // public SecurityConfig(NeoUserDetailService neoUserDetailService) {
-    //     this.neoUserDetailService = neoUserDetailService;
-    // }
+     public SecurityConfig(NeoUserDetailService neoUserDetailService) {
+         this.neoUserDetailService = neoUserDetailService;
+     }
 
-    // @Bean
-    // SecurityFilterChain configure(HttpSecurity http, HttpSecurity httpSecurity) throws Exception {
-    //     return httpSecurity
-    //             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-    //             .csrf(AbstractHttpConfigurer::disable)
-    //             .cors(Customizer.withDefaults())
-    //             .authorizeHttpRequests(auth -> auth.requestMatchers(
-    //                                     "api/v1/auth/me","api/v1/enrolments/**", "/**"
-    //                             ).authenticated()
-    //                             .anyRequest().permitAll()
-    //             ).userDetailsService(neoUserDetailService)
-    //             .httpBasic(Customizer.withDefaults())
-    //             .build();
-    // }
+     @Bean
+     SecurityFilterChain configure(HttpSecurity http, HttpSecurity httpSecurity) throws Exception {
+         return httpSecurity
+                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                 .csrf(AbstractHttpConfigurer::disable)
+                 .cors(Customizer.withDefaults())
+                 .authorizeHttpRequests(auth -> auth.requestMatchers(
+                                         "api/v1/auth/me","api/v1/enrolments/**"
+                                 ).authenticated()
+                                 .anyRequest().permitAll()
+                 ).userDetailsService(neoUserDetailService)
+                 .httpBasic(Customizer.withDefaults())
+                 .build();
+     }
 
     @Bean
     PasswordEncoder passwordEncoder(){

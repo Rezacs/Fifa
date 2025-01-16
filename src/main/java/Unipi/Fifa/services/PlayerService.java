@@ -20,11 +20,11 @@ public class PlayerService {
 
     private final PlayerRepository playerRepository;
 
-    public ObjectId save(Player player) {
+    public String save(Player player) {
         return playerRepository.save(player).getId();
     }
 
-    public Player findById(ObjectId id) {
+    public Player findById(String id) {
         return playerRepository.findById(id).orElse(null);
     }
 
@@ -32,11 +32,16 @@ public class PlayerService {
         return playerRepository.findAll();
     }
 
-    public void delete(ObjectId id) {
+    public void delete(String id) {
         playerRepository.deleteById(id);
     }
 
     public List<Player> getPlayersByClub(String clubName) {
         return playerRepository.findByClubName(clubName);
+    }
+
+    public List<Player> getPlayersByOverall(String overallRating) {
+        overallRating = overallRating.trim();
+        return playerRepository.findByOverallRating(overallRating);
     }
 }

@@ -18,7 +18,7 @@ public class Player {
 
 
     @Id
-    private ObjectId id; // Corresponds to MongoDB _id
+    private String id; // Corresponds to MongoDB _id
 
     @Field("ID")
     private Integer playerId;
@@ -61,6 +61,9 @@ public class Player {
 
     @Field("Joined")
     private String joined; // Storing as a String; can parse to LocalDate if needed
+
+    @Field("Loan date end")
+    private String loanDateEnd;
 
     @Field("Value")
     private String value;
@@ -260,11 +263,11 @@ public class Player {
     @Field("end_year")
     private Integer endYear;
 
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(String id) {
         this.id = id;
     }
 

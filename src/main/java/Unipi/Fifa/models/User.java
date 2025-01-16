@@ -3,6 +3,7 @@ package Unipi.Fifa.models;
 import lombok.*;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
+import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Node
 public class User implements UserDetails {
     @Id @GeneratedValue
     private Long id;
@@ -57,7 +59,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // ROLE_ADMIN,ROLE_TEACHER
+        // ROLE_ADMIN - ROLE_USER
         return Arrays.stream(roles.split(","))
                 .map(SimpleGrantedAuthority::new)
                 .toList();
