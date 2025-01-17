@@ -2,9 +2,6 @@ package Unipi.Fifa.services;
 
 import Unipi.Fifa.models.Player;
 import Unipi.Fifa.repositories.PlayerRepository;
-import lombok.RequiredArgsConstructor;
-import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,12 +17,12 @@ public class PlayerService {
 
     private final PlayerRepository playerRepository;
 
-    public String save(Player player) {
-        return playerRepository.save(player).getId();
+    public Integer save(Player player) {
+        return playerRepository.save(player).getPlayerId();
     }
 
-    public Player findById(String id) {
-        return playerRepository.findById(id).orElse(null);
+    public List<Player> findByPlayerId(Integer playerid) {
+        return playerRepository.findByPlayerId(playerid);
     }
 
     public List<Player> findAll() {
@@ -40,8 +37,7 @@ public class PlayerService {
         return playerRepository.findByClubName(clubName);
     }
 
-    public List<Player> getPlayersByOverall(String overallRating) {
-        overallRating = overallRating.trim();
-        return playerRepository.findByOverallRating(overallRating);
+    public List<Player> getPlayersByOverall(Integer overallRating) {
+        return playerRepository.findByOverall(overallRating);
     }
 }

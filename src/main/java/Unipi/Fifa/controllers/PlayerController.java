@@ -3,7 +3,6 @@ package Unipi.Fifa.controllers;
 import Unipi.Fifa.models.Player;
 import Unipi.Fifa.services.PlayerService;
 import lombok.RequiredArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,16 +22,12 @@ public class PlayerController {
     }
 
     @GetMapping("{playerId}")
-    public ResponseEntity<Player> findById( @PathVariable String playerId ){
-        return ResponseEntity.ok(playerService.findById(playerId));
+    public ResponseEntity<List<Player>> findByPlayerId(@PathVariable Integer playerId ){
+        return ResponseEntity.ok(playerService.findByPlayerId(playerId));
     }
 
     @GetMapping("/overall")
-    public ResponseEntity<List<Player>> getByOverall(@RequestParam String overall){
-
-//        String sanitizedOverall = overall.split("\\+")[0];
-//        String overallString = String.valueOf(overall);
-        overall = overall.trim();
+    public ResponseEntity<List<Player>> getByOverall(@RequestParam Integer overall){
         return ResponseEntity.ok(playerService.getPlayersByOverall(overall));
     }
 }
