@@ -16,12 +16,17 @@ public class PlayerNodeController {
     @Autowired
     private PlayerNodeService playerNodeService;
 
-    @GetMapping("/{clubName}")
+    @PostMapping("/playerNodeByPlayerId")
+    public List<PlayerNode> getPlayerNodeByClubName(@RequestParam("playerId") Integer playerId) {
+        return ResponseEntity.ok(playerNodeService.getPlayerByPlayerId(playerId)).getBody();
+    }
+
+    @PostMapping("/{clubName}")
     public List<PlayerNode> findPlayersByClub(@PathVariable String clubName) {
         return ResponseEntity.ok(playerNodeService.getPlayersByClub(clubName)).getBody();
     }
 
-    @PostMapping("/transfer-to-neo4j")
+    @GetMapping("/transfer-to-neo4j")
     public ResponseEntity<String> transferDataToNeo4j() {
         playerNodeService.transferDataToNeo4j();
         return ResponseEntity.ok("Data successfully transferred to Neo4j!");

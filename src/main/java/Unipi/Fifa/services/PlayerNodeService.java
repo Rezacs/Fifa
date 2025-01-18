@@ -25,6 +25,14 @@ public class PlayerNodeService {
         return playerNodeRepository.findByClubName(clubName);
     }
 
+    public List<PlayerNode> getPlayerByOverall(Integer overall) {
+        return playerNodeRepository.findByOverall(overall);
+    }
+
+    public List<PlayerNode> getPlayerByPlayerId(Integer playerId) {
+        return playerNodeRepository.findByPlayerId(playerId);
+    }
+
     public void transferDataToNeo4j() {
         List<PlayerNode> playerNodes = playerNodeRepository.findAll();
         List<Player> players = playerRepository.findAll();

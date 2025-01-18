@@ -16,17 +16,17 @@ public class PlayerController {
     @Autowired
     private PlayerService playerService;
 
-    @GetMapping("/players")
+    @PostMapping("/players")
     public List<Player> getPlayersByClub(@RequestParam String clubName) {
         return playerService.getPlayersByClub(clubName);
     }
 
-    @GetMapping("{playerId}")
+    @PostMapping("{playerId}")
     public ResponseEntity<List<Player>> findByPlayerId(@PathVariable Integer playerId ){
         return ResponseEntity.ok(playerService.findByPlayerId(playerId));
     }
 
-    @GetMapping("/overall")
+    @PostMapping("/overall")
     public ResponseEntity<List<Player>> getByOverall(@RequestParam Integer overall){
         return ResponseEntity.ok(playerService.getPlayersByOverall(overall));
     }

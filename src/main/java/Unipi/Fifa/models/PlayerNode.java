@@ -9,7 +9,7 @@ import org.springframework.data.neo4j.core.schema.Node;
 public class PlayerNode {
     @Id
     @GeneratedValue
-    private Long elementId;
+    private Long Id;
     private Integer playerId;
     private ObjectId mongoId;
     private String long_name;
@@ -18,12 +18,12 @@ public class PlayerNode {
     private String clubName;
     private Double age;
 
-    public Long getElementId() {
-        return elementId;
+    public Long getId() {
+        return Id;
     }
 
-    public void setElementId(Long elementId) {
-        this.elementId = elementId;
+    public void setId(Long elementId) {
+        this.Id = elementId;
     }
 
     public Integer getPlayerId() {
