@@ -3,11 +3,16 @@ package Unipi.Fifa.controllers;
 
 import Unipi.Fifa.models.ClubNode;
 import Unipi.Fifa.models.PlayerNode;
+import Unipi.Fifa.objects.UserFollowDTO;
+import Unipi.Fifa.queryresults.UserFollowQueryResult;
+import Unipi.Fifa.requests.UserFollowRequest;
 import Unipi.Fifa.services.PlayerNodeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -15,6 +20,7 @@ import java.util.List;
 public class PlayerNodeController {
     @Autowired
     private PlayerNodeService playerNodeService;
+
 
     @PostMapping("/playerNodeByPlayerId")
     public List<PlayerNode> getPlayerNodeByClubName(@RequestParam("playerId") Integer playerId) {
@@ -30,6 +36,16 @@ public class PlayerNodeController {
     public ResponseEntity<String> transferDataToNeo4j(@PathVariable PlayerNode.Gender gender) {
         playerNodeService.transferDataToNeo4j(gender);
         return ResponseEntity.ok("Data successfully transferred to Neo4j!");
+    }
+
+    @PostMapping("/follow")
+    public ResponseEntity<UserFollowDTO> Follow(@RequestBody UserFollowRequest request, Principal principal){
+        UserFollowQueryResult userFollowQueryResult = playerNodeService.
+        UserFollowDTO responseFollow = new UserFollowDTO(
+                userFollowQueryResult.getFollower().getUsername(),
+                userFollowQueryResult.getFollowed().getUsername()
+        );
+        return new ResponseEntity<>(responseFollow , HttpStatus.CREATED);
     }
 
 
