@@ -4,6 +4,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.Relationship;
 
 @Node
 public class PlayerNode {
@@ -22,6 +23,18 @@ public class PlayerNode {
     // Enum for gender options.
     public enum Gender {
         MALE, FEMALE
+    }
+
+
+    @Relationship(type = "BelongsTo", direction = Relationship.Direction.OUTGOING)
+    private ClubNode clubNode;
+
+    public ClubNode getClubNode() {
+        return clubNode;
+    }
+
+    public void setClubNode(ClubNode clubNode) {
+        this.clubNode = clubNode;
     }
 
     public Long getId() {

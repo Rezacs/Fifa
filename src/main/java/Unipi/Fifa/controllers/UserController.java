@@ -16,9 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -36,7 +34,7 @@ public class UserController {
     }
 
     @PostMapping("/check/{username}")
-    public Optional<UserDTO> checkUser(@RequestParam String username) {
+    public User checkUser(@RequestParam String username) {
         return userService.FindUser(username);
     }
 

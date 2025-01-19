@@ -19,7 +19,7 @@ public class PlayerFollowingService {
     }
 
     public PlayerFollowingQueryResult follow(String username, Integer playerId){
-        return userRepository.createPlayerFollowingRelationship(username, playerId);
+        return playerNodeRepository.createPlayerFollowingRelationship(username, playerId);
     }
 
     public List<PlayerNode> getAllFollowingPlayers(String username){

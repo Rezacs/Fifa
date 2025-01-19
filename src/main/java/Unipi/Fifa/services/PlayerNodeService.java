@@ -2,24 +2,29 @@ package Unipi.Fifa.services;
 
 import Unipi.Fifa.models.Player;
 import Unipi.Fifa.models.PlayerNode;
+import Unipi.Fifa.models.User;
 import Unipi.Fifa.repositories.PlayerNodeRepository;
 import Unipi.Fifa.repositories.PlayerRepository;
+import Unipi.Fifa.repositories.UserRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PlayerNodeService {
 
     private final PlayerNodeRepository playerNodeRepository;
     private final PlayerRepository playerRepository;
-    public PlayerNodeService(PlayerNodeRepository playerNodeRepository , PlayerRepository playerRepository) {
+    private UserRepository userRepository;
+
+    public PlayerNodeService(PlayerNodeRepository playerNodeRepository, PlayerRepository playerRepository, UserRepository userRepository) {
         this.playerNodeRepository = playerNodeRepository;
         this.playerRepository = playerRepository;
+        this.userRepository = userRepository;
     }
-
-
 
     public List<PlayerNode> getPlayersByClub(String clubName) {
         return playerNodeRepository.findByClubName(clubName);
@@ -51,5 +56,35 @@ public class PlayerNodeService {
 
 
         }
+    }
+
+    public void linkPlayerToLoggedInUser(String mongoId) {
+        // Get the username of the logged-in user from Spring Security
+        String loggedInUsername = getLoggedInUsername();
+
+        // Find the user by the username
+        User user = userRepository.findByUsername(loggedInUsername);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        // Find the PlayerNode by playerId
+        PlayerNode playerNode = playerNodeRepository.findByMongoId(mongoId);
+        if (playerNode == null) {
+            throw new IllegalArgumentException("PlayerNode not found");
+        }
+
+        // Link the PlayerNode to the User
+        user.setPlayerNode(playerNode);
+        userRepository.save(user);
+    }
+
+    private String getLoggedInUsername() {
+        // Retrieve the logged-in username from the security context
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            return ((UserDetails) principal).getUsername();
+        }
+        return null; // Or throw an exception if no user is logged in
     }
 }

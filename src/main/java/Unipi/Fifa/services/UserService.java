@@ -22,13 +22,13 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Optional<UserDTO> FindUser(String username){
+    public User FindUser(String username){
         return userRepository.findByUsername(username);
     }
 
     public User createUser(CreateUserRequest request) {
         // TODO: make sure that this username doesnt exists.
-        Optional<UserDTO> existingUser = userRepository.findByUsername(request.getUsername());
+        Optional<User> existingUser = Optional.ofNullable(userRepository.findByUsername(request.getUsername()));
         if (existingUser.isPresent()) {
 //            throw new IllegalArgumentException("Username is already taken.");
             throw new RuntimeException("Username is already taken.");

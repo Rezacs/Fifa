@@ -3,8 +3,11 @@ package Unipi.Fifa.controllers;
 
 import Unipi.Fifa.models.ClubNode;
 import Unipi.Fifa.models.PlayerNode;
+import Unipi.Fifa.objects.PlayerNodeDTO;
 import Unipi.Fifa.objects.UserFollowDTO;
+import Unipi.Fifa.queryresults.PlayerFollowingQueryResult;
 import Unipi.Fifa.queryresults.UserFollowQueryResult;
+import Unipi.Fifa.requests.PlayerFollowRequest;
 import Unipi.Fifa.requests.UserFollowRequest;
 import Unipi.Fifa.services.PlayerNodeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +27,7 @@ public class PlayerNodeController {
 
     @PostMapping("/playerNodeByPlayerId")
     public List<PlayerNode> getPlayerNodeByClubName(@RequestParam("playerId") Integer playerId) {
-        return ResponseEntity.ok(playerNodeService.getPlayerByPlayerId(playerId)).getBody();
+        return (List<PlayerNode>) ResponseEntity.ok(playerNodeService.getPlayerByPlayerId(playerId)).getBody();
     }
 
     @PostMapping("/{clubName}")
@@ -38,14 +41,10 @@ public class PlayerNodeController {
         return ResponseEntity.ok("Data successfully transferred to Neo4j!");
     }
 
-    @PostMapping("/follow")
-    public ResponseEntity<UserFollowDTO> Follow(@RequestBody UserFollowRequest request, Principal principal){
-        UserFollowQueryResult userFollowQueryResult = playerNodeService.
-        UserFollowDTO responseFollow = new UserFollowDTO(
-                userFollowQueryResult.getFollower().getUsername(),
-                userFollowQueryResult.getFollowed().getUsername()
-        );
-        return new ResponseEntity<>(responseFollow , HttpStatus.CREATED);
+    @PostMapping("/followByMongoId")
+    public String linkPlayerToUser(@RequestBody String mongoId){
+        playerNodeService.linkPlayerToLoggedInUser(mongoId);
+        return "Player linked to logged-in User successfully";
     }
 
 

@@ -1,9 +1,7 @@
 package Unipi.Fifa.models;
 
 import lombok.*;
-import org.springframework.data.neo4j.core.schema.GeneratedValue;
-import org.springframework.data.neo4j.core.schema.Id;
-import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,6 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +21,40 @@ public class User implements UserDetails {
     private String username;
     private String password;
     private String roles;
+
+    @Relationship(type = "FOLLOWS", direction = Relationship.Direction.OUTGOING)
+    private PlayerNode playerNode;
+    @Property(name = "Followdate")
+    private Date Followdate;
+
+    @Relationship(type = "Seguire", direction = Relationship.Direction.OUTGOING)
+    private User user;
+    @Property(name = "Seguiredate")
+    private Date Seguiredate;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public PlayerNode getPlayerNode() {
+        return playerNode;
+    }
+
+    public void setPlayerNode(PlayerNode playerNode) {
+        this.playerNode = playerNode;
+    }
 
     public String getName() {
         return name;
