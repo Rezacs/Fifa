@@ -15,7 +15,7 @@ import java.util.Map;
 
 @NoArgsConstructor // Lombok: No-argument constructor
 @AllArgsConstructor // Lombok: All-arguments constructor
-@Document(collection = "MalePlayers")
+@Document(collection = "Players")
 @Data // Lombok: Generates getters, setters, and other utility methods
 public class Player {
 
@@ -349,6 +349,9 @@ public class Player {
 
     @Field("gk")
     private String gk;
+
+    @Field("gender")
+    private String gender;
 
     public ObjectId getId() {
         return id;
@@ -1228,5 +1231,13 @@ public class Player {
 
     public void setGk(String gk) {
         this.gk = gk;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 }

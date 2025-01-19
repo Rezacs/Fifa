@@ -1,29 +1,16 @@
-package Unipi.Fifa.models;
+package Unipi.Fifa.objects;
 
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.neo4j.core.schema.GeneratedValue;
-import org.springframework.data.neo4j.core.schema.Node;
-
-@Node
-public class PlayerNode {
-    @Id
-    @GeneratedValue
+public class PlayerNodeDTO {
     private Long id;
     private Integer playerId;
-    private String mongoId;
-    private String long_name;
+    private String longName;
     private String nationality;
     private Integer overall;
     private String clubName;
     private Double age;
-    private Gender gender;
+    private String gender; // Using String to keep it simple for API transfer.
 
-    // Enum for gender options.
-    public enum Gender {
-        MALE, FEMALE
-    }
-
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -40,20 +27,12 @@ public class PlayerNode {
         this.playerId = playerId;
     }
 
-    public String getMongoId() {
-        return mongoId;
+    public String getLongName() {
+        return longName;
     }
 
-    public void setMongoId(String mongoId) {
-        this.mongoId = mongoId;
-    }
-
-    public String getLong_name() {
-        return long_name;
-    }
-
-    public void setLong_name(String long_name) {
-        this.long_name = long_name;
+    public void setLongName(String longName) {
+        this.longName = longName;
     }
 
     public String getNationality() {
@@ -88,13 +67,11 @@ public class PlayerNode {
         this.age = age;
     }
 
-    public Gender getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Gender gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
-
-
 }

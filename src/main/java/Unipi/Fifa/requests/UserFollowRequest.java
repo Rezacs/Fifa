@@ -1,16 +1,16 @@
 package Unipi.Fifa.requests;
 
 public class UserFollowRequest {
-    private String identifier;
+    private Integer playerId;
 
     public UserFollowRequest(){
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public Integer getPlayerId() {
+        return playerId;
     }
 
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+    public void setPlayerId(Integer playerId) {
+        this.playerId = playerId;
     }
 }

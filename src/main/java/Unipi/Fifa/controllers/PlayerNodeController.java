@@ -26,9 +26,9 @@ public class PlayerNodeController {
         return ResponseEntity.ok(playerNodeService.getPlayersByClub(clubName)).getBody();
     }
 
-    @GetMapping("/transfer-to-neo4j")
-    public ResponseEntity<String> transferDataToNeo4j() {
-        playerNodeService.transferDataToNeo4j();
+    @PostMapping("/transfer-to-neo4j/{gender}")
+    public ResponseEntity<String> transferDataToNeo4j(@PathVariable PlayerNode.Gender gender) {
+        playerNodeService.transferDataToNeo4j(gender);
         return ResponseEntity.ok("Data successfully transferred to Neo4j!");
     }
 

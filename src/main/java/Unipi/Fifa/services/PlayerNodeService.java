@@ -33,14 +33,15 @@ public class PlayerNodeService {
         return playerNodeRepository.findByPlayerId(playerId);
     }
 
-    public void transferDataToNeo4j() {
+    public void transferDataToNeo4j(PlayerNode.Gender gender) {
         List<PlayerNode> playerNodes = playerNodeRepository.findAll();
-        List<Player> players = playerRepository.findAll();
+        List<Player> players = playerRepository.findByGender(String.valueOf(gender));
 
         for (Player player : players) {
             PlayerNode playerNode = new PlayerNode();
+            playerNode.setGender(gender);
             playerNode.setPlayerId(player.getPlayerId());
-            playerNode.setMongoId(player.getId());
+            playerNode.setMongoId(String.valueOf(player.getId()));
             playerNode.setLong_name(player.getLongName());
             playerNode.setNationality(player.getNationalityName());
             playerNode.setOverall(player.getOverall());
