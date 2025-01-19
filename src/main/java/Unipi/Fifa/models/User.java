@@ -23,21 +23,67 @@ public class User implements UserDetails {
     private String roles;
 
     @Relationship(type = "FOLLOWS", direction = Relationship.Direction.OUTGOING)
-    private PlayerNode playerNode;
+    private List<PlayerNode> playerNodes;
     @Property(name = "Followdate")
     private Date Followdate;
 
     @Relationship(type = "Seguire", direction = Relationship.Direction.OUTGOING)
-    private User user;
+    private List<User> users;
     @Property(name = "Seguiredate")
     private Date Seguiredate;
 
-    public User getUser() {
-        return user;
+    @Relationship(type="Piace", direction = Relationship.Direction.OUTGOING)
+    private List<ClubNode> clubNodes;
+    @Property(name = "PiaceDate")
+    private Date PiaceDate;
+
+
+    public List<PlayerNode> getPlayerNodes() {
+        return playerNodes;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setPlayerNodes(List<PlayerNode> playerNodes) {
+        this.playerNodes = playerNodes;
+    }
+
+    public Date getFollowdate() {
+        return Followdate;
+    }
+
+    public void setFollowdate(Date followdate) {
+        Followdate = followdate;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
+    public Date getSeguiredate() {
+        return Seguiredate;
+    }
+
+    public void setSeguiredate(Date seguiredate) {
+        Seguiredate = seguiredate;
+    }
+
+    public List<ClubNode> getClubNodes() {
+        return clubNodes;
+    }
+
+    public void setClubNodes(List<ClubNode> clubNodes) {
+        this.clubNodes = clubNodes;
+    }
+
+    public Date getPiaceDate() {
+        return PiaceDate;
+    }
+
+    public void setPiaceDate(Date piaceDate) {
+        PiaceDate = piaceDate;
     }
 
     public Long getId() {
@@ -48,13 +94,6 @@ public class User implements UserDetails {
         this.id = id;
     }
 
-    public PlayerNode getPlayerNode() {
-        return playerNode;
-    }
-
-    public void setPlayerNode(PlayerNode playerNode) {
-        this.playerNode = playerNode;
-    }
 
     public String getName() {
         return name;
