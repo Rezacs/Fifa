@@ -28,6 +28,11 @@ public class ClubController {
         return ResponseEntity.ok(clubService.getClubbyId(ClubMongoId)).getBody();
     }
 
+    @GetMapping("/Mongo/club")
+    public List<Club> findClubByClubName(@RequestParam String clubName , @RequestParam Integer fifa_version) {
+        return ResponseEntity.ok(clubService.getClubbyNameAndFifaVersion(clubName , fifa_version)).getBody();
+    }
+
     @GetMapping("/overall/{clubOverall}")
     public List<Club> findClubOverall(@PathVariable Integer clubOverall) {
         return ResponseEntity.ok(clubService.getClubsByOverall(clubOverall)).getBody();

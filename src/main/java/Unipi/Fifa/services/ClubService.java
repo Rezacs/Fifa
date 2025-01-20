@@ -29,7 +29,7 @@ public class ClubService {
     }
 
     public List<Club> getClubbyName(String name) {
-        return clubRepository.findByName(name);
+        return clubRepository.findByTeamName(name);
     }
 
     public List<Club> getClubs() {
@@ -77,7 +77,7 @@ public class ClubService {
         for (Club club : clubs) {
             ClubNode clubNode = new ClubNode();
             clubNode.setMongoId(club.getId());
-            clubNode.setName(club.getName());
+            clubNode.setName(club.getTeamName());
             clubNode.setOverall(club.getOverall());
 
             // Save the node in Neo4j
@@ -86,4 +86,7 @@ public class ClubService {
 
     }
 
+    public List<Club> getClubbyNameAndFifaVersion(String clubName, Integer fifaVersion) {
+        return clubRepository.findByTeamNameAndFifaVersion(clubName , fifaVersion);
+    }
 }

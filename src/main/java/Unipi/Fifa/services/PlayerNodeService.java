@@ -51,6 +51,7 @@ public class PlayerNodeService {
             playerNode.setNationality(player.getNationalityName());
             playerNode.setOverall(player.getOverall());
             playerNode.setClubName(player.getClubName());
+            playerNode.setFifaVersion(player.getFifaVersion());
             playerNode.setAge(Double.valueOf(player.getAge()));
             playerNodeRepository.save(playerNode);
 
@@ -75,7 +76,7 @@ public class PlayerNodeService {
         }
 
         // Link the PlayerNode to the User
-        user.setPlayerNode(playerNode);
+        user.setPlayerNodes((List<PlayerNode>) playerNode);
         userRepository.save(user);
     }
 

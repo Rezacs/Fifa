@@ -17,6 +17,7 @@ public class PlayerNode {
     private String nationality;
     private Integer overall;
     private String clubName;
+    private Double fifaVersion;
     private Double age;
     private Gender gender;
 
@@ -91,6 +92,14 @@ public class PlayerNode {
 
     public void setClubName(String clubName) {
         this.clubName = clubName;
+    }
+
+    public Double getFifaVersion() {
+        return fifaVersion;
+    }
+
+    public void setFifaVersion(Double fifaVersion) {
+        this.fifaVersion = fifaVersion;
     }
 
     public Double getAge() {

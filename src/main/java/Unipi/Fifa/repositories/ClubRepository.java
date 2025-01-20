@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ClubRepository extends MongoRepository<Club, String> {
-    List<Club> findByName(String Name);
+    List<Club> findByTeamName(String Name);
     List<Club> findByOverall(Integer overallRating);
     Optional<Club> findById(String id);
+
+    List<Club> findByTeamNameAndFifaVersion(String clubName, Integer fifaVersion);
 }
