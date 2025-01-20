@@ -18,7 +18,7 @@ public class ClubNodeController {
     private ClubService clubService;
 
     @GetMapping("/{clubId}")
-    public List<ClubNode> findClubById(@PathVariable Long clubId) {
+    public List<ClubNode> findClubById(@PathVariable String clubId) {
         return ResponseEntity.ok(clubService.getClubNodebyId(clubId)).getBody();
     }
 

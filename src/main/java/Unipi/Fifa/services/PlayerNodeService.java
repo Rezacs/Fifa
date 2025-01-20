@@ -46,7 +46,7 @@ public class PlayerNodeService {
             PlayerNode playerNode = new PlayerNode();
             playerNode.setGender(gender);
             playerNode.setPlayerId(player.getPlayerId());
-            playerNode.setMongoId(String.valueOf(player.getId()));
+            playerNode.setMongoId(player.getId());
             playerNode.setLong_name(player.getLongName());
             playerNode.setNationality(player.getNationalityName());
             playerNode.setOverall(player.getOverall());

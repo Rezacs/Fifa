@@ -12,7 +12,7 @@ public class PlayerNode {
     @GeneratedValue
     private Long id;
     private Integer playerId;
-    private String mongoId;
+    private ObjectId mongoId;
     private String long_name;
     private String nationality;
     private Integer overall;
@@ -54,11 +54,11 @@ public class PlayerNode {
         this.playerId = playerId;
     }
 
-    public String getMongoId() {
+    public ObjectId getMongoId() {
         return mongoId;
     }
 
-    public void setMongoId(String mongoId) {
+    public void setMongoId(ObjectId mongoId) {
         this.mongoId = mongoId;
     }
 

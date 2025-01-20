@@ -46,10 +46,10 @@ public class ClubService {
     private ClubNodeRepository clubnodeRepository;
 
     public List<ClubNode> findNodeByName(String name) {
-        return clubnodeRepository.findNodeByName(name);
+        return clubnodeRepository.findNodeByTeamName(name);
     }
 
-    public List<ClubNode> getClubNodebyId(Long id) {
+    public List<ClubNode> getClubNodebyId(String id) {
         return clubnodeRepository.findNodeById(id);
     }
 
@@ -75,11 +75,15 @@ public class ClubService {
 //        }
 
         for (Club club : clubs) {
+            List<ClubNode> existingNode = clubnodeRepository.findNodeByMongoId(club.getId()) ;
             ClubNode clubNode = new ClubNode();
             clubNode.setMongoId(club.getId());
-            clubNode.setName(club.getTeamName());
+            clubNode.setFifaVersion(club.getFifaVersion());
+            clubNode.setTeamName(club.getTeamName());
+            clubNode.setNationalityName(club.getNationalityName());
             clubNode.setOverall(club.getOverall());
-
+            clubNode.setCoachId(club.getCoachId());
+            clubNode.setCaptain(club.getCaptain());
             // Save the node in Neo4j
             clubnodeRepository.save(clubNode);
         }
