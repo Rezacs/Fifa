@@ -4,6 +4,7 @@ package Unipi.Fifa.controllers;
 import Unipi.Fifa.models.ClubNode;
 import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.services.ClubService;
+import Unipi.Fifa.services.PNCNService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,9 @@ import java.util.List;
 public class ClubNodeController {
     @Autowired
     private ClubService clubService;
+
+    @Autowired
+    private PNCNService pncnService;
 
     @GetMapping("/{clubId}")
     public List<ClubNode> findClubById(@PathVariable Long clubId) {
@@ -37,6 +41,16 @@ public class ClubNodeController {
     @PostMapping("/findByMongoId")
     public ResponseEntity<List<ClubNode>> findByMongoId(@RequestParam String mongoId) {
         return ResponseEntity.ok(clubService.getClubNodeByMongoId(mongoId));
+    }
+
+    @PostMapping("/create")
+    public String createPlayerClubRelationships(@RequestParam("gender") PlayerNode.Gender gender) {
+        try {
+            pncnService.createPlayerClubRelationships(gender);
+            return String.format("Player-club relationships created successfully for gender: %s", gender);
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
+        }
     }
 
 

@@ -13,6 +13,7 @@ public interface PlayerNodeRepository extends Neo4jRepository<PlayerNode, Long> 
     List<PlayerNode> findByOverall(Integer overall);
     List<PlayerNode> findByPlayerId(Integer playerId);
     PlayerNode findByMongoId(String mongoId);
+    List<PlayerNode> findByGender(PlayerNode.Gender gender);
 
     @Query("MATCH (:User {username : $username})-[:FOLLOW]->(players:PlayerNode) RETURN players ")
     List<PlayerNode> findAllFollowingPlayers(String username);

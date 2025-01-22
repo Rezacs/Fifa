@@ -20,6 +20,7 @@ public class PlayerNode {
     private String nationality;
     private Integer overall;
     private String clubName;
+    private Integer clubTeamId;
     private Double fifaVersion;
     private Double age;
     private Gender gender;
@@ -29,6 +30,13 @@ public class PlayerNode {
         MALE, FEMALE
     }
 
+    public Integer getClubTeamId() {
+        return clubTeamId;
+    }
+
+    public void setClubTeamId(Integer clubTeamId) {
+        this.clubTeamId = clubTeamId;
+    }
 
     @Relationship(type = "BelongsTo", direction = Relationship.Direction.OUTGOING)
     private ClubNode clubNode;

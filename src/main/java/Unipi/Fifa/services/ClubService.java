@@ -74,7 +74,7 @@ public class ClubService {
             number +=1 ;
             clubNode.setMongoId(club.getId());
             clubNode.setTeamId(club.getTeamId());
-            clubNode.setFifaVersion(club.getFifaVersion());
+            clubNode.setFifaVersion(Double.valueOf(club.getFifaVersion()));
             clubNode.setTeamName(club.getTeamName());
             clubNode.setNationalityName(club.getNationalityName());
             clubNode.setOverall(club.getOverall());

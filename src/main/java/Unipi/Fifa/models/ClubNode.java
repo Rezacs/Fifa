@@ -14,7 +14,7 @@ public class ClubNode {
     private Long id;
     private String mongoId;
     private Integer teamId;
-    private Integer fifaVersion;
+    private Double fifaVersion;
     private String teamName;
     private String nationalityName;
     private Integer overall;
@@ -54,11 +54,11 @@ public class ClubNode {
         this.mongoId = mongoId;
     }
 
-    public Integer getFifaVersion() {
+    public Double getFifaVersion() {
         return fifaVersion;
     }
 
-    public void setFifaVersion(Integer fifaVersion) {
+    public void setFifaVersion(Double fifaVersion) {
         this.fifaVersion = fifaVersion;
     }
 

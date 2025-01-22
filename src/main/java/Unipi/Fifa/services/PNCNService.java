@@ -9,25 +9,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PNCNService {
     @Autowired
-    private PlayerNodeRepository playerRepository;
+    private PlayerNodeRepository playerNodeRepository;
 
     @Autowired
-    private ClubNodeRepository clubRepository;
+    private ClubNodeRepository clubNodeRepository;
 
     @Transactional
-    public void createPlayerClubRelationships() {
+    public void createPlayerClubRelationships(PlayerNode.Gender gender) {
         // Step 1: Get all players
-        List<PlayerNode> players = playerRepository.findAll();
-
+        List<PlayerNode> players = playerNodeRepository.findByGender(gender);
+//        List<ClubNode> clubs = clubNodeRepository.findClubNodeByGender(gender);
         // Step 2: Iterate over players to find matching clubs
         for (PlayerNode player : players) {
             // Step 2.1: Check the corresponding club
-            ClubNode club = clubRepository.findByTeamIdAndFifaVersionAndPlayerId(
-                    player.getClubTeamId(), player.getFifaVersion(), player.getPlayerId()
+            ClubNode club = clubNodeRepository.findByTeamIdAndFifaVersionAndGender(
+                    player.getClubTeamId(), player.getFifaVersion(), gender
             );
 
             if (club != null) {
