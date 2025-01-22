@@ -52,7 +52,7 @@ public class UserController {
 
     @PostMapping("/follow")
     public ResponseEntity<UserFollowDTO> Follow(@RequestBody UserFollowRequest request, Principal principal){
-        UserFollowQueryResult userFollowQueryResult = userService.follow(principal.getName(), request.getIdentifier());
+        UserFollowQueryResult userFollowQueryResult = userService.follow(principal.getName(), request.getUsername());
         UserFollowDTO responseFollow = new UserFollowDTO(
                 userFollowQueryResult.getFollower().getUsername(),
                 userFollowQueryResult.getFollowed().getUsername()

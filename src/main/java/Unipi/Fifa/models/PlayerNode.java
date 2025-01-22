@@ -21,7 +21,7 @@ public class PlayerNode {
     private Integer overall;
     private String clubName;
     private Integer clubTeamId;
-    private Double fifaVersion;
+    private Integer fifaVersion;
     private Double age;
     private Gender gender;
 
@@ -105,11 +105,11 @@ public class PlayerNode {
         this.clubName = clubName;
     }
 
-    public Double getFifaVersion() {
+    public Integer getFifaVersion() {
         return fifaVersion;
     }
 
-    public void setFifaVersion(Double fifaVersion) {
+    public void setFifaVersion(Integer fifaVersion) {
         this.fifaVersion = fifaVersion;
     }
 

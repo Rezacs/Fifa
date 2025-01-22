@@ -29,12 +29,12 @@ public class PNCNService {
             // Step 2.1: Check the corresponding club
             ClubNode club = clubNodeRepository.findByTeamIdAndFifaVersionAndGender(
                     player.getClubTeamId(), player.getFifaVersion(), gender
-            );
+            ).orElse(null);
 
             if (club != null) {
                 // Step 3: Create relationship (BelongsTo)
                 player.setClubNode(club);
-                playerRepository.save(player);
+                playerNodeRepository.save(player);
                 System.out.println("Created relationship for Player " + player.getId() + " with Club " + club.getTeamName());
             } else {
                 System.out.println("No matching club found for Player " + player.getId());

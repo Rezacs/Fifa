@@ -56,6 +56,7 @@ public class PlayerNodeService {
             playerNode.setNationality(player.getNationalityName());
             playerNode.setOverall(player.getOverall());
             playerNode.setClubName(player.getClubName());
+            playerNode.setClubTeamId(player.getClubTeamId());
             playerNode.setFifaVersion(player.getFifaVersion());
             playerNode.setAge(Double.valueOf(player.getAge()));
             playerNodeRepository.save(playerNode);

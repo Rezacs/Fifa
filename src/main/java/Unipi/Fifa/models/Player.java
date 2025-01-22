@@ -31,7 +31,7 @@ public class Player {
     private String playerUrl;
 
     @Field("fifa_version")
-    private Double fifaVersion;
+    private Integer fifaVersion;
 
     @Field("fifa_update")
     private Double fifaUpdate;
@@ -378,11 +378,11 @@ public class Player {
         this.playerUrl = playerUrl;
     }
 
-    public Double getFifaVersion() {
+    public Integer getFifaVersion() {
         return fifaVersion;
     }
 
-    public void setFifaVersion(Double fifaVersion) {
+    public void setFifaVersion(Integer fifaVersion) {
         this.fifaVersion = fifaVersion;
     }
 
