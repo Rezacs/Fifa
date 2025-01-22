@@ -2,6 +2,7 @@ package Unipi.Fifa.controllers;
 
 
 import Unipi.Fifa.models.ClubNode;
+import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.services.ClubService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ public class ClubNodeController {
     private ClubService clubService;
 
     @GetMapping("/{clubId}")
-    public List<ClubNode> findClubById(@PathVariable String clubId) {
+    public List<ClubNode> findClubById(@PathVariable Long clubId) {
         return ResponseEntity.ok(clubService.getClubNodebyId(clubId)).getBody();
     }
 
@@ -27,9 +28,16 @@ public class ClubNodeController {
         return clubService.findNodeByName(name);
     }
 
-    @PostMapping("/transfer-to-neo4j")
-    public ResponseEntity<String> transferDataToNeo4j() {
-        clubService.transferDataToNeo4j();
-        return ResponseEntity.ok("Data successfully transferred to Neo4j!");
+    @PostMapping("/transfer-to-neo4j/{gender}")
+    public ResponseEntity<String> transferDataToNeo4j(@PathVariable PlayerNode.Gender gender) {
+        String response = clubService.transferDataToNeo4j(gender);
+        return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/findByMongoId")
+    public ResponseEntity<List<ClubNode>> findByMongoId(@RequestParam String mongoId) {
+        return ResponseEntity.ok(clubService.getClubNodeByMongoId(mongoId));
+    }
+
+
 }

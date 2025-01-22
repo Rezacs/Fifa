@@ -10,6 +10,7 @@ public interface ClubRepository extends MongoRepository<Club, String> {
     List<Club> findByTeamName(String Name);
     List<Club> findByOverall(Integer overallRating);
     Optional<Club> findById(String id);
+    List<Club> findByGender(String gender);
 
     List<Club> findByTeamNameAndFifaVersion(String clubName, Integer fifaVersion);
 }

@@ -10,6 +10,7 @@ import Unipi.Fifa.queryresults.UserFollowQueryResult;
 import Unipi.Fifa.requests.PlayerFollowRequest;
 import Unipi.Fifa.requests.UserFollowRequest;
 import Unipi.Fifa.services.PlayerNodeService;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,12 +38,13 @@ public class PlayerNodeController {
 
     @PostMapping("/transfer-to-neo4j/{gender}")
     public ResponseEntity<String> transferDataToNeo4j(@PathVariable PlayerNode.Gender gender) {
-        playerNodeService.transferDataToNeo4j(gender);
-        return ResponseEntity.ok("Data successfully transferred to Neo4j!");
+        String response = playerNodeService.transferDataToNeo4j(gender);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/followByMongoId")
-    public String linkPlayerToUser(@RequestBody String mongoId){
+    public String linkPlayerToUser(@RequestBody PlayerFollowRequest request){
+        String mongoId = request.getMongoId();
         playerNodeService.linkPlayerToLoggedInUser(mongoId);
         return "Player linked to logged-in User successfully";
     }

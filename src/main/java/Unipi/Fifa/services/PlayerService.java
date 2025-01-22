@@ -2,6 +2,7 @@ package Unipi.Fifa.services;
 
 import Unipi.Fifa.models.Player;
 import Unipi.Fifa.repositories.PlayerRepository;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,5 +40,13 @@ public class PlayerService {
 
     public List<Player> getPlayersByOverall(Integer overallRating) {
         return playerRepository.findByOverall(overallRating);
+    }
+
+    public Player getPlayerById(String id) {
+        return playerRepository.findById(id).orElse(null);
+    }
+
+    public void savePlayer(Player player) {
+        playerRepository.save(player);
     }
 }

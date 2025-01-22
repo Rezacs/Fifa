@@ -6,6 +6,7 @@ import Unipi.Fifa.models.User;
 import Unipi.Fifa.repositories.PlayerNodeRepository;
 import Unipi.Fifa.repositories.PlayerRepository;
 import Unipi.Fifa.repositories.UserRepository;
+import org.bson.types.ObjectId;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -38,15 +39,19 @@ public class PlayerNodeService {
         return playerNodeRepository.findByPlayerId(playerId);
     }
 
-    public void transferDataToNeo4j(PlayerNode.Gender gender) {
+    public String transferDataToNeo4j(PlayerNode.Gender gender) {
         List<PlayerNode> playerNodes = playerNodeRepository.findAll();
         List<Player> players = playerRepository.findByGender(String.valueOf(gender));
-
+        int number = 0;
         for (Player player : players) {
+            if (playerNodeRepository.existsByMongoId(String.valueOf(player.getId()))){
+                continue;
+            }
             PlayerNode playerNode = new PlayerNode();
+            number +=1 ;
             playerNode.setGender(gender);
             playerNode.setPlayerId(player.getPlayerId());
-            playerNode.setMongoId(player.getId());
+            playerNode.setMongoId(String.valueOf(player.getId()));
             playerNode.setLong_name(player.getLongName());
             playerNode.setNationality(player.getNationalityName());
             playerNode.setOverall(player.getOverall());
@@ -54,9 +59,8 @@ public class PlayerNodeService {
             playerNode.setFifaVersion(player.getFifaVersion());
             playerNode.setAge(Double.valueOf(player.getAge()));
             playerNodeRepository.save(playerNode);
-
-
         }
+        return "The amount of " + players.stream().count() + " was checked and " + number + " was changed";
     }
 
     public void linkPlayerToLoggedInUser(String mongoId) {
@@ -76,8 +80,10 @@ public class PlayerNodeService {
         }
 
         // Link the PlayerNode to the User
-        user.setPlayerNodes((List<PlayerNode>) playerNode);
-        userRepository.save(user);
+        if (!user.getPlayerNodes().contains(playerNode)) {
+            user.getPlayerNodes().add(playerNode);  // Add the player node to the user's player nodes list
+            userRepository.save(user);  // Save the user with the updated list of player nodes
+        }
     }
 
     private String getLoggedInUsername() {

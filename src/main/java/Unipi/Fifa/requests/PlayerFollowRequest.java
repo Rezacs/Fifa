@@ -1,16 +1,16 @@
 package Unipi.Fifa.requests;
 
 public class PlayerFollowRequest {
-    private Integer playerId;
+    private String mongoId;
 
     public PlayerFollowRequest(){
     }
 
-    public Integer getPlayerId() {
-        return playerId;
+    public String getMongoId() {
+        return mongoId;
     }
 
-    public void setPlayerId(Integer playerId) {
-        this.playerId = playerId;
+    public void setMongoId(String mongoId) {
+        this.mongoId = mongoId;
     }
 }

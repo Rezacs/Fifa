@@ -4,6 +4,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
 @Node
@@ -12,7 +13,9 @@ public class PlayerNode {
     @GeneratedValue
     private Long id;
     private Integer playerId;
-    private ObjectId mongoId;
+
+    @Property("mongoId")
+    private String mongoId;
     private String long_name;
     private String nationality;
     private Integer overall;
@@ -54,11 +57,11 @@ public class PlayerNode {
         this.playerId = playerId;
     }
 
-    public ObjectId getMongoId() {
+    public String getMongoId() {
         return mongoId;
     }
 
-    public void setMongoId(ObjectId mongoId) {
+    public void setMongoId(String mongoId) {
         this.mongoId = mongoId;
     }
 

@@ -6,10 +6,12 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PlayerRepository extends MongoRepository<Player, String> {
     List<Player> findByClubName(String clubName);
     List<Player> findByOverall(Integer overallRating);
     List<Player> findByPlayerId(Integer playerid);
     List<Player> findByGender(String gender);
+    Optional<Player> findById(ObjectId id);
 }

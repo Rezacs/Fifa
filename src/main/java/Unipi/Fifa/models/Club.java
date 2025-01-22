@@ -91,7 +91,7 @@ public class Club {
     private Double wholeTeamAverageAge;
 
     @Field("captain")
-    private Number captain;
+    private Integer captain;
 
     @Field("short_free_kick")
     private Number shortFreeKick;
@@ -391,11 +391,11 @@ public class Club {
         this.wholeTeamAverageAge = wholeTeamAverageAge;
     }
 
-    public Number getCaptain() {
+    public Integer getCaptain() {
         return captain;
     }
 
-    public void setCaptain(Number captain) {
+    public void setCaptain(Integer captain) {
         this.captain = captain;
     }
 

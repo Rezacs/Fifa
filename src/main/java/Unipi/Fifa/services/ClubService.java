@@ -2,17 +2,20 @@ package Unipi.Fifa.services;
 
 import Unipi.Fifa.models.Club;
 import Unipi.Fifa.models.ClubNode;
+import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.repositories.ClubNodeRepository;
 import Unipi.Fifa.repositories.ClubRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ClubService {
+    @Autowired
     private final ClubRepository clubRepository;
+    @Autowired
+    private ClubNodeRepository clubNodeRepository;
 
     public ClubService(ClubRepository clubRepository) {
         this.clubRepository = clubRepository;
@@ -42,52 +45,46 @@ public class ClubService {
         return clubRepository.findByOverall(overall);
     }
 
-    @Autowired
-    private ClubNodeRepository clubnodeRepository;
+
 
     public List<ClubNode> findNodeByName(String name) {
-        return clubnodeRepository.findNodeByTeamName(name);
+        return clubNodeRepository.findNodeByTeamName(name);
     }
 
-    public List<ClubNode> getClubNodebyId(String id) {
-        return clubnodeRepository.findNodeById(id);
+    public List<ClubNode> getClubNodebyId(Long id) {
+        return clubNodeRepository.findNodeById(id);
+    }
+
+    public List<ClubNode> getClubNodeByMongoId(String mongoId) {
+        return clubNodeRepository.findNodeByMongoId(mongoId) ;
     }
 
 
-    public void transferDataToNeo4j(){
-        List<ClubNode> clubNodes = clubnodeRepository.findAll();
-        List<Club> clubs = clubRepository.findAll();
-//
-//        for (ClubNode club : clubs) {
-//            // Check if the node already exists in Neo4j
-//            List<ClubNode> existingNode = clubnodeRepository.findNodeByName(club.getName()) ;
-//
-//            if (existingNode.isEmpty()) {
-//                // If the node does not exist, create a new one
-//                ClubNode clubNode = new ClubNode();
-//                clubNode.setMongoId(club.getMongoId());
-//                clubNode.setName(club.getName());
-//                clubNode.setOverall(club.getOverall());
-//
-//                // Save the node in Neo4j
-//                clubnodeRepository.save(clubNode);
-//            }
-//        }
+    public String transferDataToNeo4j(PlayerNode.Gender gender){
+        List<ClubNode> clubNodes = clubNodeRepository.findAll();
+        List<Club> clubs = clubRepository.findByGender(String.valueOf(gender));
+        int number = 0;
 
         for (Club club : clubs) {
-            List<ClubNode> existingNode = clubnodeRepository.findNodeByMongoId(club.getId()) ;
+            if (clubNodeRepository.existsByMongoId(club.getId())){
+                continue;
+            }
+
             ClubNode clubNode = new ClubNode();
+            number +=1 ;
             clubNode.setMongoId(club.getId());
+            clubNode.setTeamId(club.getTeamId());
             clubNode.setFifaVersion(club.getFifaVersion());
             clubNode.setTeamName(club.getTeamName());
             clubNode.setNationalityName(club.getNationalityName());
             clubNode.setOverall(club.getOverall());
             clubNode.setCoachId(club.getCoachId());
             clubNode.setCaptain(club.getCaptain());
+            clubNode.setGender(gender);
             // Save the node in Neo4j
-            clubnodeRepository.save(clubNode);
+            clubNodeRepository.save(clubNode);
         }
-
+        return "The amount of " + clubs.stream().count() + " was checked and " + number + " was changed";
     }
 
     public List<Club> getClubbyNameAndFifaVersion(String clubName, Integer fifaVersion) {

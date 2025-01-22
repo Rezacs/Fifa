@@ -4,25 +4,45 @@ package Unipi.Fifa.models;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.Property;
 
 @Node
 public class ClubNode {
+
     @Id
     @GeneratedValue
-    private String id;
+    private Long id;
     private String mongoId;
+    private Integer teamId;
     private Integer fifaVersion;
     private String teamName;
     private String nationalityName;
     private Integer overall;
     private Integer coachId;
-    private Number captain;
+    private Integer captain;
+    private PlayerNode.Gender gender;
 
-    public String getId() {
+    public Integer getTeamId() {
+        return teamId;
+    }
+
+    public void setTeamId(Integer teamId) {
+        this.teamId = teamId;
+    }
+
+    public PlayerNode.Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(PlayerNode.Gender gender) {
+        this.gender = gender;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -74,11 +94,11 @@ public class ClubNode {
         this.coachId = coachId;
     }
 
-    public Number getCaptain() {
+    public Integer getCaptain() {
         return captain;
     }
 
-    public void setCaptain(Number captain) {
+    public void setCaptain(Integer captain) {
         this.captain = captain;
     }
 }
