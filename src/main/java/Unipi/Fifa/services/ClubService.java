@@ -23,8 +23,8 @@ public class ClubService {
 
 
 
-    public String saveClub(Club club) {
-        return clubRepository.save(club).getId();
+    public Club saveClub(Club club) {
+        return clubRepository.save(club);
     }
 
     public Club getClubbyId(String id) {

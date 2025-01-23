@@ -110,6 +110,18 @@ public class ClubController {
         return ResponseEntity.ok("Club updated successfully!");
     }
 
+    @PostMapping("create-new-club")
+    public ResponseEntity<Club> createClub(@RequestBody Club club) {
+        try {
+            club.setId(null);
+            Club createdClub = clubService.saveClub(club) ;
+            editClub(createdClub.getId(), club);
+            return ResponseEntity.ok(createdClub);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 
 
 }
