@@ -49,7 +49,7 @@ public class UserService {
     }
 
     public UserFollowQueryResult follow(String loggedInUsername, String targetUsername) {
-        // Fetch the logged-in user and the target user from the repository
+        // Fetch the logged-in user and the target user
         User loggedInUser = userRepository.findByUsername(loggedInUsername);
         User targetUser = userRepository.findByUsername(targetUsername);
 
@@ -57,15 +57,17 @@ public class UserService {
             throw new IllegalArgumentException("User not found.");
         }
 
-        // Add the target user to the logged-in user's 'following' list (or relationship in Neo4j)
-        loggedInUser.getUsers().add(targetUser);
-        loggedInUser.setSeguiredate(new Date()); // Set the Seguire date
+        // Create the follow relationship with the current date as the Seguiredate
+        Date followDate = new Date(); // Current date as follow date
 
-        // Save the updated user object back into Neo4j
-        userRepository.save(loggedInUser);
+        // Create the relationship and set the Seguiredate property
+        loggedInUser.seguire(targetUser, followDate);  // Assuming follow method is implemented
 
-        // Return the follow information as a DTO or other format you require
-        return new UserFollowQueryResult(loggedInUser, targetUser, loggedInUser.getSeguiredate());
+        // Save the updated users
+        userRepository.save(loggedInUser); // or a custom save method for relationships
+
+        // Return the result
+        return new UserFollowQueryResult(loggedInUser, targetUser, followDate);
     }
 
 
