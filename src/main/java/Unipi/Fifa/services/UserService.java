@@ -6,10 +6,12 @@ import Unipi.Fifa.objects.UserDTO;
 import Unipi.Fifa.queryresults.UserFollowQueryResult;
 import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.requests.CreateUserRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -46,8 +48,24 @@ public class UserService {
 
     }
 
-    public UserFollowQueryResult follow(String username , String identifier) {
-        return userRepository.createFollowRelationship(username , identifier);
+    public UserFollowQueryResult follow(String loggedInUsername, String targetUsername) {
+        // Fetch the logged-in user and the target user from the repository
+        User loggedInUser = userRepository.findByUsername(loggedInUsername);
+        User targetUser = userRepository.findByUsername(targetUsername);
+
+        if (loggedInUser == null || targetUser == null) {
+            throw new IllegalArgumentException("User not found.");
+        }
+
+        // Add the target user to the logged-in user's 'following' list (or relationship in Neo4j)
+        loggedInUser.getUsers().add(targetUser);
+        loggedInUser.setSeguiredate(new Date()); // Set the Seguire date
+
+        // Save the updated user object back into Neo4j
+        userRepository.save(loggedInUser);
+
+        // Return the follow information as a DTO or other format you require
+        return new UserFollowQueryResult(loggedInUser, targetUser, loggedInUser.getSeguiredate());
     }
 
 

@@ -11,17 +11,16 @@ public interface UserRepository extends Neo4jRepository<User, Long> {
     User findByUsername(String username);
     Optional<User> findFullByUsername(String username);
 
-//    @Query("MATCH (user1:User {username: $username1}), (user2:User {username: $username2}) " +
-//            "MERGE (user1)-[:FOLLOW]->(user2) RETURN user1, user2 ")
-    //    @Query("MATCH (user1:User), (user2:User) WHERE user1.username = $username1 AND user2.username = $username2 " +
-//            "CREATE (user1)-[:FOLLOW] -> (user2) RETURN user1, user2")
-//        @Query("MATCH (user1:User {username: $username1}), (user2:User {username: $username2}) " +
-//                "WITH COLLECT(user1)[0] AS user1, COLLECT(user2)[0] AS user2 " +
-//                "MERGE (user1)-[:FOLLOW]->(user2) " +
-//                "RETURN user1, user2")
+
+//    @Query("MATCH (user1:User {username: $username1}) , (user2:User {username: $username2}) " +
+//            "MERGE (user1)-[:FOLLOW]->(user2) RETURN user1, user2")
+//    UserFollowQueryResult createFollowRelationship(String username1, String username2 );
+
     @Query("MATCH (user1:User {username: $username1}) , (user2:User {username: $username2}) " +
-            "MERGE (user1)-[:FOLLOW]->(user2) RETURN user1, user2")
-    UserFollowQueryResult createFollowRelationship(String username1, String username2 );
+            "MERGE (user1)-[:FOLLOW]->(user2) " +
+            "RETURN user1 AS follower , user2 as followed")
+    UserFollowQueryResult createFollowRelationship(String username1, String username2);
+
 
 
 }

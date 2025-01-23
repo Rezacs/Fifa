@@ -9,8 +9,10 @@ public class UserFollowQueryResult {
     private User followed;
     private Date followedDate;
 
-    public UserFollowQueryResult(){
-
+    public UserFollowQueryResult(User follower, User followed, Date followedDate) {
+        this.follower = follower;
+        this.followed = followed;
+        this.followedDate = followedDate;
     }
 
     public User getFollower() {
@@ -35,5 +37,14 @@ public class UserFollowQueryResult {
 
     public void setFollowedDate(Date followedDate) {
         this.followedDate = followedDate;
+    }
+
+    @Override
+    public String toString() {
+        return "UserFollowQueryResult{" +
+                "follower=" + follower.getUsername() +
+                ", followed=" + followed.getUsername() +
+                ", followedDate=" + followedDate +
+                '}';
     }
 }

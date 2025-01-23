@@ -51,13 +51,24 @@ public class UserController {
     }
 
     @PostMapping("/follow")
-    public ResponseEntity<UserFollowDTO> Follow(@RequestBody UserFollowRequest request, Principal principal){
-        UserFollowQueryResult userFollowQueryResult = userService.follow(principal.getName(), request.getUsername());
+    public ResponseEntity<UserFollowDTO> follow(@RequestBody UserFollowRequest request, Principal principal) {
+        // The logged-in user's username (extracted from the Principal)
+        String loggedInUsername = principal.getName();
+
+        // The target username to follow, provided in the request body
+        String targetUsername = request.getUsername();
+
+        // Call the service to create the follow relationship
+        UserFollowQueryResult followResult = userService.follow(loggedInUsername, targetUsername);
+
+        // Create a DTO to return
         UserFollowDTO responseFollow = new UserFollowDTO(
-                userFollowQueryResult.getFollower().getUsername(),
-                userFollowQueryResult.getFollowed().getUsername()
+                followResult.getFollower().getUsername(),
+                followResult.getFollowed().getUsername(),
+                followResult.getFollowedDate()
         );
-        return new ResponseEntity<>(responseFollow , HttpStatus.CREATED);
+
+        return new ResponseEntity<>(responseFollow, HttpStatus.CREATED);
     }
 
     @GetMapping("/followings")
