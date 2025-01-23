@@ -16,7 +16,7 @@ public class CoachNode {
     private String nationalityName;
     private String gender;
 
-    @Relationship(type = "BelongsTo", direction = Relationship.Direction.OUTGOING)
+    @Relationship(type = "Manages", direction = Relationship.Direction.OUTGOING)
     private ClubNode clubNode;
 
     public ClubNode getClubNode() {

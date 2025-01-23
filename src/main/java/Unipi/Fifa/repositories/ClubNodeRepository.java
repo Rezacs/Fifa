@@ -15,6 +15,7 @@ public interface ClubNodeRepository extends Neo4jRepository<ClubNode, Long> {
     List<ClubNode> findNodeByTeamName(String name);
     List<ClubNode> findClubNodeByGender(PlayerNode.Gender gender);
     Optional<ClubNode> findByTeamIdAndFifaVersionAndGender(Integer teamId, Integer fifaVersion, PlayerNode.Gender gender);
+    Optional<List<ClubNode>> findByCoachId(Integer coachId);
 
     boolean existsByMongoId(String id);
 

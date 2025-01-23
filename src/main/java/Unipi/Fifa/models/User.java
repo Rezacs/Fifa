@@ -28,27 +28,6 @@ public class User implements UserDetails {
     @Relationship(type="Piace", direction = Relationship.Direction.OUTGOING)
     private List<ClubNode> clubNodes;
 
-    public void seguire(User targetUser, Date followDate) {
-        // Add a "Seguire" relationship with the Seguiredate property
-        if (this.users == null) {
-            this.users = new ArrayList<>();
-        }
-
-        // Assuming you use a direct way to handle relationship with a property on the edge
-        // Add the target user to the followers list and set the relationship date
-        this.users.add(targetUser);
-
-        // Set the Seguiredate as a property of the relationship (this happens when you save the users)
-        // If you're using Spring Data Neo4j, the relationship with a property will be saved automatically
-        targetUser.addFollower(this, followDate);
-    }
-
-    public void addFollower(User follower, Date followDate) {
-        // Create a relationship with the 'Seguire' type and add the date property
-        // This could be done through repository or by directly manipulating the relationship
-        // For simplicity, let's assume it's saved automatically when you save the User object
-    }
-
 
     public List<PlayerNode> getPlayerNodes() {
         return playerNodes;
