@@ -36,9 +36,15 @@ public class PlayerNodeController {
         return ResponseEntity.ok(playerNodeService.getPlayersByClub(clubName)).getBody();
     }
 
-    @PostMapping("/transfer-to-neo4j/{gender}")
-    public ResponseEntity<String> transferDataToNeo4j(@PathVariable PlayerNode.Gender gender) {
+    @PostMapping("/transfer-all-to-neo4j/{gender}")
+    public ResponseEntity<String> transferAllDataToNeo4j(@PathVariable PlayerNode.Gender gender) {
         String response = playerNodeService.transferDataToNeo4j(gender);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/transfer-one-to-neo4j/")
+    public ResponseEntity<PlayerNode> transferOneDataToNeo4j(@RequestParam String mongoId) {
+        PlayerNode response = playerNodeService.transferOneDataToNeo4j(mongoId);
         return ResponseEntity.ok(response);
     }
 

@@ -39,7 +39,7 @@ public class ClubNodeController {
     }
 
     @PostMapping("/findByMongoId")
-    public ResponseEntity<List<ClubNode>> findByMongoId(@RequestParam String mongoId) {
+    public ResponseEntity<ClubNode> findByMongoId(@RequestParam String mongoId) {
         return ResponseEntity.ok(clubService.getClubNodeByMongoId(mongoId));
     }
 
@@ -48,6 +48,16 @@ public class ClubNodeController {
         try {
             pncnService.createPlayerClubRelationships(gender);
             return String.format("Player-club relationships created successfully for gender: %s", gender);
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
+        }
+    }
+
+    @PostMapping("/create/edited")
+    public String createEditedPlayerClubRelationships(@RequestParam PlayerNode player) {
+        try {
+            pncnService.createEditedPlayerClubRelationships(player);
+            return String.format("Player-club relationships created successfully for gender: %s", player);
         } catch (Exception e) {
             return "Error: " + e.getMessage();
         }

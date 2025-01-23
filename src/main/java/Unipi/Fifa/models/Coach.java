@@ -47,6 +47,14 @@ public class Coach {
     @Field("gender")
     private String gender;
 
+    public ObjectId getId() {
+        return id;
+    }
+
+    public void setId(ObjectId id) {
+        this.id = id;
+    }
+
     public Integer getCoachId() {
         return coachId;
     }

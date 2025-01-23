@@ -31,6 +31,10 @@ public class PlayerNodeService {
         return playerNodeRepository.findByClubName(clubName);
     }
 
+    public PlayerNode getPlayerByMongoId(String mongoId){
+        return playerNodeRepository.findByMongoId(mongoId);
+    }
+
     public List<PlayerNode> getPlayerByOverall(Integer overall) {
         return playerNodeRepository.findByOverall(overall);
     }
@@ -64,6 +68,30 @@ public class PlayerNodeService {
         return "The amount of " + players.stream().count() + " was checked and " + number + " was changed";
     }
 
+    public PlayerNode transferOneDataToNeo4j(String mongoId) {
+        Player player = playerRepository.findById(mongoId).orElse(null);
+        PlayerNode playerNode = playerNodeRepository.findByMongoId(mongoId) ;
+        if (playerNode == null) {
+            playerNode = new PlayerNode();
+        }
+        if (player.getGender() == "MALE"){
+            playerNode.setGender(PlayerNode.Gender.MALE);
+        } else{
+            playerNode.setGender(PlayerNode.Gender.FEMALE);
+        }
+        playerNode.setPlayerId(player.getPlayerId());
+        playerNode.setMongoId(String.valueOf(player.getId()));
+        playerNode.setLong_name(player.getLongName());
+        playerNode.setNationality(player.getNationalityName());
+        playerNode.setOverall(player.getOverall());
+        playerNode.setClubName(player.getClubName());
+        playerNode.setClubTeamId(player.getClubTeamId());
+        playerNode.setFifaVersion(player.getFifaVersion());
+        playerNode.setAge(Double.valueOf(player.getAge()));
+        playerNodeRepository.save(playerNode);
+        return playerNode;
+    }
+
     public void linkPlayerToLoggedInUser(String mongoId) {
         // Get the username of the logged-in user from Spring Security
         String loggedInUsername = getLoggedInUsername();
@@ -95,4 +123,5 @@ public class PlayerNodeService {
         }
         return null; // Or throw an exception if no user is logged in
     }
+
 }

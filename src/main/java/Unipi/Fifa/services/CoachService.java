@@ -2,9 +2,11 @@ package Unipi.Fifa.services;
 
 import Unipi.Fifa.models.Coach;
 import Unipi.Fifa.models.CoachNode;
+import Unipi.Fifa.models.Player;
 import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.repositories.CoachNodeRepository;
 import Unipi.Fifa.repositories.CoachRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,14 @@ public class CoachService {
     public CoachService(CoachRepository coachRepository, CoachNodeRepository coachNodeRepository) {
         this.coachRepository = coachRepository;
         this.coachNodeRepository = coachNodeRepository;
+    }
+
+    public Coach getCoachById(String id){
+        return coachRepository.findById(id).orElse(null);
+    }
+
+    public CoachNode getCoachNodeByMongoId(String mongoId){
+        return coachNodeRepository.findByMongoId(mongoId);
     }
 
     public Coach getCoachById(int id) {
@@ -44,7 +54,7 @@ public class CoachService {
             }
             CoachNode coachNode = new CoachNode();
             number += 1;
-            coachNode.setMongoId(String.valueOf(coach.getCoachId()));
+            coachNode.setMongoId(String.valueOf(coach.getId()));
             coachNode.setCoachId(coach.getCoachId());
             coachNode.setLongName(coach.getLongName());
             coachNode.setNationalityName(coach.getNationalityName());
@@ -53,5 +63,24 @@ public class CoachService {
         }
 
         return "The amount of " + coaches.size() + " was checked and " + number + " was changed";
+    }
+
+    public CoachNode TransferOneDataToNeo4j(String mongoId){
+        Coach coach = coachRepository.findById(mongoId).orElse(null);
+        CoachNode coachNode = coachNodeRepository.findByMongoId(mongoId);
+        if (coachNode == null){
+            coachNode = new CoachNode();
+        }
+        coachNode.setMongoId(String.valueOf(coach.getCoachId()));
+        coachNode.setCoachId(coach.getCoachId());
+        coachNode.setLongName(coach.getLongName());
+        coachNode.setNationalityName(coach.getNationalityName());
+        coachNode.setGender(coach.getGender());
+        coachNodeRepository.save(coachNode);
+        return coachNode;
+    }
+
+    public Coach saveCoach(Coach coach) {
+        return coachRepository.save(coach);
     }
 }

@@ -1,6 +1,9 @@
 package Unipi.Fifa.controllers;
 
 import Unipi.Fifa.models.Player;
+import Unipi.Fifa.models.PlayerNode;
+import Unipi.Fifa.services.PNCNService;
+import Unipi.Fifa.services.PlayerNodeService;
 import Unipi.Fifa.services.PlayerService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
@@ -16,6 +19,12 @@ import java.util.List;
 public class PlayerController {
     @Autowired
     private PlayerService playerService;
+
+    @Autowired
+    private PNCNService pncnService;
+
+    @Autowired
+    private PlayerNodeService playerNodeService;
 
     @PostMapping("/players")
     public List<Player> getPlayersByClub(@RequestParam String clubName) {
@@ -92,6 +101,9 @@ public class PlayerController {
 
         // Save the updated player
         playerService.savePlayer(existingPlayer);
+        PlayerNode node = playerNodeService.getPlayerByMongoId(mongoId);
+        playerNodeService.transferOneDataToNeo4j(mongoId);
+        pncnService.createEditedPlayerClubRelationships(node);
 
         return ResponseEntity.ok("Player updated successfully!");
     }

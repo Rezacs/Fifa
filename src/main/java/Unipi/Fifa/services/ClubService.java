@@ -55,7 +55,7 @@ public class ClubService {
         return clubNodeRepository.findNodeById(id);
     }
 
-    public List<ClubNode> getClubNodeByMongoId(String mongoId) {
+    public ClubNode getClubNodeByMongoId(String mongoId) {
         return clubNodeRepository.findNodeByMongoId(mongoId) ;
     }
 
@@ -85,6 +85,23 @@ public class ClubService {
             clubNodeRepository.save(clubNode);
         }
         return "The amount of " + clubs.stream().count() + " was checked and " + number + " was changed";
+    }
+
+    public ClubNode TransferOneDataToNeo4j(String mongoId) {
+        Club club = clubRepository.findById(mongoId).orElse(null);
+        ClubNode clubNode = clubNodeRepository.findNodeByMongoId(club.getId());
+        if (clubNode == null){
+            clubNode = new ClubNode();
+        }
+        clubNode.setFifaVersion(club.getFifaVersion());
+        clubNode.setTeamId(club.getTeamId());
+        clubNode.setTeamName(club.getTeamName());
+        clubNode.setNationalityName(club.getNationalityName());
+        clubNode.setOverall(club.getOverall());
+        clubNode.setCoachId(club.getCoachId());
+        clubNode.setCaptain(club.getCaptain());
+        clubNodeRepository.save(clubNode);
+        return clubNode;
     }
 
     public List<Club> getClubbyNameAndFifaVersion(String clubName, Integer fifaVersion) {

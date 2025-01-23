@@ -8,8 +8,10 @@ import java.util.List;
 
 
 public interface CoachNodeRepository extends Neo4jRepository<CoachNode, Long> {
-    List<CoachNode> findByCoachId(Long id);
+    List<CoachNode> findByCoachId(Integer id);
     List<CoachNode> findByGender(PlayerNode.Gender gender);
 
     boolean existsByMongoId(String s);
+
+    CoachNode findByMongoId(String mongoId);
 }

@@ -11,7 +11,8 @@ import java.util.Optional;
 public interface CoachRepository extends MongoRepository<Coach, Integer> {
     List<Coach> findByShortName(String shortName);
     List<Coach> findByLongName(String longName);
-    Optional<Coach> findById(Integer coachId);
+    Optional<Coach> findById(String id);
+
     List<Coach> findByGender(PlayerNode.Gender gender);
     List<Coach> findByNationalityName(String nationalityName);
     List<Coach> findByDob(Date dob);
