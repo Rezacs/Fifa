@@ -40,29 +40,49 @@ public class CNCNService {
 
     @Transactional
     public void createEditedCoachClubRelationships(CoachNode coach) {
-        Optional<List<ClubNode>> clubs = clubNodeRepository.findByCoachId(coach.getCoachId());
-        if (clubs.isPresent()) {
-            for (ClubNode club : clubs.get()) {
-                coach.setClubNode(club);
-                coachNodeRepository.save(coach);
-                System.out.println("Created relationship for Player " + coach.getId() + " with Club " + club.getTeamName());
+        // Step 1: Find the current CoachNode in the database to ensure relationships are loaded
+        Optional<CoachNode> existingCoachNodeOptional = coachNodeRepository.findById(coach.getId());
+
+        if (existingCoachNodeOptional.isPresent()) {
+            CoachNode existingCoachNode = existingCoachNodeOptional.get();
+
+            // Step 2: Remove all current relationships
+            existingCoachNode.setClubNode(null); // Remove existing relationships
+            coachNodeRepository.save(existingCoachNode); // Save the updated node with no relationships
+
+            // Step 3: Fetch new relationships and create them
+            Optional<List<ClubNode>> clubs = clubNodeRepository.findByCoachId(coach.getCoachId());
+            if (clubs.isPresent()) {
+                for (ClubNode club : clubs.get()) {
+                    coach.setClubNode(club); // Assign the new relationship
+                    coachNodeRepository.save(coach); // Save the updated node
+                    System.out.println("Created relationship for Coach " + coach.getId() + " with Club " + club.getTeamName());
+                }
             }
+        } else {
+            throw new IllegalArgumentException("CoachNode not found with ID: " + coach.getId());
         }
     }
 
     @Transactional
     public void createEditedClubCoachRelationships(ClubNode club) {
-//        Optional<List<ClubNode>> clubs = clubNodeRepository.findByCoachId(club.getCoachId());
-        List<CoachNode> coaches = coachNodeRepository.findByCoachId(club.getCoachId());
-        if (coaches.isEmpty()) {
+        // Step 1: Find all CoachNodes associated with the given club's coachId
+        List<CoachNode> existingCoaches = coachNodeRepository.findByCoachId(club.getCoachId());
 
-        } else {
-            for (CoachNode coach : coaches) {
-                coach.setClubNode(club);
-                coachNodeRepository.save(coach);
-                System.out.println("Created relationship for Player " + coach.getId() + " with Club " + club.getTeamName());
-
+        if (!existingCoaches.isEmpty()) {
+            for (CoachNode coach : existingCoaches) {
+                // Step 2: Remove any existing club relationships for the coach
+                coach.setClubNode(null); // Break the current relationship
+                coachNodeRepository.save(coach); // Save changes to remove old relationships
             }
         }
+
+        // Step 3: Establish the new relationship
+        for (CoachNode coach : existingCoaches) {
+            coach.setClubNode(club); // Create the new relationship
+            coachNodeRepository.save(coach); // Save the updated node
+            System.out.println("Created relationship for Coach " + coach.getId() + " with Club " + club.getTeamName());
+        }
     }
+
 }

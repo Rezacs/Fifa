@@ -48,6 +48,9 @@ public class ClubController {
         if(existingClub == null) {
             return ResponseEntity.notFound().build();
         }
+        clubService.deletePreviousEdges(mongoId);
+
+        existingClub.setId(mongoId);
         existingClub.setTeamId(updatedClub.getTeamId());
         existingClub.setTeamUrl(updatedClub.getTeamUrl());
         existingClub.setFifaVersion(updatedClub.getFifaVersion());
