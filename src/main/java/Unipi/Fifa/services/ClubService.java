@@ -97,6 +97,7 @@ public class ClubService {
         List<CoachNode> coachNode = coachNodeRepository.findByCoachId(club.getCoachId());
         for (CoachNode node : coachNode) {
             node.setClubNode(null);
+            coachNodeRepository.save(node);
         }
         return club;
     }
