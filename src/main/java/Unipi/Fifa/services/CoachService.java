@@ -71,7 +71,7 @@ public class CoachService {
         if (coachNode == null){
             coachNode = new CoachNode();
         }
-        coachNode.setMongoId(String.valueOf(coach.getCoachId()));
+        coachNode.setMongoId(String.valueOf(coach.getId()));
         coachNode.setCoachId(coach.getCoachId());
         coachNode.setLongName(coach.getLongName());
         coachNode.setNationalityName(coach.getNationalityName());

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +32,7 @@ public class CNCNService {
             // Step 2.1: Check the corresponding club
             Optional<List<ClubNode>> clubs = clubNodeRepository.findByCoachId(coach.getCoachId());
             for (ClubNode club : clubs.orElse(null)) {
-                coach.setClubNode(club);
+                coach.setClubNode(Collections.singletonList(club));
                 coachNodeRepository.save(coach);
                 System.out.println("Created relationship for Player " + coach.getId() + " with Club " + club.getTeamName());
             }
@@ -54,7 +55,7 @@ public class CNCNService {
             Optional<List<ClubNode>> clubs = clubNodeRepository.findByCoachId(coach.getCoachId());
             if (clubs.isPresent()) {
                 for (ClubNode club : clubs.get()) {
-                    coach.setClubNode(club); // Assign the new relationship
+                    coach.setClubNode(Collections.singletonList(club)); // Assign the new relationship
                     coachNodeRepository.save(coach); // Save the updated node
                     System.out.println("Created relationship for Coach " + coach.getId() + " with Club " + club.getTeamName());
                 }
@@ -79,7 +80,7 @@ public class CNCNService {
 
         // Step 3: Establish the new relationship
         for (CoachNode coach : existingCoaches) {
-            coach.setClubNode(club); // Create the new relationship
+            coach.setClubNode(Collections.singletonList(club)); // Create the new relationship
             coachNodeRepository.save(coach); // Save the updated node
             System.out.println("Created relationship for Coach " + coach.getId() + " with Club " + club.getTeamName());
         }

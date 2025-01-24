@@ -23,4 +23,6 @@ public interface PlayerNodeRepository extends Neo4jRepository<PlayerNode, Long> 
     PlayerFollowingQueryResult createPlayerFollowingRelationship(String username, Integer playerId );
 
     boolean existsByMongoId(String mongoId);
+
+    List<PlayerNode> findByClubTeamId(Integer teamId);
 }

@@ -5,6 +5,8 @@ import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
+import java.util.List;
+
 @Node
 public class CoachNode {
     @Id
@@ -17,13 +19,13 @@ public class CoachNode {
     private String gender;
 
     @Relationship(type = "Manages", direction = Relationship.Direction.OUTGOING)
-    private ClubNode clubNode;
+    private List<ClubNode> clubNode;
 
-    public ClubNode getClubNode() {
+    public List<ClubNode> getClubNode() {
         return clubNode;
     }
 
-    public void setClubNode(ClubNode clubNode) {
+    public void setClubNode(List<ClubNode> clubNode) {
         this.clubNode = clubNode;
     }
 

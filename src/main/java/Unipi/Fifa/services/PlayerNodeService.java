@@ -1,11 +1,13 @@
 package Unipi.Fifa.services;
 
+import Unipi.Fifa.models.ClubNode;
 import Unipi.Fifa.models.Player;
 import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.models.User;
 import Unipi.Fifa.repositories.PlayerNodeRepository;
 import Unipi.Fifa.repositories.PlayerRepository;
 import Unipi.Fifa.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import org.bson.types.ObjectId;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -92,6 +94,28 @@ public class PlayerNodeService {
         return playerNode;
     }
 
+    @Transactional
+    public void createEditedPlayerClubRelationships2(ClubNode club) {
+        // Step 1: Find all PlayerNodes associated with the given club's teamId (instead of coachId)
+        List<PlayerNode> existingPlayers = playerNodeRepository.findByClubTeamId(club.getTeamId());
+
+        if (!existingPlayers.isEmpty()) {
+            // Step 2: Remove any existing club relationships for the players
+            for (PlayerNode player : existingPlayers) {
+                // Remove the current relationship with the club (i.e., disconnect the player from the club)
+                player.setClubNode(null); // Break the current relationship
+                playerNodeRepository.save(player); // Save the changes to remove old relationships
+            }
+        }
+
+        // Step 3: Establish the new relationship between the players and the club
+        for (PlayerNode player : existingPlayers) {
+            player.setClubNode(club); // Set the new club relationship
+            playerNodeRepository.save(player); // Save the updated player node
+            System.out.println("Created relationship for Player " + player.getId() + " with Club " + club.getTeamName());
+        }
+    }
+
     public void linkPlayerToLoggedInUser(String mongoId) {
         // Get the username of the logged-in user from Spring Security
         String loggedInUsername = getLoggedInUsername();
@@ -124,4 +148,9 @@ public class PlayerNodeService {
         return null; // Or throw an exception if no user is logged in
     }
 
+    public PlayerNode deletePreviousEdges(String mongoId) {
+        PlayerNode playerNode = playerNodeRepository.findByMongoId(mongoId);
+        playerNode.setClubNode(null);
+        return playerNodeRepository.save(playerNode);
+    }
 }

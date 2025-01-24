@@ -44,12 +44,13 @@ public class PlayerController {
     @PutMapping("/edit/{mongoId}")
     public ResponseEntity<String> editPlayer(@PathVariable String mongoId, @RequestBody Player updatedPlayer) {
         Player existingPlayer = playerService.getPlayerById(mongoId);
-
         if (existingPlayer == null) {
             return ResponseEntity.notFound().build(); // Return 404 if player is not found
         }
+        playerNodeService.deletePreviousEdges(mongoId);
 
         // Update the fields of the existing player with the new values
+        existingPlayer.setId(mongoId);
         existingPlayer.setPlayerId(updatedPlayer.getPlayerId());
         existingPlayer.setPlayerUrl(updatedPlayer.getPlayerUrl());
         existingPlayer.setFifaVersion(updatedPlayer.getFifaVersion());
