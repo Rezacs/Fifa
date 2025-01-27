@@ -64,4 +64,16 @@ public class CoachController {
         return ResponseEntity.ok("Coach updated successfully!");
     }
 
+    @PostMapping("create-new-coach")
+    public ResponseEntity<Coach> createNewCoach(@RequestBody Coach newCoach) {
+        try{
+            newCoach.setId(null);
+            Coach createdCoach = coachService.saveCoach(newCoach);
+            editCoach(createdCoach.getId(), newCoach);
+            return ResponseEntity.ok(createdCoach);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

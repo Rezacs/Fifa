@@ -50,7 +50,7 @@ public class UserController {
         return new ResponseEntity<>(responseUser , HttpStatus.CREATED);
     }
 
-    @PostMapping("/follow")
+    @PostMapping("/seguire")
     public ResponseEntity<UserFollowDTO> follow(@RequestBody UserFollowRequest request, Principal principal) {
         // The logged-in user's username (extracted from the Principal)
         String loggedInUsername = principal.getName();
@@ -70,6 +70,21 @@ public class UserController {
 
         return new ResponseEntity<>(responseFollow, HttpStatus.CREATED);
     }
+
+    @PostMapping("/nonseguire")
+    public ResponseEntity<String> unfollow(@RequestBody UserFollowRequest request, Principal principal) {
+        // The logged-in user's username (extracted from the Principal)
+        String loggedInUsername = principal.getName();
+
+        // The target username to unfollow, provided in the request body
+        String targetUsername = request.getUsername();
+
+        // Call the service to remove the follow relationship
+        UserFollowQueryResult unfollowResult = userService.unfollow(loggedInUsername, targetUsername);
+
+        return new ResponseEntity<>("User" + targetUsername + "unfollowed", HttpStatus.OK);
+    }
+
 
     @GetMapping("/followings")
     public ResponseEntity<List<PlayerNodeDTO>> followings(Principal principal) {

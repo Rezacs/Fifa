@@ -4,6 +4,7 @@ import Unipi.Fifa.models.Club;
 import Unipi.Fifa.models.ClubNode;
 import Unipi.Fifa.services.CNCNService;
 import Unipi.Fifa.services.ClubService;
+import Unipi.Fifa.services.PNCNService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,9 @@ public class ClubController {
 
     @Autowired
     private CNCNService cncnService;
+
+    @Autowired
+    private PNCNService pncnService;
 
     @GetMapping("/clubs")
     public List<Club> findByName(@RequestParam String name) {
@@ -50,7 +54,7 @@ public class ClubController {
         }
         clubService.deletePreviousEdges(mongoId);
 
-        existingClub.setId(mongoId);
+        existingClub.setId(existingClub.getId());
         existingClub.setTeamId(updatedClub.getTeamId());
         existingClub.setTeamUrl(updatedClub.getTeamUrl());
         existingClub.setFifaVersion(updatedClub.getFifaVersion());
@@ -110,6 +114,7 @@ public class ClubController {
         clubService.saveClub(existingClub);
         ClubNode cd = clubService.TransferOneDataToNeo4j(mongoId);
         cncnService.createEditedClubCoachRelationships(cd);
+        pncnService.createEditedClubPlayerRelationships(cd);
         return ResponseEntity.ok("Club updated successfully!");
     }
 

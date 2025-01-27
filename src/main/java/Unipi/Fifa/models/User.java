@@ -28,6 +28,19 @@ public class User implements UserDetails {
     @Relationship(type="Piace", direction = Relationship.Direction.OUTGOING)
     private List<ClubNode> clubNodes;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(username, user.username);  // Compare based on username (or userId)
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username);  // Hash based on username (or userId)
+    }
+
 
     public List<PlayerNode> getPlayerNodes() {
         return playerNodes;

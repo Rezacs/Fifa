@@ -1,5 +1,6 @@
 package Unipi.Fifa.controllers;
 
+import Unipi.Fifa.models.Club;
 import Unipi.Fifa.models.Player;
 import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.services.PNCNService;
@@ -102,10 +103,24 @@ public class PlayerController {
 
         // Save the updated player
         playerService.savePlayer(existingPlayer);
-        PlayerNode node = playerNodeService.getPlayerByMongoId(mongoId);
         playerNodeService.transferOneDataToNeo4j(mongoId);
+        PlayerNode node = playerNodeService.getPlayerByMongoId(mongoId);
         pncnService.createEditedPlayerClubRelationships(node);
 
         return ResponseEntity.ok("Player updated successfully!");
+    }
+
+    @PostMapping("create-new-player")
+    public ResponseEntity<Player> createNewPlayer(@RequestBody Player player) {
+        try{
+            player.setId(null);
+            Player createdPlayer = playerService.savePlayer(player);
+//            editPlayer(createdPlayer.getId(), player);
+            PlayerNode node = playerNodeService.transferOneDataToNeo4j(createdPlayer.getId());
+            pncnService.createEditedPlayerClubRelationships(node);
+            return ResponseEntity.ok(createdPlayer);
+        } catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

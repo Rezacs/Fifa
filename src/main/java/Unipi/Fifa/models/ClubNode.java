@@ -15,12 +15,20 @@ public class ClubNode {
     private String mongoId;
     private Integer teamId;
     private Integer fifaVersion;
+    private Integer fifaUpdate;
     private String teamName;
     private String nationalityName;
     private Integer overall;
     private Integer coachId;
     private Integer captain;
     private PlayerNode.Gender gender;
+    public Integer getFifaUpdate() {
+        return fifaUpdate;
+    }
+
+    public void setFifaUpdate(Integer fifaUpdate) {
+        this.fifaUpdate = fifaUpdate;
+    }
 
     public Integer getTeamId() {
         return teamId;

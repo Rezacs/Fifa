@@ -55,5 +55,12 @@ public class PlayerNodeController {
         return "Player linked to logged-in User successfully";
     }
 
+    @PostMapping("/unfollowByMongoId")
+    public String unlinkPlayerFromUser(@RequestBody PlayerFollowRequest request){
+        String mongoId = request.getMongoId();
+        playerNodeService.unlinkPlayerToLoggedInUser(mongoId);
+        return "Player unlinked to logged-in User successfully";
+    }
+
 
 }

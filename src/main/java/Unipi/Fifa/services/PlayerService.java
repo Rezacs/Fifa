@@ -46,7 +46,8 @@ public class PlayerService {
         return playerRepository.findById(id).orElse(null);
     }
 
-    public void savePlayer(Player player) {
+    public Player savePlayer(Player player) {
         playerRepository.save(player);
+        return player;
     }
 }

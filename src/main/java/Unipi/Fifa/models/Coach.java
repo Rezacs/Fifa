@@ -18,7 +18,7 @@ import java.util.Date;
 public class Coach {
     @Id
     @GeneratedValue
-    private ObjectId id;
+    private String id;
 
     @Field("coach_id")
     private Integer coachId;
@@ -47,11 +47,11 @@ public class Coach {
     @Field("gender")
     private String gender;
 
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(String id) {
         this.id = id;
     }
 

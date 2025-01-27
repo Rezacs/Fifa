@@ -4,10 +4,7 @@ import Unipi.Fifa.models.Club;
 import Unipi.Fifa.models.ClubNode;
 import Unipi.Fifa.models.CoachNode;
 import Unipi.Fifa.models.PlayerNode;
-import Unipi.Fifa.repositories.ClubNodeRepository;
-import Unipi.Fifa.repositories.ClubRepository;
-import Unipi.Fifa.repositories.CoachNodeRepository;
-import Unipi.Fifa.repositories.CoachRepository;
+import Unipi.Fifa.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +18,8 @@ public class ClubService {
     private ClubNodeRepository clubNodeRepository;
     @Autowired
     private CoachNodeRepository coachNodeRepository;
+    @Autowired
+    private PlayerNodeRepository playerNodeRepository;
 
     public ClubService(ClubRepository clubRepository) {
         this.clubRepository = clubRepository;
@@ -80,6 +79,7 @@ public class ClubService {
             clubNode.setMongoId(club.getId());
             clubNode.setTeamId(club.getTeamId());
             clubNode.setFifaVersion(club.getFifaVersion());
+            clubNode.setFifaUpdate(club.getFifaUpdate());
             clubNode.setTeamName(club.getTeamName());
             clubNode.setNationalityName(club.getNationalityName());
             clubNode.setOverall(club.getOverall());
@@ -95,9 +95,15 @@ public class ClubService {
     public Club deletePreviousEdges(String mongoId){
         Club club = clubRepository.findById(mongoId).orElse(null);
         List<CoachNode> coachNode = coachNodeRepository.findByCoachId(club.getCoachId());
+        List<PlayerNode> playerNodes = playerNodeRepository.findByClubTeamId(club.getTeamId());
         for (CoachNode node : coachNode) {
             node.setClubNode(null);
             coachNodeRepository.save(node);
+        }
+        for (PlayerNode node : playerNodes) {
+            node.setClubNode(null);
+            playerNodeRepository.save(node);
+
         }
         return club;
     }
@@ -118,6 +124,7 @@ public class ClubService {
         clubNode.setMongoId(mongoId);
         clubNode.setTeamId(club.getTeamId());
         clubNode.setFifaVersion(club.getFifaVersion());
+        clubNode.setFifaUpdate(club.getFifaUpdate());
         clubNode.setTeamName(club.getTeamName());
         clubNode.setNationalityName(club.getNationalityName());
         clubNode.setOverall(club.getOverall());

@@ -70,19 +70,48 @@ public class PlayerNodeService {
         return "The amount of " + players.stream().count() + " was checked and " + number + " was changed";
     }
 
+//    public PlayerNode transferOneDataToNeo4j(String mongoId) {
+//        Player player = playerRepository.findById(mongoId).orElse(null);
+//        PlayerNode playerNode = playerNodeRepository.findByMongoId(mongoId) ;
+//        if (playerNode == null) {
+//            playerNode = new PlayerNode();
+//        }
+//        if ("MALE".equals(player.getGender())){
+//            playerNode.setGender(PlayerNode.Gender.MALE);
+//        } else{
+//            playerNode.setGender(PlayerNode.Gender.FEMALE);
+//        }
+//        playerNode.setMongoId(mongoId);
+//        playerNode.setPlayerId(player.getPlayerId());
+//        playerNode.setMongoId(String.valueOf(player.getId()));
+//        playerNode.setLong_name(player.getLongName());
+//        playerNode.setNationality(player.getNationalityName());
+//        playerNode.setOverall(player.getOverall());
+//        playerNode.setClubName(player.getClubName());
+//        playerNode.setClubTeamId(player.getClubTeamId());
+//        playerNode.setFifaVersion(player.getFifaVersion());
+//        playerNode.setAge(Double.valueOf(player.getAge()));
+//        playerNodeRepository.save(playerNode);
+//        return playerNode;
+//    }
+
+
     public PlayerNode transferOneDataToNeo4j(String mongoId) {
+        // Retrieve data from MongoDB
         Player player = playerRepository.findById(mongoId).orElse(null);
-        PlayerNode playerNode = playerNodeRepository.findByMongoId(mongoId) ;
+        if (player == null) {
+            throw new IllegalArgumentException("Player with MongoId " + mongoId + " not found");
+        }
+
+        // Retrieve or create a corresponding Neo4j node
+        PlayerNode playerNode = playerNodeRepository.findByMongoId(mongoId);
         if (playerNode == null) {
-            playerNode = new PlayerNode();
+            playerNode = new PlayerNode(); // Create new node if it doesn't exist
         }
-        if (player.getGender() == "MALE"){
-            playerNode.setGender(PlayerNode.Gender.MALE);
-        } else{
-            playerNode.setGender(PlayerNode.Gender.FEMALE);
-        }
+
+        // Map fields from MongoDB to Neo4j
+        playerNode.setMongoId(player.getId());
         playerNode.setPlayerId(player.getPlayerId());
-        playerNode.setMongoId(String.valueOf(player.getId()));
         playerNode.setLong_name(player.getLongName());
         playerNode.setNationality(player.getNationalityName());
         playerNode.setOverall(player.getOverall());
@@ -90,8 +119,14 @@ public class PlayerNodeService {
         playerNode.setClubTeamId(player.getClubTeamId());
         playerNode.setFifaVersion(player.getFifaVersion());
         playerNode.setAge(Double.valueOf(player.getAge()));
-        playerNodeRepository.save(playerNode);
-        return playerNode;
+
+        // Handle gender mapping
+        playerNode.setGender("MALE".equals(player.getGender())
+                ? PlayerNode.Gender.MALE
+                : PlayerNode.Gender.FEMALE);
+
+        // Save the updated node in Neo4j
+        return playerNodeRepository.save(playerNode);
     }
 
     @Transactional
@@ -139,6 +174,23 @@ public class PlayerNodeService {
         }
     }
 
+    public void unlinkPlayerToLoggedInUser(String mongoId) {
+        String loggedInUsername = getLoggedInUsername();
+        User user = userRepository.findByUsername(loggedInUsername);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+        PlayerNode playerNode = playerNodeRepository.findByMongoId(mongoId);
+        if (playerNode == null) {
+            throw new IllegalArgumentException("PlayerNode not found");
+        }
+        if (!user.getPlayerNodes().contains(playerNode)) {
+            user.getPlayerNodes().remove(playerNode);  // Add the player node to the user's player nodes list
+            userRepository.save(user);  // Save the user with the updated list of player nodes
+        }
+    }
+
+
     private String getLoggedInUsername() {
         // Retrieve the logged-in username from the security context
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -153,4 +205,6 @@ public class PlayerNodeService {
         playerNode.setClubNode(null);
         return playerNodeRepository.save(playerNode);
     }
+
+
 }

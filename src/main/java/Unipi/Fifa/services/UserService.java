@@ -68,4 +68,31 @@ public class UserService {
     }
 
 
+    public UserFollowQueryResult unfollow(String loggedInUsername, String targetUsername) {
+        // Fetch the logged-in user and the target user from the repository
+        User loggedInUser = userRepository.findByUsername(loggedInUsername);
+        User targetUser = userRepository.findByUsername(targetUsername);
+
+        if (loggedInUser == null || targetUser == null) {
+            throw new IllegalArgumentException("User not found.");
+        }
+
+        // Log the users the logged-in user is following
+        System.out.println("Logged-in user " + loggedInUsername + " is following: " + loggedInUser.getUsers());
+
+        System.out.println("Logged-in user is following: " + loggedInUser.getUsers());
+        // Check if the logged-in user is already following the target user
+        if (!loggedInUser.getUsers().contains(targetUser)) {
+            throw new IllegalArgumentException("You are not following this user.");
+        }
+
+        // Remove the target user from the logged-in user's 'following' list (or relationship in Neo4j)
+        loggedInUser.getUsers().remove(targetUser);
+
+        // Save the updated user object back into Neo4j
+        userRepository.save(loggedInUser);
+
+        // Return the unfollow information as a DTO or other format you require
+        return new UserFollowQueryResult(loggedInUser, targetUser, new Date());
+    }
 }

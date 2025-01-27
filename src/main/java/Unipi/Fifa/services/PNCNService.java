@@ -42,20 +42,77 @@ public class PNCNService {
         }
     }
 
+//    @Transactional
+//    public void createEditedPlayerClubRelationships(PlayerNode player) {
+//            // Step 2.1: Check the corresponding club
+//            ClubNode club = clubNodeRepository.findByTeamIdAndFifaVersionAndGender(
+//                    player.getClubTeamId(), player.getFifaVersion(), player.getGender()
+//            ).orElse(null);
+//
+//            if (club != null) {
+//                // Step 3: Create relationship (BelongsTo)
+//                player.setClubNode(club);
+//                playerNodeRepository.save(player);
+//                System.out.println("Created relationship for Player " + player.getId() + " with Club " + club.getTeamName());
+//            } else {
+//                System.out.println("No matching club found for Player " + player.getId());
+//            }
+//    }
+
     @Transactional
     public void createEditedPlayerClubRelationships(PlayerNode player) {
-            // Step 2.1: Check the corresponding club
-            ClubNode club = clubNodeRepository.findByTeamIdAndFifaVersionAndGender(
-                    player.getClubTeamId(), player.getFifaVersion(), player.getGender()
-            ).orElse(null);
+        // Validate the PlayerNode
+        if (player == null || player.getClubTeamId() == null) {
+            throw new IllegalArgumentException("Invalid player or club team ID");
+        }
 
-            if (club != null) {
-                // Step 3: Create relationship (BelongsTo)
-                player.setClubNode(club);
-                playerNodeRepository.save(player);
-                System.out.println("Created relationship for Player " + player.getId() + " with Club " + club.getTeamName());
-            } else {
-                System.out.println("No matching club found for Player " + player.getId());
-            }
+        // Find the corresponding ClubNode
+        ClubNode club = clubNodeRepository.findByTeamIdAndFifaVersionAndGender(
+                player.getClubTeamId(), player.getFifaVersion(), player.getGender()
+        ).orElse(null);
+
+        if (club != null) {
+            // Set the relationship
+            player.setClubNode(club);
+
+            // Save the relationship in Neo4j
+            playerNodeRepository.save(player);
+
+            System.out.println("Created/Updated relationship for Player "
+                    + player.getLong_name() + " with Club " + club.getTeamName());
+        } else {
+            System.out.println("No matching ClubNode found for PlayerNode: "
+                    + player.getLong_name());
+        }
     }
+
+    @Transactional
+    public void createEditedClubPlayerRelationships(ClubNode club) {
+        // Validate the ClubNode
+        if (club == null || club.getTeamId() == null) {
+            throw new IllegalArgumentException("Invalid club or club team ID");
+        }
+
+        // Find the corresponding PlayerNodes based on the club's details
+        List<PlayerNode> players = playerNodeRepository.findByClubTeamIdAndFifaVersionAndGender(
+                club.getTeamId(), club.getFifaVersion(), club.getGender()
+        );
+
+        if (!players.isEmpty()) {
+            for (PlayerNode player : players) {
+                // Set the relationship from Player to Club
+                player.setClubNode(club);
+
+                // Save the updated player with the club relationship in Neo4j
+                playerNodeRepository.save(player);
+
+                System.out.println("Created/Updated relationship for Player "
+                        + player.getLong_name() + " with Club " + club.getTeamName());
+            }
+        } else {
+            System.out.println("No matching PlayerNodes found for ClubNode: "
+                    + club.getTeamName());
+        }
+    }
+
 }

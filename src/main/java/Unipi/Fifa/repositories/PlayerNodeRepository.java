@@ -25,4 +25,6 @@ public interface PlayerNodeRepository extends Neo4jRepository<PlayerNode, Long> 
     boolean existsByMongoId(String mongoId);
 
     List<PlayerNode> findByClubTeamId(Integer teamId);
+
+    List<PlayerNode> findByClubTeamIdAndFifaVersionAndGender(Integer teamId, Integer fifaVersion, PlayerNode.Gender gender);
 }
