@@ -86,7 +86,7 @@ public class UserController {
     }
 
 
-    @GetMapping("/followings")
+    @GetMapping("/followingPlayers")
     public ResponseEntity<List<PlayerNodeDTO>> followings(Principal principal) {
         // Fetch the list of PlayerNode entities the user is following
         List<PlayerNode> playerNodes = playerFollowingService.getAllFollowingPlayers(principal.getName());
@@ -107,6 +107,28 @@ public class UserController {
 
         // Return the DTO list wrapped in a ResponseEntity
         return ResponseEntity.ok(followings);
+    }
+
+    @GetMapping("/followingUsers")
+    public ResponseEntity<List<UserDTO>> followingUsers(Principal principal) {
+        // Fetch the list of User entities the logged-in user is following
+        List<User> users = userService.FindFollowings(principal.getName());
+
+        // Map User entities to UserDTOs
+        List<UserDTO> userDTOs = users.stream().map(user -> {
+            UserDTO userDTO = new UserDTO(user.getName() , user.getUsername() , user.getRoles());
+            userDTO.setName(user.getName());
+            userDTO.setUsername(user.getUsername());
+
+            // Assuming roles are stored as a comma-separated String in the 'roles' field of the User entity
+            // If roles are stored as an array, list, or collection, you'll need to adjust accordingly
+            userDTO.setRoles(user.getRoles()); // directly setting roles here
+
+            return userDTO;
+        }).collect(Collectors.toList());
+
+        // Return the DTO list wrapped in a ResponseEntity
+        return ResponseEntity.ok(userDTOs);
     }
 
 

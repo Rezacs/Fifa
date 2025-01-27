@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,6 +27,11 @@ public class UserService {
 
     public User FindUser(String username){
         return userRepository.findByUsername(username);
+    }
+
+    public List<User> FindFollowings(String username){
+        User user = FindUser(username);
+        return user.getUsers();
     }
 
     public User createUser(CreateUserRequest request) {

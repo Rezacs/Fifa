@@ -117,6 +117,13 @@ public class User implements UserDetails {
                 .toList();
     }
 
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        return Arrays.stream(roles.split(","))
+//                .map(SimpleGrantedAuthority::new)
+//                .collect(Collectors.toList());
+//    }
+
 
     @Override
     public boolean isAccountNonExpired() {
