@@ -1,7 +1,7 @@
 package Unipi.Fifa.services;
 
 import Unipi.Fifa.models.PlayerNode;
-import Unipi.Fifa.queryresults.PlayerFollowingQueryResult;
+import Unipi.Fifa.queryresults.PlayerFollowQueryResult;
 import Unipi.Fifa.repositories.PlayerNodeRepository;
 import Unipi.Fifa.repositories.UserRepository;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class PlayerFollowingService {
         this.userRepository = userRepository;
     }
 
-    public PlayerFollowingQueryResult follow(String username, Integer playerId){
+    public PlayerFollowQueryResult follow(String username, Integer playerId){
         return playerNodeRepository.createPlayerFollowingRelationship(username, playerId);
     }
 

@@ -1,16 +1,15 @@
 package Unipi.Fifa.services;
 
-import Unipi.Fifa.exceptions.GlobalExceptionHandler;
+import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.models.User;
-import Unipi.Fifa.objects.UserDTO;
+import Unipi.Fifa.queryresults.PlayerFollowQueryResult;
 import Unipi.Fifa.queryresults.UserFollowQueryResult;
+import Unipi.Fifa.repositories.PlayerNodeRepository;
 import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.requests.CreateUserRequest;
-import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -19,10 +18,12 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PlayerNodeRepository playerNodeRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, PlayerNodeRepository playerNodeRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.playerNodeRepository = playerNodeRepository;
     }
 
     public User FindUser(String username){
@@ -71,6 +72,49 @@ public class UserService {
 
         // Return the follow information as a DTO or other format you require
         return new UserFollowQueryResult(loggedInUser, targetUser, new Date());
+    }
+
+    public PlayerFollowQueryResult followPlayer(String loggedInUsername, String mongoId) {
+        User loggedInUser = userRepository.findByUsername(loggedInUsername);
+        PlayerNode targetPlayer = playerNodeRepository.findByMongoId(mongoId);
+        if (loggedInUser == null || targetPlayer == null) {
+            throw new IllegalArgumentException("User or followingPlayer not found.");
+        }
+        if (!loggedInUser.getPlayerNodes().contains(targetPlayer)) {
+            loggedInUser.getPlayerNodes().add(targetPlayer);
+        } else {
+            throw new IllegalArgumentException("Player is already followed.");
+        }
+
+        // Save the updated user entity
+        userRepository.save(loggedInUser);
+        return new PlayerFollowQueryResult( loggedInUser, targetPlayer);
+    }
+
+    public PlayerFollowQueryResult unfollowPlayer(String loggedInUsername, String mongoId) {
+        // Fetch the logged-in user from the repository
+        User loggedInUser = userRepository.findByUsername(loggedInUsername);
+
+        // Fetch the target player from the repository
+        PlayerNode targetPlayer = playerNodeRepository.findByMongoId(mongoId);
+
+        // Validate the existence of both the logged-in user and target player
+        if (loggedInUser == null || targetPlayer == null) {
+            throw new IllegalArgumentException("User or followingPlayer not found.");
+        }
+
+        // Remove the target player from the player's nodes list if it exists
+        if (loggedInUser.getPlayerNodes().contains(targetPlayer)) {
+            loggedInUser.getPlayerNodes().remove(targetPlayer);
+        } else {
+            throw new IllegalArgumentException("Player is not followed.");
+        }
+
+        // Save the updated user entity
+        userRepository.save(loggedInUser);
+
+        // Return a result object (assumes PlayerUnfollowQueryResult is defined elsewhere)
+        return new PlayerFollowQueryResult(loggedInUser, targetPlayer);
     }
 
 

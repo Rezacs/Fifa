@@ -1,14 +1,18 @@
 package Unipi.Fifa.controllers;
 
 
+import Unipi.Fifa.models.Comment;
+import Unipi.Fifa.models.Player;
 import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.models.User;
-import Unipi.Fifa.objects.PlayerNodeDTO;
-import Unipi.Fifa.objects.UserFollowDTO;
-import Unipi.Fifa.objects.UserDTO;
+import Unipi.Fifa.objects.*;
+import Unipi.Fifa.queryresults.PlayerFollowQueryResult;
 import Unipi.Fifa.queryresults.UserFollowQueryResult;
+import Unipi.Fifa.requests.CommentRequest;
 import Unipi.Fifa.requests.CreateUserRequest;
+import Unipi.Fifa.requests.PlayerFollowRequest;
 import Unipi.Fifa.requests.UserFollowRequest;
+import Unipi.Fifa.services.CommentService;
 import Unipi.Fifa.services.PlayerFollowingService;
 import Unipi.Fifa.services.UserService;
 import org.springframework.http.HttpStatus;
@@ -16,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,13 +29,15 @@ import java.util.stream.Collectors;
 public class UserController {
     private final UserService userService;
     private final PlayerFollowingService playerFollowingService;
+    private final CommentService commentService;
 
 //    private final AuthenticationManager authenticationManager;
 
 
-    public UserController(UserService userService, PlayerFollowingService playerFollowingService) {
+    public UserController(UserService userService, PlayerFollowingService playerFollowingService, CommentService commentService) {
         this.userService = userService;
         this.playerFollowingService = playerFollowingService;
+        this.commentService = commentService;
     }
 
     @PostMapping("/check/{username}")
@@ -69,6 +76,19 @@ public class UserController {
         );
 
         return new ResponseEntity<>(responseFollow, HttpStatus.CREATED);
+    }
+
+    @PostMapping("writeComment")
+    public ResponseEntity<String> addComment(@RequestBody CommentRequest request, Principal principal) {
+        String loggedInUsername = principal.getName();
+        String targetPlayerId = request.getPlayer();
+        Comment newComment = new Comment();
+        newComment.setComment(request.getComment());
+        newComment.setAuthor(principal.getName());
+        newComment.setPlayer(targetPlayerId);
+        newComment.setCommentDate(LocalDateTime.now());
+        commentService.save(newComment);
+        return new ResponseEntity<>("New Comment with id " + newComment.getId()  + " was saved!", HttpStatus.CREATED);
     }
 
     @PostMapping("/nonseguire")
@@ -130,6 +150,40 @@ public class UserController {
         // Return the DTO list wrapped in a ResponseEntity
         return ResponseEntity.ok(userDTOs);
     }
+
+    @PostMapping("/followPlayer")
+    public ResponseEntity<PlayerFollowDTO> followPlayer(@RequestBody PlayerFollowRequest request, Principal principal) {
+        // The logged-in user's username (extracted from the Principal)
+        String loggedInUsername = principal.getName();
+
+        // The playerId to follow, provided in the request body
+        String mongoId = request.getMongoId();
+
+        // Call the service to create the follow relationship between the user and the player
+        PlayerFollowQueryResult followResult = userService.followPlayer(loggedInUsername, request.getMongoId());
+
+        // Create a DTO to return with player follow details
+        PlayerFollowDTO responseFollow = new PlayerFollowDTO(
+                followResult.getUser().getUsername(),
+                followResult.getPlayerNode().getMongoId()
+        );
+
+        // Return the PlayerFollowDTO wrapped in a ResponseEntity with CREATED status
+        return new ResponseEntity<>(responseFollow, HttpStatus.CREATED);
+    }
+
+    @PostMapping("UnfollowPlayer")
+    public ResponseEntity<String> unfollowPlayer(@RequestBody PlayerFollowRequest request, Principal principal) {
+        String loggedInUsername = principal.getName();
+        String mongoId = request.getMongoId();
+        PlayerFollowQueryResult unfollowResult = userService.unfollowPlayer(loggedInUsername, request.getMongoId());
+        PlayerFollowDTO responseFollow = new PlayerFollowDTO(
+                unfollowResult.getUser().getUsername(),
+                unfollowResult.getPlayerNode().getMongoId()
+        );
+        return new ResponseEntity<>("User " + loggedInUsername + "Unfollowed : " + unfollowResult.getPlayerNode().getMongoId(), HttpStatus.CREATED);
+    }
+
 
 
 }

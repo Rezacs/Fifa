@@ -109,4 +109,17 @@ public class ClubNode {
     public void setCaptain(Integer captain) {
         this.captain = captain;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        ClubNode that = (ClubNode) obj;
+        return mongoId != null && mongoId.equals(that.mongoId);
+    }
+
+    @Override
+    public int hashCode() {
+        return mongoId != null ? mongoId.hashCode() : 0;
+    }
 }
