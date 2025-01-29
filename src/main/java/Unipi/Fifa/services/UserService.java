@@ -106,8 +106,20 @@ public class UserService {
         } else {
             throw new IllegalArgumentException("Player is already followed.");
         }
+        userRepository.save(loggedInUser);
+    }
 
-        // Save the updated user entity
+    public void unFollowCoach(String loggedInUsername, String mongoId) {
+        User loggedInUser = userRepository.findByUsername(loggedInUsername);
+        CoachNode coach = coachNodeRepository.findByMongoId(mongoId);
+        if (loggedInUser == null || coach == null) {
+            throw new IllegalArgumentException("User or followingCoach not found.");
+        }
+        if (loggedInUser.getCoachNodes().contains(coach)) {
+            loggedInUser.getCoachNodes().remove(coach);
+        } else{
+            throw new IllegalArgumentException("Player is already followed.");
+        }
         userRepository.save(loggedInUser);
     }
 
@@ -165,6 +177,7 @@ public class UserService {
         // Return the unfollow information as a DTO or other format you require
         return new UserFollowQueryResult(loggedInUser, targetUser, new Date());
     }
+
 
 
 }

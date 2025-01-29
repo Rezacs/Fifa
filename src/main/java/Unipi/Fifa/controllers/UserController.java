@@ -91,7 +91,7 @@ public class UserController {
         return new ResponseEntity<>("New Comment with id " + newComment.getId()  + " was saved!", HttpStatus.CREATED);
     }
 
-    @PostMapping("/nonseguire")
+    @DeleteMapping("/nonseguire")
     public ResponseEntity<String> unfollow(@RequestBody UserFollowRequest request, Principal principal) {
         // The logged-in user's username (extracted from the Principal)
         String loggedInUsername = principal.getName();
@@ -181,7 +181,16 @@ public class UserController {
         return new ResponseEntity<>("Coach " + coach.getLongName() + " followed.", HttpStatus.CREATED);
     }
 
-    @PostMapping("UnfollowPlayer")
+    @DeleteMapping("/unFollowCoach")
+    public ResponseEntity<String> unFollowCoach(@RequestBody CoachFollowRequest request, Principal principal) {
+        String loggedInUsername = principal.getName();
+        String mongoId = request.getMongoId();
+        CoachNode coach = coachNodeRepository.findByMongoId(mongoId);
+        userService.unFollowCoach(loggedInUsername, request.getMongoId());
+        return new ResponseEntity<>("Coach " + coach.getLongName() + " unfollowed.", HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("UnfollowPlayer")
     public ResponseEntity<String> unfollowPlayer(@RequestBody PlayerFollowRequest request, Principal principal) {
         String loggedInUsername = principal.getName();
         String mongoId = request.getMongoId();
