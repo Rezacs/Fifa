@@ -32,7 +32,8 @@ public class CNCNService {
             // Step 2.1: Check the corresponding club
             Optional<List<ClubNode>> clubs = clubNodeRepository.findByCoachId(coach.getCoachId());
             for (ClubNode club : clubs.orElse(null)) {
-                coach.setClubNode(Collections.singletonList(club));
+//                coach.setClubNode(Collections.singletonList(club));
+                coach.getClubNode().add(club);
                 coachNodeRepository.save(coach);
                 System.out.println("Created relationship for Player " + coach.getId() + " with Club " + club.getTeamName());
             }

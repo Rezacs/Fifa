@@ -207,4 +207,8 @@ public class PlayerNodeService {
     }
 
 
+    public void deletePlayerNodeById(String playerId) {
+        PlayerNode target = playerNodeRepository.findByMongoId(playerId);
+        playerNodeRepository.deletePlayerNodeById(target.getId());
+    }
 }

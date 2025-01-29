@@ -1,22 +1,20 @@
 package Unipi.Fifa.controllers;
 
 
-import Unipi.Fifa.models.Comment;
-import Unipi.Fifa.models.Player;
-import Unipi.Fifa.models.PlayerNode;
-import Unipi.Fifa.models.User;
+import Unipi.Fifa.models.*;
 import Unipi.Fifa.objects.*;
 import Unipi.Fifa.queryresults.PlayerFollowQueryResult;
 import Unipi.Fifa.queryresults.UserFollowQueryResult;
-import Unipi.Fifa.requests.CommentRequest;
-import Unipi.Fifa.requests.CreateUserRequest;
-import Unipi.Fifa.requests.PlayerFollowRequest;
-import Unipi.Fifa.requests.UserFollowRequest;
+import Unipi.Fifa.repositories.CoachNodeRepository;
+import Unipi.Fifa.repositories.CoachRepository;
+import Unipi.Fifa.requests.*;
 import Unipi.Fifa.services.CommentService;
 import Unipi.Fifa.services.PlayerFollowingService;
 import Unipi.Fifa.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -30,14 +28,16 @@ public class UserController {
     private final UserService userService;
     private final PlayerFollowingService playerFollowingService;
     private final CommentService commentService;
+    private final CoachNodeRepository coachNodeRepository;
 
 //    private final AuthenticationManager authenticationManager;
 
 
-    public UserController(UserService userService, PlayerFollowingService playerFollowingService, CommentService commentService) {
+    public UserController(UserService userService, PlayerFollowingService playerFollowingService, CommentService commentService, CoachNodeRepository coachNodeRepository) {
         this.userService = userService;
         this.playerFollowingService = playerFollowingService;
         this.commentService = commentService;
+        this.coachNodeRepository = coachNodeRepository;
     }
 
     @PostMapping("/check/{username}")
@@ -172,6 +172,15 @@ public class UserController {
         return new ResponseEntity<>(responseFollow, HttpStatus.CREATED);
     }
 
+    @PostMapping("/followCoach")
+    public ResponseEntity<String> followCoach(@RequestBody CoachFollowRequest request, Principal principal) {
+        String loggedInUsername = principal.getName();
+        String mongoId = request.getMongoId();
+        CoachNode coach = coachNodeRepository.findByMongoId(mongoId);
+        userService.followCoach(loggedInUsername, request.getMongoId());
+        return new ResponseEntity<>("Coach " + coach.getLongName() + " followed.", HttpStatus.CREATED);
+    }
+
     @PostMapping("UnfollowPlayer")
     public ResponseEntity<String> unfollowPlayer(@RequestBody PlayerFollowRequest request, Principal principal) {
         String loggedInUsername = principal.getName();
@@ -182,6 +191,25 @@ public class UserController {
                 unfollowResult.getPlayerNode().getMongoId()
         );
         return new ResponseEntity<>("User " + loggedInUsername + "Unfollowed : " + unfollowResult.getPlayerNode().getMongoId(), HttpStatus.CREATED);
+    }
+
+    @GetMapping("roles")
+    public List<String> getLoggedInUserRoles() {
+        // Retrieve the current authentication object
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // Ensure the authenticated principal is a User instance
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            User loggedInUser = (User) authentication.getPrincipal();
+
+            // Return the roles as a List of Strings
+            return loggedInUser.getAuthorities().stream()
+                    .map(authority -> authority.getAuthority()) // Extract role names
+                    .toList();
+        }
+
+        // Return an empty list if no user is logged in or authentication fails
+        return List.of();
     }
 
 

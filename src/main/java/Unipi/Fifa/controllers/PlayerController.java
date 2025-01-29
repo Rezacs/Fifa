@@ -9,7 +9,9 @@ import Unipi.Fifa.services.PlayerService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -99,6 +101,13 @@ public class PlayerController {
         existingPlayer.setDribbling(updatedPlayer.getDribbling());
         existingPlayer.setDefending(updatedPlayer.getDefending());
         existingPlayer.setPhysic(updatedPlayer.getPhysic());
+        existingPlayer.setGender(updatedPlayer.getGender());
+//        if (updatedPlayer.getGender() == "MALE" || updatedPlayer.getGender() == "FEMALE") {
+//            existingPlayer.setGender(updatedPlayer.getGender());
+//        } else {
+//            return ResponseEntity.badRequest().body("Invalid gender");
+//        }
+
         // You can continue updating other fields similarly
 
         // Save the updated player
@@ -109,6 +118,8 @@ public class PlayerController {
 
         return ResponseEntity.ok("Player updated successfully!");
     }
+
+
 
     @PostMapping("create-new-player")
     public ResponseEntity<Player> createNewPlayer(@RequestBody Player player) {
@@ -122,5 +133,19 @@ public class PlayerController {
         } catch (Exception e){
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @DeleteMapping("/deletePlayer")
+    public ResponseEntity<String> deletePlayer(@RequestParam String playerId) {
+        Player targetPlayer = playerService.getPlayerById(playerId);
+
+        if (targetPlayer == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Player not found");
+        }
+
+        playerNodeService.deletePreviousEdges(playerId);
+        playerNodeService.deletePlayerNodeById(playerId);
+        playerService.deletePlayerById(playerId);
+        return ResponseEntity.ok("Player deleted successfully");
     }
 }

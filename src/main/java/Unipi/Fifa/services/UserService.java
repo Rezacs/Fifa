@@ -1,9 +1,11 @@
 package Unipi.Fifa.services;
 
+import Unipi.Fifa.models.CoachNode;
 import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.models.User;
 import Unipi.Fifa.queryresults.PlayerFollowQueryResult;
 import Unipi.Fifa.queryresults.UserFollowQueryResult;
+import Unipi.Fifa.repositories.CoachNodeRepository;
 import Unipi.Fifa.repositories.PlayerNodeRepository;
 import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.requests.CreateUserRequest;
@@ -19,11 +21,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final PlayerNodeRepository playerNodeRepository;
+    private final CoachNodeRepository coachNodeRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, PlayerNodeRepository playerNodeRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, PlayerNodeRepository playerNodeRepository, CoachNodeRepository coachNodeRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.playerNodeRepository = playerNodeRepository;
+        this.coachNodeRepository = coachNodeRepository;
     }
 
     public User FindUser(String username){
@@ -91,6 +95,22 @@ public class UserService {
         return new PlayerFollowQueryResult( loggedInUser, targetPlayer);
     }
 
+    public void followCoach(String loggedInUsername, String mongoId) {
+        User loggedInUser = userRepository.findByUsername(loggedInUsername);
+        CoachNode coach = coachNodeRepository.findByMongoId(mongoId);
+        if (loggedInUser == null || coach == null) {
+            throw new IllegalArgumentException("User or followingCoach not found.");
+        }
+        if (!loggedInUser.getCoachNodes().contains(coach)) {
+            loggedInUser.getCoachNodes().add(coach);
+        } else {
+            throw new IllegalArgumentException("Player is already followed.");
+        }
+
+        // Save the updated user entity
+        userRepository.save(loggedInUser);
+    }
+
     public PlayerFollowQueryResult unfollowPlayer(String loggedInUsername, String mongoId) {
         // Fetch the logged-in user from the repository
         User loggedInUser = userRepository.findByUsername(loggedInUsername);
@@ -145,4 +165,6 @@ public class UserService {
         // Return the unfollow information as a DTO or other format you require
         return new UserFollowQueryResult(loggedInUser, targetUser, new Date());
     }
+
+
 }

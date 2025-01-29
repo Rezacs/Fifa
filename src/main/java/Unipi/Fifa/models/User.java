@@ -28,6 +28,9 @@ public class User implements UserDetails {
     @Relationship(type="Piace", direction = Relationship.Direction.OUTGOING)
     private List<ClubNode> clubNodes;
 
+    @Relationship(type="FollowCoach", direction = Relationship.Direction.OUTGOING)
+    private List<CoachNode> coachNodes;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -41,6 +44,13 @@ public class User implements UserDetails {
         return Objects.hash(username);  // Hash based on username (or userId)
     }
 
+    public List<CoachNode> getCoachNodes() {
+        return coachNodes;
+    }
+
+    public void setCoachNodes(List<CoachNode> coachNodes) {
+        this.coachNodes = coachNodes;
+    }
 
     public List<PlayerNode> getPlayerNodes() {
         return playerNodes;

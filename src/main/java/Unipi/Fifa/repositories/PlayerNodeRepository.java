@@ -4,6 +4,7 @@ import Unipi.Fifa.queryresults.PlayerFollowQueryResult;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import Unipi.Fifa.models.PlayerNode;
 import org.springframework.data.neo4j.repository.query.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -20,6 +21,10 @@ public interface PlayerNodeRepository extends Neo4jRepository<PlayerNode, Long> 
     @Query("MATCH(user:User), (player:PlayerNode) WHERE user.username = $username AND player.playerId = $playerId "+
             "CREATE (user)-[:FOLLOW] -> (player) RETURN user, player")
     PlayerFollowQueryResult createPlayerFollowingRelationship(String username, Integer playerId );
+
+    @Query("MATCH (p:PlayerNode) WHERE ID(p) = $nodeId DETACH DELETE p")
+    void deletePlayerNodeById(@Param("nodeId") Long nodeId);
+
 
     boolean existsByMongoId(String mongoId);
 

@@ -137,4 +137,9 @@ public class ClubService {
     public List<Club> getClubbyNameAndFifaVersion(String clubName, Integer fifaVersion) {
         return clubRepository.findByTeamNameAndFifaVersion(clubName , fifaVersion);
     }
+
+    public void deleClubNodeByMongoId(String mongoId) {
+        ClubNode target = clubNodeRepository.findNodeByMongoId(mongoId);
+        clubNodeRepository.deleteClubNodeById(target.getId());
+    }
 }

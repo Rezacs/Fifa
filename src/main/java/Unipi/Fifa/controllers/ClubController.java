@@ -2,11 +2,13 @@ package Unipi.Fifa.controllers;
 
 import Unipi.Fifa.models.Club;
 import Unipi.Fifa.models.ClubNode;
+import Unipi.Fifa.models.Player;
 import Unipi.Fifa.services.CNCNService;
 import Unipi.Fifa.services.ClubService;
 import Unipi.Fifa.services.PNCNService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -128,6 +130,20 @@ public class ClubController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @DeleteMapping("/deleteClub")
+    public ResponseEntity<String> deleteClub(@RequestParam String clubMongoId) {
+        Club targetClub = clubService.getClubbyId(clubMongoId);
+
+        if (targetClub == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Club not found");
+        }
+
+        clubService.deletePreviousEdges(clubMongoId);
+        clubService.deleClubNodeByMongoId(clubMongoId);
+        clubService.deleteClub(clubMongoId);
+        return ResponseEntity.ok("Club deleted successfully");
     }
 
 
