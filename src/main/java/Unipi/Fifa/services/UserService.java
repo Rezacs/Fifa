@@ -9,6 +9,9 @@ import Unipi.Fifa.repositories.CoachNodeRepository;
 import Unipi.Fifa.repositories.PlayerNodeRepository;
 import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.requests.CreateUserRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -176,6 +179,14 @@ public class UserService {
 
         // Return the unfollow information as a DTO or other format you require
         return new UserFollowQueryResult(loggedInUser, targetUser, new Date());
+    }
+
+    public static String getLoggedInUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            return ((UserDetails) authentication.getPrincipal()).getUsername();
+        }
+        return null;
     }
 
 

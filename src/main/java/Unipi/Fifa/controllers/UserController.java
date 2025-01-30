@@ -91,7 +91,7 @@ public class UserController {
         return new ResponseEntity<>("New Comment with id " + newComment.getId()  + " was saved!", HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/nonseguire")
+    @DeleteMapping("/unfollowUser")
     public ResponseEntity<String> unfollow(@RequestBody UserFollowRequest request, Principal principal) {
         // The logged-in user's username (extracted from the Principal)
         String loggedInUsername = principal.getName();

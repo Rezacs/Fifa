@@ -1,20 +1,26 @@
 package Unipi.Fifa.controllers;
 
 
-import Unipi.Fifa.models.Coach;
-import Unipi.Fifa.models.CoachNode;
-import Unipi.Fifa.models.PlayerNode;
+import Unipi.Fifa.models.*;
+import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.services.CNCNService;
 import Unipi.Fifa.services.CoachService;
 import Unipi.Fifa.services.PNCNService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import static Unipi.Fifa.services.UserService.getLoggedInUsername;
 
 @RestController
 @RequestMapping("/api/v1/Coache")
 public class CoachController {
+
+
+    UserRepository userRepository;
+
     @Autowired
     private CoachService coachService;
 
@@ -73,6 +79,24 @@ public class CoachController {
             return ResponseEntity.ok(createdCoach);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/deleteCoach")
+    public ResponseEntity<String> deletePlayer(@RequestParam String mongoId) {
+        User user = userRepository.findByUsername(getLoggedInUsername());
+        if (user.isAdmin()){
+            Coach targetCoach = coachService.getCoachByMongoId(mongoId).orElse(null);
+            if (targetCoach == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Coach not found");
+            }
+
+            coachService.deletePreviousEdges(mongoId);
+            coachService.deleteCoachNodeById(coachId);
+            coachService.deleteCoachById(coachId);
+            return ResponseEntity.ok("coach deleted successfully");
+        } else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not admin");
         }
     }
 

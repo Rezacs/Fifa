@@ -3,6 +3,8 @@ package Unipi.Fifa.controllers;
 import Unipi.Fifa.models.Club;
 import Unipi.Fifa.models.Player;
 import Unipi.Fifa.models.PlayerNode;
+import Unipi.Fifa.models.User;
+import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.services.PNCNService;
 import Unipi.Fifa.services.PlayerNodeService;
 import Unipi.Fifa.services.PlayerService;
@@ -12,9 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static Unipi.Fifa.services.UserService.getLoggedInUsername;
 
 @RestController
 @RequestMapping("/api/v1/p")
@@ -28,6 +35,8 @@ public class PlayerController {
 
     @Autowired
     private PlayerNodeService playerNodeService;
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("/players")
     public List<Player> getPlayersByClub(@RequestParam String clubName) {
@@ -137,15 +146,20 @@ public class PlayerController {
 
     @DeleteMapping("/deletePlayer")
     public ResponseEntity<String> deletePlayer(@RequestParam String playerId) {
-        Player targetPlayer = playerService.getPlayerById(playerId);
+        User user = userRepository.findByUsername(getLoggedInUsername());
+        if (user.isAdmin()){
+            Player targetPlayer = playerService.getPlayerById(playerId);
 
-        if (targetPlayer == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Player not found");
+            if (targetPlayer == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Player not found");
+            }
+
+            playerNodeService.deletePreviousEdges(playerId);
+            playerNodeService.deletePlayerNodeById(playerId);
+            playerService.deletePlayerById(playerId);
+            return ResponseEntity.ok("Player deleted successfully");
+        } else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not admin");
         }
-
-        playerNodeService.deletePreviousEdges(playerId);
-        playerNodeService.deletePlayerNodeById(playerId);
-        playerService.deletePlayerById(playerId);
-        return ResponseEntity.ok("Player deleted successfully");
     }
 }

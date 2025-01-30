@@ -2,15 +2,13 @@ package Unipi.Fifa.services;
 
 import Unipi.Fifa.models.Coach;
 import Unipi.Fifa.models.CoachNode;
-import Unipi.Fifa.models.Player;
 import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.repositories.CoachNodeRepository;
 import Unipi.Fifa.repositories.CoachRepository;
-import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CoachService {
@@ -29,6 +27,10 @@ public class CoachService {
 
     public CoachNode getCoachNodeByMongoId(String mongoId){
         return coachNodeRepository.findByMongoId(mongoId);
+    }
+
+    public Optional<Coach> getCoachByMongoId(String mongoId){
+        return coachRepository.findById(mongoId);
     }
 
     public Coach getCoachById(int id) {
@@ -82,5 +84,11 @@ public class CoachService {
 
     public Coach saveCoach(Coach coach) {
         return coachRepository.save(coach);
+    }
+
+    public void deletePreviousEdges(String mongoId) {
+        CoachNode coachNode = coachNodeRepository.findByMongoId(mongoId);
+        coachNode.setClubNode(null);
+        coachNodeRepository.save(coachNode);
     }
 }

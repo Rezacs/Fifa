@@ -135,6 +135,12 @@ public class User implements UserDetails {
 //    }
 
 
+    public boolean isAdmin() {
+        return Arrays.stream(this.roles.split(","))
+                .anyMatch(role -> role.equals("ROLE_ADMIN"));
+    }
+
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
