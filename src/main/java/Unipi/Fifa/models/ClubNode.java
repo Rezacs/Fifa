@@ -25,6 +25,18 @@ public class ClubNode {
     public Integer getFifaUpdate() {
         return fifaUpdate;
     }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        ClubNode that = (ClubNode) obj;
+        return mongoId != null && mongoId.equals(that.mongoId);
+    }
+
+    @Override
+    public int hashCode() {
+        return mongoId != null ? mongoId.hashCode() : 0;
+    }
 
     public void setFifaUpdate(Integer fifaUpdate) {
         this.fifaUpdate = fifaUpdate;
@@ -110,16 +122,5 @@ public class ClubNode {
         this.captain = captain;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        ClubNode that = (ClubNode) obj;
-        return mongoId != null && mongoId.equals(that.mongoId);
-    }
 
-    @Override
-    public int hashCode() {
-        return mongoId != null ? mongoId.hashCode() : 0;
-    }
 }

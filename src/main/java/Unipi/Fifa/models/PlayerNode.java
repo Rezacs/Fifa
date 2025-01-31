@@ -30,6 +30,19 @@ public class PlayerNode {
         MALE, FEMALE
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        PlayerNode that = (PlayerNode) obj;
+        return mongoId != null && mongoId.equals(that.mongoId);
+    }
+
+    @Override
+    public int hashCode() {
+        return mongoId != null ? mongoId.hashCode() : 0;
+    }
+
     public Integer getClubTeamId() {
         return clubTeamId;
     }
@@ -129,18 +142,7 @@ public class PlayerNode {
         this.gender = gender;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        PlayerNode that = (PlayerNode) obj;
-        return mongoId != null && mongoId.equals(that.mongoId);
-    }
 
-    @Override
-    public int hashCode() {
-        return mongoId != null ? mongoId.hashCode() : 0;
-    }
 
 
 }
