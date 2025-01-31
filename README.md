@@ -77,7 +77,6 @@ mvn spring-boot:run
 
 ## Security & Authentication
 - Uses **Spring Security** for authentication.
-- Users are authenticated via **JWT Tokens**.
 - **BCrypt** password encoding for secure storage.
 
 ## Contributions
@@ -87,5 +86,5 @@ mvn spring-boot:run
 4. **Submit a pull request**
 
 ## License
-This project is licensed under the MIT License.
+This project's Database (https://www.kaggle.com/datasets/stefanoleone992/ea-sports-fc-24-complete-player-dataset?select=male_teams.csv) is licensed under the MIT License.
 
