@@ -23,8 +23,12 @@ public class CommentService {
     public List<Comment> findAll() {
         return commentRepository.findAll();
     }
-    public Optional<Comment> findById(String id) {
-        return commentRepository.findById(id);
+
+    public List<Comment> findByAuthor(String authorUsername) {
+        return commentRepository.findCommentByAuthor(authorUsername);
+    }
+    public Comment findById(String id) {
+        return commentRepository.findById(id).orElse(null);
     }
     public void deleteById(String id) {
         commentRepository.deleteById(id);

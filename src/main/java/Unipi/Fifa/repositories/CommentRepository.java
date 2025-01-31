@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface CommentRepository extends MongoRepository<Comment, String> {
-    List<Comment> findCommentByAuthor(String authorMongoid);
+    List<Comment> findCommentByAuthor(String username);
     Comment findCommentById(String id);
 
 }

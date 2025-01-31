@@ -33,6 +33,12 @@ public class CoachController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/transfer-one-to-neo4j/{mongoId}")
+    public ResponseEntity<String> transferOneToNeo4j(@PathVariable String mongoId) {
+        CoachNode response = coachService.TransferOneDataToNeo4j(mongoId);
+        return ResponseEntity.ok("coach created in neo4j with coachId : " + response.getCoachId());
+    }
+
     @PostMapping("/create")
     public String createCoachClubRelationships(@RequestParam("gender") PlayerNode.Gender gender) {
         try {
@@ -76,6 +82,9 @@ public class CoachController {
             newCoach.setId(null);
             Coach createdCoach = coachService.saveCoach(newCoach);
             editCoach(createdCoach.getId(), newCoach);
+//            transferOneToNeo4j(newCoach.getId());
+//            cncnService.createEditedCoachClubRelationships();
+            coachService.saveCoach(createdCoach);
             return ResponseEntity.ok(createdCoach);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
@@ -83,15 +92,15 @@ public class CoachController {
     }
 
     @DeleteMapping("/deleteCoach")
-    public ResponseEntity<String> deletePlayer(@RequestParam String mongoId) {
+    public ResponseEntity<String> deletePlayer(@RequestParam Integer coachId) {
         User user = userRepository.findByUsername(getLoggedInUsername());
         if (user.isAdmin()){
-            Coach targetCoach = coachService.getCoachByMongoId(mongoId).orElse(null);
+            Coach targetCoach = coachService.getCoachByCoachId(coachId);
             if (targetCoach == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Coach not found");
             }
 
-            coachService.deletePreviousEdges(mongoId);
+            coachService.deletePreviousEdges(coachId);
             coachService.deleteCoachNodeById(coachId);
             coachService.deleteCoachById(coachId);
             return ResponseEntity.ok("coach deleted successfully");

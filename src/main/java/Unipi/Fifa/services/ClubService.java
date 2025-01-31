@@ -94,26 +94,21 @@ public class ClubService {
 
     public Club deletePreviousEdges(String mongoId){
         Club club = clubRepository.findById(mongoId).orElse(null);
-        List<CoachNode> coachNode = coachNodeRepository.findByCoachId(club.getCoachId());
-        List<PlayerNode> playerNodes = playerNodeRepository.findByClubTeamId(club.getTeamId());
-        for (CoachNode node : coachNode) {
-            node.setClubNode(null);
-            coachNodeRepository.save(node);
+        CoachNode coachNode = coachNodeRepository.findByCoachId(club.getCoachId());
+        if (coachNode != null) {
+            coachNode.setClubNode(null);
+            coachNodeRepository.save(coachNode);
         }
+        List<PlayerNode> playerNodes = playerNodeRepository.findByClubTeamId(club.getTeamId());
         for (PlayerNode node : playerNodes) {
             node.setClubNode(null);
             playerNodeRepository.save(node);
-
         }
         return club;
     }
 
     public ClubNode TransferOneDataToNeo4j(String mongoId) {
         Club club = clubRepository.findById(mongoId).orElse(null);
-        List<CoachNode> coachNode = coachNodeRepository.findByCoachId(club.getCoachId());
-//        for (CoachNode node : coachNode) {
-//            node.setClubNode(null);
-//        }
         if (club == null) {
             throw new IllegalArgumentException("Club with the provided mongoId does not exist.");
         }

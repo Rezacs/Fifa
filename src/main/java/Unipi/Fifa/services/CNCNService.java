@@ -69,22 +69,14 @@ public class CNCNService {
     @Transactional
     public void createEditedClubCoachRelationships(ClubNode club) {
         // Step 1: Find all CoachNodes associated with the given club's coachId
-        List<CoachNode> existingCoaches = coachNodeRepository.findByCoachId(club.getCoachId());
+        CoachNode existingCoache = coachNodeRepository.findByCoachId(club.getCoachId());
 
-        if (!existingCoaches.isEmpty()) {
-            for (CoachNode coach : existingCoaches) {
-                // Step 2: Remove any existing club relationships for the coach
-                coach.setClubNode(null); // Break the current relationship
-                coachNodeRepository.save(coach); // Save changes to remove old relationships
-            }
-        }
-
-        // Step 3: Establish the new relationship
-        for (CoachNode coach : existingCoaches) {
-            coach.setClubNode(Collections.singletonList(club)); // Create the new relationship
-            coachNodeRepository.save(coach); // Save the updated node
-            System.out.println("Created relationship for Coach " + coach.getId() + " with Club " + club.getTeamName());
+        if (existingCoache != null) {
+            existingCoache.setClubNode(null); // Break the current relationship
+            coachNodeRepository.save(existingCoache); // Save changes to remove old relationships
+            existingCoache.setClubNode(Collections.singletonList(club)); // Create the new relationship
+            coachNodeRepository.save(existingCoache); // Save the updated node
+            System.out.println("Created relationship for Coach " + existingCoache.getId() + " with Club " + club.getTeamName());
         }
     }
-
 }

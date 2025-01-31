@@ -5,15 +5,15 @@ import Unipi.Fifa.models.Player;
 import java.util.Date;
 
 public class CommentRequest {
-    private String player;
+    private String playerId;
     private String comment;
 
-    public String getPlayer() {
-        return player;
+    public String getPlayerId() {
+        return playerId;
     }
 
-    public void setPlayer(String player) {
-        this.player = player;
+    public void setPlayerId(String playerId) {
+        this.playerId = playerId;
     }
 
     public String getComment() {

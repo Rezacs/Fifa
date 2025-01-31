@@ -12,6 +12,7 @@ public interface CoachRepository extends MongoRepository<Coach, Integer> {
     List<Coach> findByShortName(String shortName);
     List<Coach> findByLongName(String longName);
     Optional<Coach> findById(String id);
+    Coach findByCoachId(Integer coachId);
 
     List<Coach> findByGender(PlayerNode.Gender gender);
     List<Coach> findByNationalityName(String nationalityName);

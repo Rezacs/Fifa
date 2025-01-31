@@ -19,7 +19,9 @@ public class Comment {
     @GeneratedValue
     private String id;
     private String author;
-    private String player;
+    private String playerName;
+    private String playerClub;
+    private String playerId;
     private LocalDateTime commentDate;
     private String comment;
 
@@ -39,14 +41,6 @@ public class Comment {
         this.author = author;
     }
 
-    public String getPlayer() {
-        return player;
-    }
-
-    public void setPlayer(String player) {
-        this.player = player;
-    }
-
     public LocalDateTime getCommentDate() {
         return commentDate;
     }
@@ -61,5 +55,29 @@ public class Comment {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
+
+    public String getPlayerClub() {
+        return playerClub;
+    }
+
+    public void setPlayerClub(String playerClub) {
+        this.playerClub = playerClub;
+    }
+
+    public String getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(String playerId) {
+        this.playerId = playerId;
     }
 }

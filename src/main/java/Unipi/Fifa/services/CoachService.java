@@ -33,8 +33,8 @@ public class CoachService {
         return coachRepository.findById(mongoId);
     }
 
-    public Coach getCoachById(int id) {
-        return coachRepository.findById(id).get();
+    public Coach getCoachByCoachId(Integer coachId) {
+        return coachRepository.findByCoachId(coachId);
     }
 
     public List<Coach> getAllCoaches() {
@@ -51,7 +51,7 @@ public class CoachService {
         int number = 0;
 
         for (Coach coach : coaches) {
-            if (coachNodeRepository.existsByMongoId(String.valueOf(coach.getCoachId()))) {
+            if (coachNodeRepository.existsByMongoId(coach.getId())){
                 continue;
             }
             CoachNode coachNode = new CoachNode();
@@ -86,9 +86,22 @@ public class CoachService {
         return coachRepository.save(coach);
     }
 
-    public void deletePreviousEdges(String mongoId) {
-        CoachNode coachNode = coachNodeRepository.findByMongoId(mongoId);
+    public void deletePreviousEdges(Integer coachId) {
+        CoachNode coachNode = coachNodeRepository.findByCoachId(coachId);
         coachNode.setClubNode(null);
         coachNodeRepository.save(coachNode);
+    }
+
+    public void deleteCoachNodeById(Integer coachId) {
+        CoachNode coachNode = coachNodeRepository.findByCoachId(coachId);
+        Long id = coachNode.getId();
+        coachNodeRepository.deleteCoachNodeById(id);
+    }
+
+    public void deleteCoachById(Integer coachId) {
+        Coach coach = coachRepository.findById(coachId).orElse(null);
+        if (coach != null){
+            coachRepository.delete(coach);
+        }
     }
 }

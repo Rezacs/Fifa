@@ -7,6 +7,8 @@ import Unipi.Fifa.queryresults.PlayerFollowQueryResult;
 import Unipi.Fifa.queryresults.UserFollowQueryResult;
 import Unipi.Fifa.repositories.CoachNodeRepository;
 import Unipi.Fifa.repositories.CoachRepository;
+import Unipi.Fifa.repositories.PlayerRepository;
+import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.requests.*;
 import Unipi.Fifa.services.CommentService;
 import Unipi.Fifa.services.PlayerFollowingService;
@@ -20,7 +22,10 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static Unipi.Fifa.services.UserService.getLoggedInUsername;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -29,15 +34,19 @@ public class UserController {
     private final PlayerFollowingService playerFollowingService;
     private final CommentService commentService;
     private final CoachNodeRepository coachNodeRepository;
+    private final PlayerRepository playerRepository;
+    private final UserRepository userRepository;
 
 //    private final AuthenticationManager authenticationManager;
 
 
-    public UserController(UserService userService, PlayerFollowingService playerFollowingService, CommentService commentService, CoachNodeRepository coachNodeRepository) {
+    public UserController(UserService userService, PlayerFollowingService playerFollowingService, CommentService commentService, CoachNodeRepository coachNodeRepository, PlayerRepository playerRepository , UserRepository userRepository) {
         this.userService = userService;
         this.playerFollowingService = playerFollowingService;
         this.commentService = commentService;
         this.coachNodeRepository = coachNodeRepository;
+        this.playerRepository = playerRepository;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/check/{username}")
@@ -81,15 +90,55 @@ public class UserController {
     @PostMapping("writeComment")
     public ResponseEntity<String> addComment(@RequestBody CommentRequest request, Principal principal) {
         String loggedInUsername = principal.getName();
-        String targetPlayerId = request.getPlayer();
+        String targetPlayerId = request.getPlayerId();
+        Player player = playerRepository.findById(targetPlayerId).orElse(null);
+        if (player == null) {
+            return new ResponseEntity<>("Player not found", HttpStatus.NOT_FOUND);
+        }
         Comment newComment = new Comment();
         newComment.setComment(request.getComment());
         newComment.setAuthor(principal.getName());
-        newComment.setPlayer(targetPlayerId);
+        newComment.setPlayerName(player.getLongName());
+        newComment.setPlayerClub(player.getClubName());
+        newComment.setPlayerId(targetPlayerId);
         newComment.setCommentDate(LocalDateTime.now());
         commentService.save(newComment);
         return new ResponseEntity<>("New Comment with id " + newComment.getId()  + " was saved!", HttpStatus.CREATED);
     }
+
+    @GetMapping("myComments")
+    public ResponseEntity<List<Comment>> myComments(Principal principal) {
+        String loggedInUsername = principal.getName();
+        List<Comment> comments = commentService.findByAuthor(loggedInUsername);
+        return new ResponseEntity<>(comments, HttpStatus.OK);
+    }
+
+    @PutMapping("editComment")
+    public ResponseEntity<String> editComment(@RequestBody CommentRequest request, Principal principal, String CommentId) {
+        User user = userRepository.findByUsername(getLoggedInUsername());
+        Comment comment = commentService.findById(CommentId);
+        if (user.isAdmin() || Objects.equals(comment.getAuthor(), user.getUsername())) {
+            comment.setComment(request.getComment());
+            comment.setCommentDate(LocalDateTime.now());
+            commentService.save(comment);
+            return new ResponseEntity<>("Comment with id " + comment.getId()  + " was edited and saved!", HttpStatus.CREATED);
+        } else{
+            return new ResponseEntity<>("You can't edit this comment", HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @DeleteMapping("deleteComment")
+    public ResponseEntity<String> deleteComment(@RequestBody String commentId, Principal principal) {
+        User user = userRepository.findByUsername(getLoggedInUsername());
+        Comment comment = commentService.findById(commentId);
+        if (user.isAdmin() || comment.getAuthor() == user.getUsername() ) {
+            commentService.deleteById(commentId);
+            return new ResponseEntity<>("Comment with id " + commentId + " was deleted!", HttpStatus.OK);
+        } else{
+            return new ResponseEntity<>("You can't delete this comment", HttpStatus.FORBIDDEN);
+        }
+    }
+
 
     @DeleteMapping("/unfollowUser")
     public ResponseEntity<String> unfollow(@RequestBody UserFollowRequest request, Principal principal) {
