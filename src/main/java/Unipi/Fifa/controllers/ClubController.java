@@ -3,6 +3,8 @@ package Unipi.Fifa.controllers;
 import Unipi.Fifa.models.Club;
 import Unipi.Fifa.models.ClubNode;
 import Unipi.Fifa.models.Player;
+import Unipi.Fifa.models.User;
+import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.services.CNCNService;
 import Unipi.Fifa.services.ClubService;
 import Unipi.Fifa.services.PNCNService;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+
+import static Unipi.Fifa.services.UserService.getLoggedInUsername;
 
 @RestController
 @RequestMapping("/api/v1/c")
@@ -27,6 +31,9 @@ public class ClubController {
 
     @Autowired
     private PNCNService pncnService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @GetMapping("/clubs")
     public List<Club> findByName(@RequestParam String name) {
@@ -50,102 +57,111 @@ public class ClubController {
 
     @PutMapping("/edit/{mongoId}")
     public ResponseEntity<String> editClub(@PathVariable String mongoId, @RequestBody Club updatedClub) {
-        Club existingClub = clubService.getClubbyId(mongoId);
-        if(existingClub == null) {
-            return ResponseEntity.notFound().build();
+        User user = userRepository.findByUsername(getLoggedInUsername());
+        if (user.isAdmin()) {
+            Club existingClub = clubService.getClubbyId(mongoId);
+            if (existingClub == null) {
+                return ResponseEntity.notFound().build();
+            }
+            clubService.deletePreviousEdges(mongoId);
+
+            existingClub.setId(existingClub.getId());
+            existingClub.setTeamId(updatedClub.getTeamId());
+            existingClub.setTeamUrl(updatedClub.getTeamUrl());
+            existingClub.setFifaVersion(updatedClub.getFifaVersion());
+            existingClub.setFifaUpdate(updatedClub.getFifaUpdate());
+            existingClub.setUpdateAsOf(updatedClub.getUpdateAsOf());
+            existingClub.setTeamName(updatedClub.getTeamName());
+            existingClub.setLeagueId(updatedClub.getLeagueId());
+            existingClub.setLeagueName(updatedClub.getLeagueName());
+            existingClub.setLeagueLevel(updatedClub.getLeagueLevel());
+            existingClub.setNationalityId(updatedClub.getNationalityId());
+            existingClub.setNationalityName(updatedClub.getNationalityName());
+            existingClub.setOverall(updatedClub.getOverall());
+            existingClub.setAttack(updatedClub.getAttack());
+            existingClub.setMidfield(updatedClub.getMidfield());
+            existingClub.setDefence(updatedClub.getDefence());
+            existingClub.setCoachId(updatedClub.getCoachId());
+            existingClub.setHomeStadium(updatedClub.getHomeStadium());
+            existingClub.setRivalTeam(updatedClub.getRivalTeam());
+            existingClub.setInternationalPrestige(updatedClub.getInternationalPrestige());
+            existingClub.setDomesticPrestige(updatedClub.getDomesticPrestige());
+            existingClub.setTransferBudgetEur(updatedClub.getTransferBudgetEur());
+            existingClub.setClubWorthEur(updatedClub.getClubWorthEur());
+            existingClub.setStartingXiAverageAge(updatedClub.getStartingXiAverageAge());
+            existingClub.setWholeTeamAverageAge(updatedClub.getWholeTeamAverageAge());
+            existingClub.setCaptain(updatedClub.getCaptain());
+            existingClub.setShortFreeKick(updatedClub.getShortFreeKick());
+            existingClub.setLongFreeKick(updatedClub.getLongFreeKick());
+            existingClub.setLeftShortFreeKick(updatedClub.getLeftShortFreeKick());
+            existingClub.setRightShortFreeKick(updatedClub.getRightShortFreeKick());
+            existingClub.setPenalties(updatedClub.getPenalties());
+            existingClub.setLeftCorner(updatedClub.getLeftCorner());
+            existingClub.setRightCorner(updatedClub.getRightCorner());
+            existingClub.setDefStyle(updatedClub.getDefStyle());
+            existingClub.setDefTeamWidth(updatedClub.getDefTeamWidth());
+            existingClub.setDefTeamDepth(updatedClub.getDefTeamDepth());
+            existingClub.setDefDefencePressure(updatedClub.getDefDefencePressure());
+            existingClub.setDefDefenceAggression(updatedClub.getDefDefenceAggression());
+            existingClub.setDefDefenceWidth(updatedClub.getDefDefenceWidth());
+            existingClub.setDefDefenceDefenderLine(updatedClub.getDefDefenceDefenderLine());
+            existingClub.setOffStyle(updatedClub.getOffStyle());
+            existingClub.setOffBuildUpPlay(updatedClub.getOffBuildUpPlay());
+            existingClub.setOffChanceCreation(updatedClub.getOffChanceCreation());
+            existingClub.setOffTeamWidth(updatedClub.getOffTeamWidth());
+            existingClub.setOffPlayersInBox(updatedClub.getOffPlayersInBox());
+            existingClub.setOffCorners(updatedClub.getOffCorners());
+            existingClub.setOffFreeKicks(updatedClub.getOffFreeKicks());
+            existingClub.setBuildUpPlaySpeed(updatedClub.getBuildUpPlaySpeed());
+            existingClub.setBuildUpPlayDribbling(updatedClub.getBuildUpPlayDribbling());
+            existingClub.setBuildUpPlayPassing(updatedClub.getBuildUpPlayPassing());
+            existingClub.setBuildUpPlayPositioning(updatedClub.getBuildUpPlayPositioning());
+            existingClub.setChanceCreationPassing(updatedClub.getChanceCreationPassing());
+            existingClub.setChanceCreationCrossing(updatedClub.getChanceCreationCrossing());
+            existingClub.setChanceCreationShooting(updatedClub.getChanceCreationShooting());
+            existingClub.setChanceCreationPositioning(updatedClub.getChanceCreationPositioning());
+            existingClub.setGender(updatedClub.getGender());
+
+            clubService.saveClub(existingClub);
+            ClubNode cd = clubService.TransferOneDataToNeo4j(mongoId);
+            cncnService.createEditedClubCoachRelationships(cd);
+            pncnService.createEditedClubPlayerRelationships(cd);
+            return ResponseEntity.ok("Club updated successfully!");
+        } else{
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-        clubService.deletePreviousEdges(mongoId);
-
-        existingClub.setId(existingClub.getId());
-        existingClub.setTeamId(updatedClub.getTeamId());
-        existingClub.setTeamUrl(updatedClub.getTeamUrl());
-        existingClub.setFifaVersion(updatedClub.getFifaVersion());
-        existingClub.setFifaUpdate(updatedClub.getFifaUpdate());
-        existingClub.setUpdateAsOf(updatedClub.getUpdateAsOf());
-        existingClub.setTeamName(updatedClub.getTeamName());
-        existingClub.setLeagueId(updatedClub.getLeagueId());
-        existingClub.setLeagueName(updatedClub.getLeagueName());
-        existingClub.setLeagueLevel(updatedClub.getLeagueLevel());
-        existingClub.setNationalityId(updatedClub.getNationalityId());
-        existingClub.setNationalityName(updatedClub.getNationalityName());
-        existingClub.setOverall(updatedClub.getOverall());
-        existingClub.setAttack(updatedClub.getAttack());
-        existingClub.setMidfield(updatedClub.getMidfield());
-        existingClub.setDefence(updatedClub.getDefence());
-        existingClub.setCoachId(updatedClub.getCoachId());
-        existingClub.setHomeStadium(updatedClub.getHomeStadium());
-        existingClub.setRivalTeam(updatedClub.getRivalTeam());
-        existingClub.setInternationalPrestige(updatedClub.getInternationalPrestige());
-        existingClub.setDomesticPrestige(updatedClub.getDomesticPrestige());
-        existingClub.setTransferBudgetEur(updatedClub.getTransferBudgetEur());
-        existingClub.setClubWorthEur(updatedClub.getClubWorthEur());
-        existingClub.setStartingXiAverageAge(updatedClub.getStartingXiAverageAge());
-        existingClub.setWholeTeamAverageAge(updatedClub.getWholeTeamAverageAge());
-        existingClub.setCaptain(updatedClub.getCaptain());
-        existingClub.setShortFreeKick(updatedClub.getShortFreeKick());
-        existingClub.setLongFreeKick(updatedClub.getLongFreeKick());
-        existingClub.setLeftShortFreeKick(updatedClub.getLeftShortFreeKick());
-        existingClub.setRightShortFreeKick(updatedClub.getRightShortFreeKick());
-        existingClub.setPenalties(updatedClub.getPenalties());
-        existingClub.setLeftCorner(updatedClub.getLeftCorner());
-        existingClub.setRightCorner(updatedClub.getRightCorner());
-        existingClub.setDefStyle(updatedClub.getDefStyle());
-        existingClub.setDefTeamWidth(updatedClub.getDefTeamWidth());
-        existingClub.setDefTeamDepth(updatedClub.getDefTeamDepth());
-        existingClub.setDefDefencePressure(updatedClub.getDefDefencePressure());
-        existingClub.setDefDefenceAggression(updatedClub.getDefDefenceAggression());
-        existingClub.setDefDefenceWidth(updatedClub.getDefDefenceWidth());
-        existingClub.setDefDefenceDefenderLine(updatedClub.getDefDefenceDefenderLine());
-        existingClub.setOffStyle(updatedClub.getOffStyle());
-        existingClub.setOffBuildUpPlay(updatedClub.getOffBuildUpPlay());
-        existingClub.setOffChanceCreation(updatedClub.getOffChanceCreation());
-        existingClub.setOffTeamWidth(updatedClub.getOffTeamWidth());
-        existingClub.setOffPlayersInBox(updatedClub.getOffPlayersInBox());
-        existingClub.setOffCorners(updatedClub.getOffCorners());
-        existingClub.setOffFreeKicks(updatedClub.getOffFreeKicks());
-        existingClub.setBuildUpPlaySpeed(updatedClub.getBuildUpPlaySpeed());
-        existingClub.setBuildUpPlayDribbling(updatedClub.getBuildUpPlayDribbling());
-        existingClub.setBuildUpPlayPassing(updatedClub.getBuildUpPlayPassing());
-        existingClub.setBuildUpPlayPositioning(updatedClub.getBuildUpPlayPositioning());
-        existingClub.setChanceCreationPassing(updatedClub.getChanceCreationPassing());
-        existingClub.setChanceCreationCrossing(updatedClub.getChanceCreationCrossing());
-        existingClub.setChanceCreationShooting(updatedClub.getChanceCreationShooting());
-        existingClub.setChanceCreationPositioning(updatedClub.getChanceCreationPositioning());
-        existingClub.setGender(updatedClub.getGender());
-
-        clubService.saveClub(existingClub);
-        ClubNode cd = clubService.TransferOneDataToNeo4j(mongoId);
-        cncnService.createEditedClubCoachRelationships(cd);
-        pncnService.createEditedClubPlayerRelationships(cd);
-        return ResponseEntity.ok("Club updated successfully!");
     }
 
     @PostMapping("create-new-club")
     public ResponseEntity<Club> createClub(@RequestBody Club club) {
-        try {
-            club.setId(null);
-            Club createdClub = clubService.saveClub(club) ;
-            editClub(createdClub.getId(), club);
-            return ResponseEntity.ok(createdClub);
-        } catch (Exception e) {
+        User user = userRepository.findByUsername(getLoggedInUsername());
+        if (user.isAdmin()) {
+            try {
+                club.setId(null);
+                Club createdClub = clubService.saveClub(club);
+                editClub(createdClub.getId(), club);
+                return ResponseEntity.ok(createdClub);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().build();
+            }
+        } else{
             return ResponseEntity.badRequest().build();
         }
     }
 
     @DeleteMapping("/deleteClub")
     public ResponseEntity<String> deleteClub(@RequestParam String clubMongoId) {
-        Club targetClub = clubService.getClubbyId(clubMongoId);
-
-        if (targetClub == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Club not found");
+        User user = userRepository.findByUsername(getLoggedInUsername());
+        if (user.isAdmin()) {
+            Club targetClub = clubService.getClubbyId(clubMongoId);
+            if (targetClub == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Club not found");
+            }
+            clubService.deletePreviousEdges(clubMongoId);
+            clubService.deleClubNodeByMongoId(clubMongoId);
+            clubService.deleteClub(clubMongoId);
+            return ResponseEntity.ok("Club deleted successfully");
         }
-
-        clubService.deletePreviousEdges(clubMongoId);
-        clubService.deleClubNodeByMongoId(clubMongoId);
-        clubService.deleteClub(clubMongoId);
-        return ResponseEntity.ok("Club deleted successfully");
+        return ResponseEntity.badRequest().build();
     }
-
-
-
 }

@@ -62,6 +62,4 @@ public class ClubNodeController {
             return "Error: " + e.getMessage();
         }
     }
-
-
 }
