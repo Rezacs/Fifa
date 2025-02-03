@@ -13,5 +13,6 @@ public interface PlayerRepository extends MongoRepository<Player, String> {
     List<Player> findByOverall(Integer overallRating);
     List<Player> findByPlayerId(Integer playerid);
     List<Player> findByGender(String gender);
+    List<Player> findByLongName(String longName);
     Optional<Player> findById(ObjectId id);
 }

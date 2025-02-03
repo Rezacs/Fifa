@@ -71,6 +71,12 @@ public class UserService {
             throw new IllegalArgumentException("User not found.");
         }
 
+        List<User> followings = loggedInUser.getUsers();
+        for (User following : followings) {
+            if (following.getUsername().equals(targetUsername)) {
+                throw new IllegalArgumentException("Target User already followed by you.");
+            }
+        }
         // Add the target user to the logged-in user's 'following' list (or relationship in Neo4j)
         loggedInUser.getUsers().add(targetUser);
 

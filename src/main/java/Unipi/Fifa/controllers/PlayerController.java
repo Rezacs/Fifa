@@ -9,6 +9,7 @@ import Unipi.Fifa.services.PNCNService;
 import Unipi.Fifa.services.PlayerNodeService;
 import Unipi.Fifa.services.PlayerService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,6 +52,11 @@ public class PlayerController {
     @PostMapping("/overall")
     public ResponseEntity<List<Player>> getByOverall(@RequestParam Integer overall){
         return ResponseEntity.ok(playerService.getPlayersByOverall(overall));
+    }
+
+    @GetMapping("/{playerName}")
+    public ResponseEntity<List<Player>> getByPlayerName(@PathVariable String playerName){
+        return ResponseEntity.ok(playerService.getPlayerByLongName(playerName));
     }
 
     @PutMapping("/edit/{mongoId}")
@@ -162,4 +168,5 @@ public class PlayerController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not admin");
         }
     }
+
 }

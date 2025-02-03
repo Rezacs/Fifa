@@ -54,4 +54,8 @@ public class PlayerService {
     public void deletePlayerById(String playerId) {
         playerRepository.deleteById(playerId);
     }
+
+    public List<Player> getPlayerByLongName(String playerName) {
+        return playerRepository.findByLongName(playerName);
+    }
 }
