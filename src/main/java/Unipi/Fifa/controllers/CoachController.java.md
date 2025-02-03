@@ -1,4 +1,4 @@
-# CoachController Internal Documentation
+ CoachController Internal Documentation
 
 ## Table of Contents
 
