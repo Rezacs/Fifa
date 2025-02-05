@@ -56,7 +56,8 @@ public class CNCNService {
             Optional<List<ClubNode>> clubs = clubNodeRepository.findByCoachId(coach.getCoachId());
             if (clubs.isPresent()) {
                 for (ClubNode club : clubs.get()) {
-                    coach.setClubNode(Collections.singletonList(club)); // Assign the new relationship
+//                    coach.setClubNode(Collections.singletonList(club));
+                    coach.getClubNode().add(club); // Assign the new relationship
                     coachNodeRepository.save(coach); // Save the updated node
                     System.out.println("Created relationship for Coach " + coach.getId() + " with Club " + club.getTeamName());
                 }
@@ -69,14 +70,16 @@ public class CNCNService {
     @Transactional
     public void createEditedClubCoachRelationships(ClubNode club) {
         // Step 1: Find all CoachNodes associated with the given club's coachId
-        CoachNode existingCoache = coachNodeRepository.findByCoachId(club.getCoachId());
+        CoachNode existingCoach = coachNodeRepository.findByCoachId(club.getCoachId());
 
-        if (existingCoache != null) {
-            existingCoache.setClubNode(null); // Break the current relationship
-            coachNodeRepository.save(existingCoache); // Save changes to remove old relationships
-            existingCoache.setClubNode(Collections.singletonList(club)); // Create the new relationship
-            coachNodeRepository.save(existingCoache); // Save the updated node
-            System.out.println("Created relationship for Coach " + existingCoache.getId() + " with Club " + club.getTeamName());
+        if (existingCoach != null) {
+            existingCoach.setClubNode(null); // Break the current relationship
+            coachNodeRepository.save(existingCoach); // Save changes to remove old relationships
+            //existingCoache.setClubNode(Collections.singletonList(club));
+            existingCoach.getClubNode().add(club);
+            // Create the new relationship
+            coachNodeRepository.save(existingCoach); // Save the updated node
+            System.out.println("Created relationship for Coach " + existingCoach.getId() + " with Club " + club.getTeamName());
         }
     }
 }

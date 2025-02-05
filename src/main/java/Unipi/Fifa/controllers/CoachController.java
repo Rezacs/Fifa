@@ -52,7 +52,6 @@ public class CoachController {
     @PutMapping("/edit/{mongoId}")
     public ResponseEntity<String> editCoach(@PathVariable String mongoId, @RequestBody Coach updatedCoach) {
         Coach existingCoach = coachService.getCoachById(mongoId);
-
         if (existingCoach == null) {
             return ResponseEntity.notFound().build(); // Return 404 if coach is not found
         }

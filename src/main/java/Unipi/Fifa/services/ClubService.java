@@ -125,6 +125,7 @@ public class ClubService {
         clubNode.setOverall(club.getOverall());
         clubNode.setCoachId(club.getCoachId());
         clubNode.setCaptain(club.getCaptain());
+        clubNode.setGender(PlayerNode.Gender.valueOf(club.getGender()));
         clubNodeRepository.save(clubNode);
         return clubNode;
     }

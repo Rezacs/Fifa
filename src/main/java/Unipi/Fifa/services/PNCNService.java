@@ -89,7 +89,8 @@ public class PNCNService {
     @Transactional
     public void createEditedClubPlayerRelationships(ClubNode club) {
         // Validate the ClubNode
-        if (club == null || club.getTeamId() == null) {
+        // || club.getTeamId() == null
+        if (club == null ) {
             throw new IllegalArgumentException("Invalid club or club team ID");
         }
 

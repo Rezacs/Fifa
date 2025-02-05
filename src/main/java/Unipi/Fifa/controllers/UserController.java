@@ -11,7 +11,7 @@ import Unipi.Fifa.repositories.PlayerRepository;
 import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.requests.*;
 import Unipi.Fifa.services.PlayerFollowingService;
-import Unipi.Fifa.services.PostService;
+import Unipi.Fifa.services.ArticleService;
 import Unipi.Fifa.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +32,7 @@ import static Unipi.Fifa.services.UserService.getLoggedInUsername;
 public class UserController {
     private final UserService userService;
     private final PlayerFollowingService playerFollowingService;
-    private final PostService postService;
+    private final ArticleService articleService;
     private final CoachNodeRepository coachNodeRepository;
     private final PlayerRepository playerRepository;
     private final UserRepository userRepository;
@@ -40,10 +40,10 @@ public class UserController {
 //    private final AuthenticationManager authenticationManager;
 
 
-    public UserController(UserService userService, PlayerFollowingService playerFollowingService, PostService postService, CoachNodeRepository coachNodeRepository, PlayerRepository playerRepository , UserRepository userRepository) {
+    public UserController(UserService userService, PlayerFollowingService playerFollowingService, ArticleService articleService, CoachNodeRepository coachNodeRepository, PlayerRepository playerRepository , UserRepository userRepository) {
         this.userService = userService;
         this.playerFollowingService = playerFollowingService;
-        this.postService = postService;
+        this.articleService = articleService;
         this.coachNodeRepository = coachNodeRepository;
         this.playerRepository = playerRepository;
         this.userRepository = userRepository;
@@ -87,46 +87,44 @@ public class UserController {
         return new ResponseEntity<>(responseFollow, HttpStatus.CREATED);
     }
 
-    @PostMapping("writePost")
-    public ResponseEntity<String> addComment(@RequestBody PostRequest request, Principal principal) {
+    @PostMapping("writeArticle")
+    public ResponseEntity<String> addArticle(@RequestBody ArticleRequest request, Principal principal) {
         String loggedInUsername = principal.getName();
-        Post newPost = new Post();
-        newPost.setText(request.getText());
-        newPost.setSubject(request.getSubject());
-        newPost.setAuthor(principal.getName());
-        newPost.setPostDate(LocalDateTime.now());
-        postService.save(newPost);
-        return new ResponseEntity<>("New Comment with id " + newPost.getId()  + " was saved!", HttpStatus.CREATED);
+        Article newArticle = new Article();
+        newArticle.setContent(request.getContent());
+        newArticle.setTitle(request.getTitle());
+        newArticle.setAuthor(principal.getName());
+        articleService.save(newArticle);
+        return new ResponseEntity<>("New Article with id " + newArticle.getId()  + " was saved!", HttpStatus.CREATED);
     }
 
-    @GetMapping("myPosts")
-    public ResponseEntity<List<Post>> myComments(Principal principal) {
+    @GetMapping("myArticles")
+    public ResponseEntity<List<Article>> myArticles(Principal principal) {
         String loggedInUsername = principal.getName();
-        List<Post> comments = postService.findByAuthor(loggedInUsername);
+        List<Article> comments = articleService.findByAuthor(loggedInUsername);
         return new ResponseEntity<>(comments, HttpStatus.OK);
     }
 
-    @PutMapping("editPost")
-    public ResponseEntity<String> editComment(@RequestBody PostRequest request, Principal principal, String CommentId) {
+    @PutMapping("editArticle")
+    public ResponseEntity<String> editArticle(@RequestBody ArticleRequest request, Principal principal, String CommentId) {
         User user = userRepository.findByUsername(getLoggedInUsername());
-        Post post = postService.findById(CommentId);
-        if (user.isAdmin() || Objects.equals(post.getAuthor(), user.getUsername())) {
-            post.setText(request.getText());
-            post.setSubject(request.getSubject());
-            post.setPostDate(LocalDateTime.now());
-            postService.save(post);
-            return new ResponseEntity<>("Comment with id " + post.getId()  + " was edited and saved!", HttpStatus.CREATED);
+        Article article = articleService.findById(CommentId);
+        if (user.isAdmin() || Objects.equals(article.getAuthor(), user.getUsername())) {
+            article.setContent(request.getContent());
+            article.setTitle(request.getTitle());
+            articleService.save(article);
+            return new ResponseEntity<>("Article with id " + article.getId()  + " was edited and saved!", HttpStatus.CREATED);
         } else{
             return new ResponseEntity<>("You can't edit this comment", HttpStatus.FORBIDDEN);
         }
     }
 
-    @DeleteMapping("deletePost")
+    @DeleteMapping("deleteArticle")
     public ResponseEntity<String> deleteComment(@RequestBody String commentId, Principal principal) {
         User user = userRepository.findByUsername(getLoggedInUsername());
-        Post post = postService.findById(commentId);
-        if (user.isAdmin() || post.getAuthor() == user.getUsername() ) {
-            postService.deleteById(commentId);
+        Article article = articleService.findById(commentId);
+        if (user.isAdmin() || article.getAuthor() == user.getUsername() ) {
+            articleService.deleteById(commentId);
             return new ResponseEntity<>("Comment with id " + commentId + " was deleted!", HttpStatus.OK);
         } else{
             return new ResponseEntity<>("You can't delete this comment", HttpStatus.FORBIDDEN);

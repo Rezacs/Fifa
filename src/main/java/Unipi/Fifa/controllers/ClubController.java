@@ -58,7 +58,7 @@ public class ClubController {
     @PutMapping("/edit/{mongoId}")
     public ResponseEntity<String> editClub(@PathVariable String mongoId, @RequestBody Club updatedClub) {
         User user = userRepository.findByUsername(getLoggedInUsername());
-        if (user.isAdmin()) {
+//        if (user.isAdmin()) {
             Club existingClub = clubService.getClubbyId(mongoId);
             if (existingClub == null) {
                 return ResponseEntity.notFound().build();
@@ -67,11 +67,11 @@ public class ClubController {
 
             existingClub.setId(existingClub.getId());
             existingClub.setTeamId(updatedClub.getTeamId());
+            existingClub.setTeamName(updatedClub.getTeamName());
             existingClub.setTeamUrl(updatedClub.getTeamUrl());
             existingClub.setFifaVersion(updatedClub.getFifaVersion());
             existingClub.setFifaUpdate(updatedClub.getFifaUpdate());
             existingClub.setUpdateAsOf(updatedClub.getUpdateAsOf());
-            existingClub.setTeamName(updatedClub.getTeamName());
             existingClub.setLeagueId(updatedClub.getLeagueId());
             existingClub.setLeagueName(updatedClub.getLeagueName());
             existingClub.setLeagueLevel(updatedClub.getLeagueLevel());
@@ -127,9 +127,9 @@ public class ClubController {
             cncnService.createEditedClubCoachRelationships(cd);
             pncnService.createEditedClubPlayerRelationships(cd);
             return ResponseEntity.ok("Club updated successfully!");
-        } else{
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+//        } else{
+//            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+//        }
     }
 
     @PostMapping("create-new-club")
