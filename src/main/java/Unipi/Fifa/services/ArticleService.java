@@ -23,8 +23,8 @@ public class ArticleService {
         return articleRepository.findAll();
     }
 
-    public List<Article> findByAuthor(String authorUsername) {
-        return articleRepository.findArticleByAuthor(authorUsername);
+    public List<Article> findByUsername(String Username) {
+        return articleRepository.findArticleByUsername(Username);
     }
     public Article findById(String id) {
         return articleRepository.findById(id).orElse(null);

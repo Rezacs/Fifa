@@ -28,6 +28,8 @@ public class Article {
     private String content;
     @Field("source")
     private String source;
+    @Field("username")
+    private String username;
 
     public String getId() {
         return id;
@@ -75,5 +77,12 @@ public class Article {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

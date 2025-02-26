@@ -86,6 +86,7 @@ public class UserController {
         newArticle.setContent(request.getContent());
         newArticle.setTitle(request.getTitle());
         newArticle.setAuthor(principal.getName());
+        newArticle.setUsername(principal.getName());
         articleService.save(newArticle);
         return new ResponseEntity<>("New Article with id " + newArticle.getId()  + " was saved!", HttpStatus.CREATED);
     }
@@ -93,7 +94,7 @@ public class UserController {
     @GetMapping("myArticles")
     public ResponseEntity<List<Article>> myArticles(Principal principal) {
         String loggedInUsername = principal.getName();
-        List<Article> comments = articleService.findByAuthor(loggedInUsername);
+        List<Article> comments = articleService.findByUsername(loggedInUsername);
         return new ResponseEntity<>(comments, HttpStatus.OK);
     }
 
