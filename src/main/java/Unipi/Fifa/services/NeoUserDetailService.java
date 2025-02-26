@@ -1,5 +1,6 @@
 package Unipi.Fifa.services;
 
+import Unipi.Fifa.repositories.User2Repository;
 import Unipi.Fifa.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -8,15 +9,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class NeoUserDetailService implements UserDetailsService {
-    private final UserRepository userRepository;
+    private final User2Repository user2Repository;
 
-    public NeoUserDetailService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public NeoUserDetailService(User2Repository user2Repository) {
+        this.user2Repository = user2Repository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository
+        return user2Repository
                 .findFullByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found" + username));
     }

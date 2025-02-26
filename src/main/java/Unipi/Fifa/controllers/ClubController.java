@@ -1,9 +1,7 @@
 package Unipi.Fifa.controllers;
 
-import Unipi.Fifa.models.Club;
-import Unipi.Fifa.models.ClubNode;
-import Unipi.Fifa.models.Player;
-import Unipi.Fifa.models.User;
+import Unipi.Fifa.models.*;
+import Unipi.Fifa.repositories.User2Repository;
 import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.services.CNCNService;
 import Unipi.Fifa.services.ClubService;
@@ -34,6 +32,8 @@ public class ClubController {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private User2Repository user2Repository;
 
     @GetMapping("/clubs")
     public List<Club> findByName(@RequestParam String name) {
@@ -134,7 +134,7 @@ public class ClubController {
 
     @PostMapping("create-new-club")
     public ResponseEntity<Club> createClub(@RequestBody Club club) {
-        User user = userRepository.findByUsername(getLoggedInUsername());
+        User2 user = user2Repository.findByUsername(getLoggedInUsername());
         if (user.isAdmin()) {
             try {
                 club.setId(null);
@@ -151,7 +151,7 @@ public class ClubController {
 
     @DeleteMapping("/deleteClub")
     public ResponseEntity<String> deleteClub(@RequestParam String clubMongoId) {
-        User user = userRepository.findByUsername(getLoggedInUsername());
+        User2 user = user2Repository.findByUsername(getLoggedInUsername());
         if (user.isAdmin()) {
             Club targetClub = clubService.getClubbyId(clubMongoId);
             if (targetClub == null) {

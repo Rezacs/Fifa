@@ -43,23 +43,16 @@ public class UserService {
     }
 
     public User createUser(CreateUserRequest request) {
-        // TODO: make sure that this username doesnt exists.
         Optional<User> existingUser = Optional.ofNullable(userRepository.findByUsername(request.getUsername()));
         if (existingUser.isPresent()) {
-//            throw new IllegalArgumentException("Username is already taken.");
             throw new RuntimeException("Username is already taken.");
         }
         else {
             User user = new User();
-            user.setName(request.getName());
             user.setUsername(request.getUsername());
-            user.setRoles(request.getRoles());
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
             userRepository.save(user);
             return user;
         }
-
-
     }
 
     public UserFollowQueryResult follow(String loggedInUsername, String targetUsername) {

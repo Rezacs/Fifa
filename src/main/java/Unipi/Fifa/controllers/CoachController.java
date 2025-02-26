@@ -2,6 +2,7 @@ package Unipi.Fifa.controllers;
 
 
 import Unipi.Fifa.models.*;
+import Unipi.Fifa.repositories.User2Repository;
 import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.services.CNCNService;
 import Unipi.Fifa.services.CoachService;
@@ -19,7 +20,7 @@ import static Unipi.Fifa.services.UserService.getLoggedInUsername;
 public class CoachController {
 
 
-    UserRepository userRepository;
+    User2Repository user2Repository;
 
     @Autowired
     private CoachService coachService;
@@ -92,7 +93,7 @@ public class CoachController {
 
     @DeleteMapping("/deleteCoach")
     public ResponseEntity<String> deletePlayer(@RequestParam Integer coachId) {
-        User user = userRepository.findByUsername(getLoggedInUsername());
+        User2 user = user2Repository.findByUsername(getLoggedInUsername());
         if (user.isAdmin()){
             Coach targetCoach = coachService.getCoachByCoachId(coachId);
             if (targetCoach == null) {

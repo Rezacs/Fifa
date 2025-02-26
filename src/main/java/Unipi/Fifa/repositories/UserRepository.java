@@ -4,6 +4,7 @@ import Unipi.Fifa.models.User;
 import Unipi.Fifa.queryresults.UserFollowQueryResult;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -20,6 +21,9 @@ public interface UserRepository extends Neo4jRepository<User, Long> {
             "MERGE (user1)-[:FOLLOW]->(user2) " +
             "RETURN user1 AS follower , user2 as followed")
     UserFollowQueryResult createFollowRelationship(String username1, String username2);
+
+    @Query("MATCH (p:User) WHERE ID(p) = $nodeId DETACH DELETE p")
+    void deleteUserNodeById(@Param("nodeId") Long nodeId);
 
 
 

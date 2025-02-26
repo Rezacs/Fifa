@@ -5,10 +5,7 @@ import Unipi.Fifa.models.*;
 import Unipi.Fifa.objects.*;
 import Unipi.Fifa.queryresults.PlayerFollowQueryResult;
 import Unipi.Fifa.queryresults.UserFollowQueryResult;
-import Unipi.Fifa.repositories.CoachNodeRepository;
-import Unipi.Fifa.repositories.CoachRepository;
-import Unipi.Fifa.repositories.PlayerRepository;
-import Unipi.Fifa.repositories.UserRepository;
+import Unipi.Fifa.repositories.*;
 import Unipi.Fifa.requests.*;
 import Unipi.Fifa.services.PlayerFollowingService;
 import Unipi.Fifa.services.ArticleService;
@@ -36,17 +33,19 @@ public class UserController {
     private final CoachNodeRepository coachNodeRepository;
     private final PlayerRepository playerRepository;
     private final UserRepository userRepository;
+    private final User2Repository user2Repository;
 
 //    private final AuthenticationManager authenticationManager;
 
 
-    public UserController(UserService userService, PlayerFollowingService playerFollowingService, ArticleService articleService, CoachNodeRepository coachNodeRepository, PlayerRepository playerRepository , UserRepository userRepository) {
+    public UserController(UserService userService, PlayerFollowingService playerFollowingService, ArticleService articleService, CoachNodeRepository coachNodeRepository, PlayerRepository playerRepository , UserRepository userRepository, User2Repository user2Repository) {
         this.userService = userService;
         this.playerFollowingService = playerFollowingService;
         this.articleService = articleService;
         this.coachNodeRepository = coachNodeRepository;
         this.playerRepository = playerRepository;
         this.userRepository = userRepository;
+        this.user2Repository = user2Repository;
     }
 
     @PostMapping("/check/{username}")
@@ -57,13 +56,6 @@ public class UserController {
     @GetMapping("/me")
     public String loggedInUser(Principal principal){
         return principal.getName();
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<UserDTO> signUp(@RequestBody CreateUserRequest request){
-        User user = userService.createUser(request);
-        UserDTO responseUser = new UserDTO(user.getName() , user.getUsername() , user.getRoles());
-        return new ResponseEntity<>(responseUser , HttpStatus.CREATED);
     }
 
     @PostMapping("/seguire")
@@ -107,7 +99,7 @@ public class UserController {
 
     @PutMapping("editArticle")
     public ResponseEntity<String> editArticle(@RequestBody ArticleRequest request, Principal principal, String CommentId) {
-        User user = userRepository.findByUsername(getLoggedInUsername());
+        User2 user = user2Repository.findByUsername(getLoggedInUsername());
         Article article = articleService.findById(CommentId);
         if (user.isAdmin() || Objects.equals(article.getAuthor(), user.getUsername())) {
             article.setContent(request.getContent());
@@ -121,7 +113,7 @@ public class UserController {
 
     @DeleteMapping("deleteArticle")
     public ResponseEntity<String> deleteComment(@RequestBody String commentId, Principal principal) {
-        User user = userRepository.findByUsername(getLoggedInUsername());
+        User2 user = user2Repository.findByUsername(getLoggedInUsername());
         Article article = articleService.findById(commentId);
         if (user.isAdmin() || article.getAuthor() == user.getUsername() ) {
             articleService.deleteById(commentId);
@@ -177,14 +169,8 @@ public class UserController {
 
         // Map User entities to UserDTOs
         List<UserDTO> userDTOs = users.stream().map(user -> {
-            UserDTO userDTO = new UserDTO(user.getName() , user.getUsername() , user.getRoles());
-            userDTO.setName(user.getName());
+            UserDTO userDTO = new UserDTO(user.getUsername());
             userDTO.setUsername(user.getUsername());
-
-            // Assuming roles are stored as a comma-separated String in the 'roles' field of the User entity
-            // If roles are stored as an array, list, or collection, you'll need to adjust accordingly
-            userDTO.setRoles(user.getRoles()); // directly setting roles here
-
             return userDTO;
         }).collect(Collectors.toList());
 
@@ -250,7 +236,7 @@ public class UserController {
 
         // Ensure the authenticated principal is a User instance
         if (authentication != null && authentication.getPrincipal() instanceof User) {
-            User loggedInUser = (User) authentication.getPrincipal();
+            User2 loggedInUser = (User2) authentication.getPrincipal();
 
             // Return the roles as a List of Strings
             return loggedInUser.getAuthorities().stream()

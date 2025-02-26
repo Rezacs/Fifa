@@ -1,9 +1,7 @@
 package Unipi.Fifa.controllers;
 
-import Unipi.Fifa.models.Club;
-import Unipi.Fifa.models.Player;
-import Unipi.Fifa.models.PlayerNode;
-import Unipi.Fifa.models.User;
+import Unipi.Fifa.models.*;
+import Unipi.Fifa.repositories.User2Repository;
 import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.services.PNCNService;
 import Unipi.Fifa.services.PlayerNodeService;
@@ -37,7 +35,7 @@ public class PlayerController {
     @Autowired
     private PlayerNodeService playerNodeService;
     @Autowired
-    private UserRepository userRepository;
+    private User2Repository user2Repository;
 
     @PostMapping("/players")
     public List<Player> getPlayersByClub(@RequestParam String clubName) {
@@ -152,7 +150,7 @@ public class PlayerController {
 
     @DeleteMapping("/deletePlayer")
     public ResponseEntity<String> deletePlayer(@RequestParam String playerId) {
-        User user = userRepository.findByUsername(getLoggedInUsername());
+        User2 user = user2Repository.findByUsername(getLoggedInUsername());
         if (user.isAdmin()){
             Player targetPlayer = playerService.getPlayerById(playerId);
 
