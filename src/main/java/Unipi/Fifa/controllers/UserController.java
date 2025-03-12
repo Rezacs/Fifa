@@ -10,6 +10,9 @@ import Unipi.Fifa.requests.*;
 import Unipi.Fifa.services.PlayerFollowingService;
 import Unipi.Fifa.services.ArticleService;
 import Unipi.Fifa.services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -58,6 +62,21 @@ public class UserController {
         return principal.getName();
     }
 
+    @GetMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+        // Invalidate session
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+
+        // Remove authentication details
+        SecurityContextHolder.clearContext();
+
+        return ResponseEntity.ok("Logged out successfully");
+    }
+
+
     @PostMapping("/seguire")
     public ResponseEntity<UserFollowDTO> follow(@RequestBody UserFollowRequest request, Principal principal) {
         // The logged-in user's username (extracted from the Principal)
@@ -85,8 +104,9 @@ public class UserController {
         Article newArticle = new Article();
         newArticle.setContent(request.getContent());
         newArticle.setTitle(request.getTitle());
-        newArticle.setAuthor(principal.getName());
+        newArticle.setInAssociatedWith(principal.getName());
         newArticle.setUsername(principal.getName());
+        newArticle.setPublishTime(new Date());
         articleService.save(newArticle);
         return new ResponseEntity<>("New Article with id " + newArticle.getId()  + " was saved!", HttpStatus.CREATED);
     }
@@ -99,10 +119,10 @@ public class UserController {
     }
 
     @PutMapping("editArticle")
-    public ResponseEntity<String> editArticle(@RequestBody ArticleRequest request, Principal principal, String CommentId) {
+    public ResponseEntity<String> editArticle(@RequestBody ArticleRequest request, Principal principal, String ArticleMongoId) {
         User2 user = user2Repository.findByUsername(getLoggedInUsername());
-        Article article = articleService.findById(CommentId);
-        if (user.isAdmin() || Objects.equals(article.getAuthor(), user.getUsername())) {
+        Article article = articleService.findById(ArticleMongoId);
+        if (user.isAdmin() || Objects.equals(article.getInAssociatedWith(), user.getUsername())) {
             article.setContent(request.getContent());
             article.setTitle(request.getTitle());
             articleService.save(article);
@@ -116,7 +136,7 @@ public class UserController {
     public ResponseEntity<String> deleteComment(@RequestBody String commentId, Principal principal) {
         User2 user = user2Repository.findByUsername(getLoggedInUsername());
         Article article = articleService.findById(commentId);
-        if (user.isAdmin() || article.getAuthor() == user.getUsername() ) {
+        if (user.isAdmin() || article.getInAssociatedWith() == user.getUsername() ) {
             articleService.deleteById(commentId);
             return new ResponseEntity<>("Comment with id " + commentId + " was deleted!", HttpStatus.OK);
         } else{
@@ -197,6 +217,20 @@ public class UserController {
         );
 
         // Return the PlayerFollowDTO wrapped in a ResponseEntity with CREATED status
+        return new ResponseEntity<>(responseFollow, HttpStatus.CREATED);
+    }
+
+    @PostMapping("followPlayerEasy")
+    public ResponseEntity<PlayerFollowDTO> followPlayerEasy(@RequestBody PlayerFollowEasyRequest request, Principal principal) {
+        String loggedInUsername = principal.getName();
+        String longName = request.getLong_name();
+        Integer fifaVersion = request.getFifaVersion();
+        PlayerFollowQueryResult followResult = userService.followPlayerEasy(loggedInUsername, longName, fifaVersion);
+
+        PlayerFollowDTO responseFollow = new PlayerFollowDTO(
+                followResult.getUser().getUsername(),
+                followResult.getPlayerNode().getMongoId()
+        );
         return new ResponseEntity<>(responseFollow, HttpStatus.CREATED);
     }
 

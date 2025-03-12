@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,14 +21,19 @@ public class Article {
     private String id;
     @Field("link")
     private String link;
-    @Field("author")
-    private String author;
+
+    @Field("in_associated_with")
+    private String inAssociatedWith;
+
     @Field("title")
     private String title;
+
     @Field("content")
     private String content;
-    @Field("source")
-    private String source;
+
+    @Field("publish-time")
+    private Date publishTime;
+
     @Field("username")
     private String username;
 
@@ -47,12 +53,12 @@ public class Article {
         this.link = link;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getInAssociatedWith() {
+        return inAssociatedWith;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setInAssociatedWith(String inAssociatedWith) {
+        this.inAssociatedWith = inAssociatedWith;
     }
 
     public String getTitle() {
@@ -71,17 +77,18 @@ public class Article {
         this.content = content;
     }
 
-    public String getSource() {
-        return source;
+    public Date getPublishTime() {
+        return publishTime;
     }
 
-    public void setSource(String source) {
-        this.source = source;
+    public void setPublishTime(Date publishTime) {
+        this.publishTime = publishTime;
     }
 
     public String getUsername() {
         return username;
     }
+
     public void setUsername(String username) {
         this.username = username;
     }

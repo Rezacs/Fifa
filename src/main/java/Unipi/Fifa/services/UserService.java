@@ -189,5 +189,19 @@ public class UserService {
     }
 
 
-
+    public PlayerFollowQueryResult followPlayerEasy(String loggedInUsername, String longName, Integer fifaVersion) {
+        User loggedInUser = userRepository.findByUsername(loggedInUsername);
+        PlayerNode targetPlayer = playerNodeRepository.findByLongNameAndFifaVersion(longName, fifaVersion);
+        if (loggedInUser == null || targetPlayer == null) {
+            throw new IllegalArgumentException("User or followingPlayer not found.");
+        }
+        if (!loggedInUser.getPlayerNodes().contains(targetPlayer)) {
+            loggedInUser.getPlayerNodes().add(targetPlayer);
+        } else {
+            throw new IllegalArgumentException("Player is already followed.");
+        }
+        // Save the updated user entity
+        userRepository.save(loggedInUser);
+        return new PlayerFollowQueryResult( loggedInUser, targetPlayer);
+    }
 }

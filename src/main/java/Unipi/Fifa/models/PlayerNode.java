@@ -16,7 +16,9 @@ public class PlayerNode {
 
     @Property("mongoId")
     private String mongoId;
-    private String long_name;
+
+    @Property("long_name")
+    private String longName;
     private String nationality;
     private Integer overall;
     private String clubName;
@@ -87,11 +89,11 @@ public class PlayerNode {
     }
 
     public String getLong_name() {
-        return long_name;
+        return longName;
     }
 
     public void setLong_name(String long_name) {
-        this.long_name = long_name;
+        this.longName = long_name;
     }
 
     public String getNationality() {
