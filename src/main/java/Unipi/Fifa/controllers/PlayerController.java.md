@@ -20,7 +20,7 @@ This document provides internal code documentation for the `Unipi.Fifa.controlle
 
 ## 2. Class Overview: PlayerController
 
-The `PlayerController` class is a Spring REST controller annotated with `@RestController` and `@RequestMapping("/api/v1/p")`. It uses `@Autowired` for dependency injection to access services for player data manipulation and a repository for user authentication.  The controller exposes several endpoints for retrieving, updating, creating, and deleting player information.  Security is implemented using Spring Security's `@PreAuthorize` annotation for admin-only operations.
+The `PlayerController` class is a Spring REST controller annotated with `@RestController` and `@RequestMapping("/api/v1/p")`. It uses `@Autowired` for dependency injection to access services for player data manipulation and a repository for userNode authentication.  The controller exposes several endpoints for retrieving, updating, creating, and deleting player information.  Security is implemented using Spring Security's `@PreAuthorize` annotation for admin-only operations.
 
 
 ## 3. Method Details
@@ -113,11 +113,11 @@ This method creates a new player.  The process involves:
 
 | Return Value | Type          | Description                                                                       |
 | ------------- | -------------- | --------------------------------------------------------------------------------- |
-| `ResponseEntity<String>` | `ResponseEntity<String>` | Returns a 200 OK with "Player deleted successfully" if successful, 404 Not Found if the player doesn't exist, 403 Forbidden if the user is not an admin. |
+| `ResponseEntity<String>` | `ResponseEntity<String>` | Returns a 200 OK with "Player deleted successfully" if successful, 404 Not Found if the player doesn't exist, 403 Forbidden if the userNode is not an admin. |
 
 This method deletes a player. The process includes:
 
-1. **Authorization:**  It first checks if the logged-in user is an admin using `userRepository.findByUsername(getLoggedInUsername())`.  If not, a 403 Forbidden response is returned.
+1. **Authorization:**  It first checks if the logged-in userNode is an admin using `userRepository.findByUsername(getLoggedInUsername())`.  If not, a 403 Forbidden response is returned.
 2. **Player Retrieval:** The player is retrieved using `playerService.getPlayerById(playerId)`. A 404 Not Found response is returned if the player doesn't exist.
 3. **Relationship Deletion:** Existing relationships are removed in Neo4j using `playerNodeService.deletePreviousEdges(playerId)`.
 4. **Node Deletion:** The player node in Neo4j is deleted using `playerNodeService.deletePlayerNodeById(playerId)`.

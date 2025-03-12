@@ -23,7 +23,7 @@ The `CoachController` class utilizes Spring's dependency injection to access nec
 
 | Field Name             | Type                  | Description                                                                 |
 |-------------------------|-----------------------|-----------------------------------------------------------------------------|
-| `userRepository`        | `UserRepository`      | Used to access user information, primarily for authorization checks.       |
+| `userRepository`        | `UserRepository`      | Used to access userNode information, primarily for authorization checks.       |
 | `coachService`         | `CoachService`        | Handles business logic related to coach data manipulation in MongoDB.      |
 | `cncnService`          | `CNCNService`         | Manages the creation and update of coach-club relationships in Neo4j.     |
 
@@ -109,8 +109,8 @@ This method creates a new coach.  It first sets the ID to null to prevent confli
 ```java
 @DeleteMapping("/deleteCoach")
 public ResponseEntity<String> deletePlayer(@RequestParam String mongoId) {
-    User user = userRepository.findByUsername(getLoggedInUsername());
-    if (user.isAdmin()) {
+    User userNode = userRepository.findByUsername(getLoggedInUsername());
+    if (userNode.isAdmin()) {
         Coach targetCoach = coachService.getCoachByMongoId(mongoId).orElse(null);
         if (targetCoach == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Coach not found");
@@ -126,4 +126,4 @@ public ResponseEntity<String> deletePlayer(@RequestParam String mongoId) {
 }
 ```
 
-This method deletes a coach. It first performs an authorization check to ensure only administrators can delete coaches. If the coach exists, it deletes associated edges and the coach itself using methods within `coachService`.  If the coach is not found, a 404 Not Found response is returned; if the user lacks permissions, a 403 Forbidden response is returned.  **Note:** The code snippet contains a potential error: `coachId` is used instead of `mongoId` in the delete calls. This should be corrected to use `mongoId`.
+This method deletes a coach. It first performs an authorization check to ensure only administrators can delete coaches. If the coach exists, it deletes associated edges and the coach itself using methods within `coachService`.  If the coach is not found, a 404 Not Found response is returned; if the userNode lacks permissions, a 403 Forbidden response is returned.  **Note:** The code snippet contains a potential error: `coachId` is used instead of `mongoId` in the delete calls. This should be corrected to use `mongoId`.

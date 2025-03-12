@@ -3,11 +3,8 @@ package Unipi.Fifa.controllers;
 
 import Unipi.Fifa.models.*;
 import Unipi.Fifa.repositories.User2Repository;
-import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.services.CNCNService;
 import Unipi.Fifa.services.CoachService;
-import Unipi.Fifa.services.PNCNService;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -93,7 +90,7 @@ public class CoachController {
 
     @DeleteMapping("/deleteCoach")
     public ResponseEntity<String> deletePlayer(@RequestParam Integer coachId) {
-        User2 user = user2Repository.findByUsername(getLoggedInUsername());
+        User user = user2Repository.findByUsername(getLoggedInUsername());
         if (user.isAdmin()){
             Coach targetCoach = coachService.getCoachByCoachId(coachId);
             if (targetCoach == null) {

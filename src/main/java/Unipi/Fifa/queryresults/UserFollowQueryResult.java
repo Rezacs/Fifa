@@ -1,33 +1,33 @@
 package Unipi.Fifa.queryresults;
 
-import Unipi.Fifa.models.User;
+import Unipi.Fifa.models.UserNode;
 
 import java.util.Date;
 
 public class UserFollowQueryResult {
-    private User follower;
-    private User followed;
+    private UserNode follower;
+    private UserNode followed;
     private Date followedDate;
 
-    public UserFollowQueryResult(User follower, User followed, Date followedDate) {
+    public UserFollowQueryResult(UserNode follower, UserNode followed, Date followedDate) {
         this.follower = follower;
         this.followed = followed;
         this.followedDate = followedDate;
     }
 
-    public User getFollower() {
+    public UserNode getFollower() {
         return follower;
     }
 
-    public void setFollower(User follower) {
+    public void setFollower(UserNode follower) {
         this.follower = follower;
     }
 
-    public User getFollowed() {
+    public UserNode getFollowed() {
         return followed;
     }
 
-    public void setFollowed(User followed) {
+    public void setFollowed(UserNode followed) {
         this.followed = followed;
     }
 

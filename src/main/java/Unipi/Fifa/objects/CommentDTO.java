@@ -1,10 +1,5 @@
 package Unipi.Fifa.objects;
 
-import Unipi.Fifa.models.Player;
-import Unipi.Fifa.models.User;
-
-import java.util.Date;
-
 public class CommentDTO {
     private String author;
     private String playerMongoId;

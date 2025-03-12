@@ -25,7 +25,7 @@ Currently, the `PlayerFollowingController` class contains no methods.  Future de
 
 * **DELETE `/api/v1/followplayer/{playerId}`:**  This endpoint would handle unfollowing a player, identified by their `playerId`.  Similar to the POST request, it would require data store access and error handling.
 
-* **GET `/api/v1/followplayer/{playerId}`:** This endpoint could return information about whether a user is following a given player.
+* **GET `/api/v1/followplayer/{playerId}`:** This endpoint could return information about whether a userNode is following a given player.
 
 
 ## 4. Future Development Considerations
@@ -33,7 +33,7 @@ Currently, the `PlayerFollowingController` class contains no methods.  Future de
 The lack of methods in the current implementation suggests a planned future implementation.  Key considerations for future development include:
 
 * **Data Access:** Defining how player following data will be stored and retrieved (e.g., using a database, in-memory storage, or a dedicated service).  The choice will depend on scalability and performance requirements.
-* **Authentication and Authorization:**  Implementing mechanisms to ensure only authenticated users can modify follow status.  This could involve integrating with an authentication provider (e.g., Spring Security).
+* **Authentication and Authorization:**  Implementing mechanisms to ensure only authenticated userNodes can modify follow status.  This could involve integrating with an authentication provider (e.g., Spring Security).
 * **Error Handling:**  Implementing robust error handling to gracefully manage invalid requests, database errors, and other potential issues.  This would involve returning appropriate HTTP status codes and error messages.
 * **Input Validation:**  Adding input validation to ensure that requests contain valid data, preventing unexpected behavior or security vulnerabilities.
 * **Concurrency Control:**  Designing the system to handle concurrent requests efficiently and prevent race conditions, especially for updating the follow status.

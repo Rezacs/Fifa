@@ -58,8 +58,8 @@ mvn spring-boot:run
 ### Authentication
 | Method | Endpoint          | Description            |
 |--------|------------------|------------------------|
-| POST   | `/api/v1/auth/register` | Register a new user |
-| GET    | `/api/v1/auth/me` | Get logged-in user info |
+| POST   | `/api/v1/auth/register` | Register a new userNode |
+| GET    | `/api/v1/auth/me` | Get logged-in userNode info |
 
 ### Player Management
 | Method | Endpoint          | Description            |

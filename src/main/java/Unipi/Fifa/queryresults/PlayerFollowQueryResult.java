@@ -1,23 +1,23 @@
 package Unipi.Fifa.queryresults;
 
 import Unipi.Fifa.models.PlayerNode;
-import Unipi.Fifa.models.User;
+import Unipi.Fifa.models.UserNode;
 
 public class PlayerFollowQueryResult {
-    private User user;
+    private UserNode userNode;
     private PlayerNode playerNode;
 
-    public PlayerFollowQueryResult(User user, PlayerNode playerNode) {
-        this.user = user;
+    public PlayerFollowQueryResult(UserNode userNode, PlayerNode playerNode) {
+        this.userNode = userNode;
         this.playerNode = playerNode;
     }
 
-    public User getUser() {
-        return user;
+    public UserNode getUser() {
+        return userNode;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser(UserNode userNode) {
+        this.userNode = userNode;
     }
 
     public PlayerNode getPlayerNode() {

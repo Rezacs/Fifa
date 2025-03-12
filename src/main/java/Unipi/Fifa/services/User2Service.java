@@ -1,15 +1,13 @@
 package Unipi.Fifa.services;
 
-import Unipi.Fifa.models.User2;
 import Unipi.Fifa.models.User;
+import Unipi.Fifa.models.UserNode;
 import Unipi.Fifa.repositories.User2Repository;
 import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.requests.CreateUserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class User2Service {
@@ -22,14 +20,14 @@ public class User2Service {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public User2 createUser(CreateUserRequest request) {
+    public User createUser(CreateUserRequest request) {
 //        User2 existingUser = user2Repository.findByUsername(request.getUsername()) ;
-        User2 existingUser = user2Repository.findByUsername(request.getUsername());
+        User existingUser = user2Repository.findByUsername(request.getUsername());
 
         if (existingUser != null && existingUser.isEnabled()) {
             throw new RuntimeException("Username is already taken.");
         }
-        User2 user = new User2();
+        User user = new User();
         user.setName(request.getName());
         user.setUsername(request.getUsername());
         user.setRoles(request.getRoles());
@@ -39,8 +37,8 @@ public class User2Service {
     }
 
     public void deleteByUsername(String uname) {
-        User2 existingUser = user2Repository.findByUsername(uname);
-        User userNode = userRepository.findByUsername(uname);
+        User existingUser = user2Repository.findByUsername(uname);
+        UserNode userNode = userRepository.findByUsername(uname);
         if (existingUser == null) {
             throw new RuntimeException("User not found.");
         }

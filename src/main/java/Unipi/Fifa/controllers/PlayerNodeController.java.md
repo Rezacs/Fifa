@@ -88,7 +88,7 @@ public String linkPlayerToUser(@RequestBody PlayerFollowRequest request){
 }
 ```
 
-This method links a player (identified by `mongoId` from the request body) to the currently logged-in user.  The actual linking is handled by `PlayerNodeService.linkPlayerToLoggedInUser()`.  A success message is returned.
+This method links a player (identified by `mongoId` from the request body) to the currently logged-in userNode.  The actual linking is handled by `PlayerNodeService.linkPlayerToLoggedInUser()`.  A success message is returned.
 
 ### 3.6 `unlinkPlayerFromUser`
 
@@ -101,5 +101,5 @@ public String unlinkPlayerFromUser(@RequestBody PlayerFollowRequest request){
 }
 ```
 
-This method unlinks a player (identified by `mongoId` from the request body) from the currently logged-in user.  The unlinking is handled by `PlayerNodeService.unlinkPlayerToLoggedInUser()`. A success message is returned.
+This method unlinks a player (identified by `mongoId` from the request body) from the currently logged-in userNode.  The unlinking is handled by `PlayerNodeService.unlinkPlayerToLoggedInUser()`. A success message is returned.
 

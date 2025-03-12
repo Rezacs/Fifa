@@ -1,43 +1,39 @@
 package Unipi.Fifa.models;
 
-
-import org.springframework.data.neo4j.core.schema.*;
-
+import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-@Node
-public class User {
-    @Id @GeneratedValue
-    private Long id;
+@Document(collection = "Users")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class User implements UserDetails {
+    @Id
+    private String id;
+    private String name;
     private String username;
+    private String password;
+    private String roles;
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Relationship(type = "FOLLOWS", direction = Relationship.Direction.OUTGOING)
+    @DBRef
     private List<PlayerNode> playerNodes;
 
-    @Relationship(type = "Seguire", direction = Relationship.Direction.OUTGOING)
-    private List<User> users;
+    @DBRef
+    private List<UserNode> userNodes;
 
-    @Relationship(type="Piace", direction = Relationship.Direction.OUTGOING)
+    @DBRef
     private List<ClubNode> clubNodes;
 
-    @Relationship(type="FollowCoach", direction = Relationship.Direction.OUTGOING)
+    @DBRef
     private List<CoachNode> coachNodes;
 
     @Override
@@ -45,41 +41,43 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(username, user.username);  // Compare based on username (or userId)
+        return Objects.equals(username, user.username);
     }
 
-
-    public List<CoachNode> getCoachNodes() {
-        return coachNodes;
+    @Override
+    public int hashCode() {
+        return Objects.hash(username);
     }
 
-    public void setCoachNodes(List<CoachNode> coachNodes) {
-        this.coachNodes = coachNodes;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Arrays.stream(roles.split(","))
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
     }
 
-    public List<PlayerNode> getPlayerNodes() {
-        return playerNodes;
+    public boolean isAdmin() {
+        return Arrays.stream(this.roles.split(","))
+                .anyMatch(role -> role.equals("ROLE_ADMIN"));
     }
 
-    public void setPlayerNodes(List<PlayerNode> playerNodes) {
-        this.playerNodes = playerNodes;
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
-    public List<User> getUsers() {
-        return users;
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
     }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 
-    public List<ClubNode> getClubNodes() {
-        return clubNodes;
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
-
-    public void setClubNodes(List<ClubNode> clubNodes) {
-        this.clubNodes = clubNodes;
-    }
-
-
 }

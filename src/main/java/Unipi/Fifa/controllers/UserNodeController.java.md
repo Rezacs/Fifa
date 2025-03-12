@@ -1,4 +1,4 @@
-# Unipi.Fifa.controllers.UserController - Internal Documentation
+# Unipi.Fifa.controllers.UserNodeController - Internal Documentation
 
 ## Table of Contents
 
@@ -7,7 +7,7 @@
 * [3. Constructor](#3-constructor)
 * [4. Methods](#4-methods)
     * [4.1. `checkUser`](#41-checkuser)
-    * [4.2. `loggedInUser`](#42-loggedinuser)
+    * [4.2. `loggedInUserNode`](#42-loggedinuser)
     * [4.3. `signUp`](#43-signup)
     * [4.4. `follow`](#44-follow)
     * [4.5. `addComment`](#45-addcomment)
@@ -23,15 +23,15 @@
 
 ## 1. Overview
 
-The `UserController` class handles various user-related requests within the Unipi.Fifa application.  It uses Spring's `@RestController` annotation to expose RESTful endpoints.  These endpoints allow users to check user existence, register, follow/unfollow other users and players, add comments, and retrieve lists of followed users and players. The controller interacts with several services and repositories to manage user data and relationships.
+The `UserController` class handles various userNode-related requests within the Unipi.Fifa application.  It uses Spring's `@RestController` annotation to expose RESTful endpoints.  These endpoints allow userNodes to check userNode existence, register, follow/unfollow other userNodes and players, add comments, and retrieve lists of followed userNodes and players. The controller interacts with several services and repositories to manage userNode data and relationships.
 
 
 ## 2. Class Variables
 
 | Variable Name             | Type                               | Description                                                                        |
 |--------------------------|------------------------------------|------------------------------------------------------------------------------------|
-| `userService`             | `UserService`                       | Handles user-related business logic.                                                |
-| `playerFollowingService` | `PlayerFollowingService`           | Manages the relationships between users and players they are following.             |
+| `userService`             | `UserService`                       | Handles userNode-related business logic.                                                |
+| `playerFollowingService` | `PlayerFollowingService`           | Manages the relationships between userNodes and players they are following.             |
 | `commentService`          | `CommentService`                    | Handles the creation and persistence of comments.                                   |
 | `coachNodeRepository`     | `CoachNodeRepository`              | Provides access to CoachNode data in the database.                               |
 
@@ -54,7 +54,7 @@ public UserController(UserService userService, PlayerFollowingService playerFoll
 
 ### 4.1. `checkUser`
 
-This method checks if a user with the given username exists.
+This method checks if a userNode with the given username exists.
 
 ```java
 @PostMapping("/check/{username}")
@@ -63,33 +63,33 @@ public User checkUser(@RequestParam String username) {
 }
 ```
 
-### 4.2. `loggedInUser`
+### 4.2. `loggedInUserNode`
 
-This method returns the username of the currently logged-in user.
+This method returns the username of the currently logged-in userNode.
 
 ```java
 @GetMapping("/me")
-public String loggedInUser(Principal principal) {
+public String loggedInUserNode(Principal principal) {
     return principal.getName();
 }
 ```
 
 ### 4.3. `signUp`
 
-This method registers a new user.  It receives a `CreateUserRequest` object, creates a `User` object via the `userService`, and returns a `UserDTO` containing user information.
+This method registers a new userNode.  It receives a `CreateUserRequest` object, creates a `User` object via the `userService`, and returns a `UserDTO` containing userNode information.
 
 ```java
 @PostMapping("/register")
 public ResponseEntity<UserDTO> signUp(@RequestBody CreateUserRequest request) {
-    User user = userService.createUser(request);
-    UserDTO responseUser = new UserDTO(user.getName(), user.getUsername(), user.getRoles());
+    User userNode = userService.createUser(request);
+    UserDTO responseUser = new UserDTO(userNode.getName(), userNode.getUsername(), userNode.getRoles());
     return new ResponseEntity<>(responseUser, HttpStatus.CREATED);
 }
 ```
 
 ### 4.4. `follow`
 
-This method allows a logged-in user to follow another user. It extracts usernames from the `Principal` and request body, uses the `userService.follow` method to create the relationship, and returns a `UserFollowDTO`.
+This method allows a logged-in userNode to follow another userNode. It extracts usernames from the `Principal` and request body, uses the `userService.follow` method to create the relationship, and returns a `UserFollowDTO`.
 
 ```java
 @PostMapping("/seguire")
@@ -108,7 +108,7 @@ public ResponseEntity<UserFollowDTO> follow(@RequestBody UserFollowRequest reque
 
 ### 4.5. `addComment`
 
-This method allows a logged-in user to add a comment on a player.  It extracts information from the `Principal` and request body, creates a `Comment` object, saves it using `commentService`, and returns a confirmation message.
+This method allows a logged-in userNode to add a comment on a player.  It extracts information from the `Principal` and request body, creates a `Comment` object, saves it using `commentService`, and returns a confirmation message.
 
 ```java
 @PostMapping("writeComment")
@@ -127,7 +127,7 @@ public ResponseEntity<String> addComment(@RequestBody CommentRequest request, Pr
 
 ### 4.6. `unfollow`
 
-This method allows a logged-in user to unfollow another user.  Similar to the `follow` method, it uses the `userService.unfollow` method to remove the relationship and returns a confirmation message.
+This method allows a logged-in userNode to unfollow another userNode.  Similar to the `follow` method, it uses the `userService.unfollow` method to remove the relationship and returns a confirmation message.
 
 ```java
 @DeleteMapping("/unfollowUser")
@@ -141,7 +141,7 @@ public ResponseEntity<String> unfollow(@RequestBody UserFollowRequest request, P
 
 ### 4.7. `followings`
 
-This method retrieves a list of players the logged-in user is following.  It uses the `playerFollowingService`, maps the retrieved `PlayerNode` entities to `PlayerNodeDTO` objects, and returns the list.  The mapping involves copying individual fields from the entity to the DTO.
+This method retrieves a list of players the logged-in userNode is following.  It uses the `playerFollowingService`, maps the retrieved `PlayerNode` entities to `PlayerNodeDTO` objects, and returns the list.  The mapping involves copying individual fields from the entity to the DTO.
 
 ```java
 @GetMapping("/followingPlayers")
@@ -158,14 +158,14 @@ public ResponseEntity<List<PlayerNodeDTO>> followings(Principal principal) {
 
 ### 4.8. `followingUsers`
 
-This method retrieves a list of users the logged-in user is following. It uses the `userService`, maps `User` entities to `UserDTO` objects, and returns the list.
+This method retrieves a list of userNodes the logged-in userNode is following. It uses the `userService`, maps `User` entities to `UserDTO` objects, and returns the list.
 
 ```java
 @GetMapping("/followingUsers")
 public ResponseEntity<List<UserDTO>> followingUsers(Principal principal) {
-    List<User> users = userService.FindFollowings(principal.getName());
-    List<UserDTO> userDTOs = users.stream().map(user -> {
-        UserDTO userDTO = new UserDTO(user.getName(), user.getUsername(), user.getRoles());
+    List<User> userNodes = userService.FindFollowings(principal.getName());
+    List<UserDTO> userDTOs = userNodes.stream().map(userNode -> {
+        UserDTO userDTO = new UserDTO(userNode.getName(), userNode.getUsername(), userNode.getRoles());
         // ... Mapping of fields ...
         return userDTO;
     }).collect(Collectors.toList());
@@ -175,7 +175,7 @@ public ResponseEntity<List<UserDTO>> followingUsers(Principal principal) {
 
 ### 4.9. `followPlayer`
 
-This method allows a logged-in user to follow a player. It uses the `userService.followPlayer` method and returns a `PlayerFollowDTO`.
+This method allows a logged-in userNode to follow a player. It uses the `userService.followPlayer` method and returns a `PlayerFollowDTO`.
 
 ```java
 @PostMapping("/followPlayer")
@@ -193,7 +193,7 @@ public ResponseEntity<PlayerFollowDTO> followPlayer(@RequestBody PlayerFollowReq
 
 ### 4.10. `followCoach`
 
-This method allows a logged-in user to follow a coach.  It retrieves the coach from the repository, uses the `userService` to establish the follow relationship, and returns a confirmation message.
+This method allows a logged-in userNode to follow a coach.  It retrieves the coach from the repository, uses the `userService` to establish the follow relationship, and returns a confirmation message.
 
 
 ```java
@@ -209,7 +209,7 @@ public ResponseEntity<String> followCoach(@RequestBody CoachFollowRequest reques
 
 ### 4.11. `unFollowCoach`
 
-This method allows a logged-in user to unfollow a coach.  It's functionally similar to `followCoach`, but removes the follow relationship.
+This method allows a logged-in userNode to unfollow a coach.  It's functionally similar to `followCoach`, but removes the follow relationship.
 
 ```java
 @DeleteMapping("/unFollowCoach")
@@ -224,7 +224,7 @@ public ResponseEntity<String> unFollowCoach(@RequestBody CoachFollowRequest requ
 
 ### 4.12. `unfollowPlayer`
 
-This method allows a logged-in user to unfollow a player. It uses the `userService.unfollowPlayer` method and returns a confirmation message.
+This method allows a logged-in userNode to unfollow a player. It uses the `userService.unfollowPlayer` method and returns a confirmation message.
 
 ```java
 @DeleteMapping("UnfollowPlayer")
@@ -242,7 +242,7 @@ public ResponseEntity<String> unfollowPlayer(@RequestBody PlayerFollowRequest re
 
 ### 4.13. `getLoggedInUserRoles`
 
-This method retrieves the roles of the currently authenticated user using Spring Security's `SecurityContextHolder`. It handles potential `null` values and returns an empty list if no user is logged in or authentication fails.  The roles are extracted from the user's authorities.
+This method retrieves the roles of the currently authenticated userNode using Spring Security's `SecurityContextHolder`. It handles potential `null` values and returns an empty list if no userNode is logged in or authentication fails.  The roles are extracted from the userNode's authorities.
 
 
 ```java
@@ -250,8 +250,8 @@ This method retrieves the roles of the currently authenticated user using Spring
 public List<String> getLoggedInUserRoles() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     if (authentication != null && authentication.getPrincipal() instanceof User) {
-        User loggedInUser = (User) authentication.getPrincipal();
-        return loggedInUser.getAuthorities().stream()
+        User loggedInUserNode = (User) authentication.getPrincipal();
+        return loggedInUserNode.getAuthorities().stream()
                 .map(authority -> authority.getAuthority())
                 .toList();
     }

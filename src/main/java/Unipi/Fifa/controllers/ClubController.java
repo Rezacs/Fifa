@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import static Unipi.Fifa.services.UserService.getLoggedInUsername;
 
@@ -57,7 +56,7 @@ public class ClubController {
 
     @PutMapping("/edit/{mongoId}")
     public ResponseEntity<String> editClub(@PathVariable String mongoId, @RequestBody Club updatedClub) {
-        User user = userRepository.findByUsername(getLoggedInUsername());
+        UserNode userNode = userRepository.findByUsername(getLoggedInUsername());
 //        if (user.isAdmin()) {
             Club existingClub = clubService.getClubbyId(mongoId);
             if (existingClub == null) {
@@ -134,7 +133,7 @@ public class ClubController {
 
     @PostMapping("create-new-club")
     public ResponseEntity<Club> createClub(@RequestBody Club club) {
-        User2 user = user2Repository.findByUsername(getLoggedInUsername());
+        User user = user2Repository.findByUsername(getLoggedInUsername());
         if (user.isAdmin()) {
             try {
                 club.setId(null);
@@ -151,7 +150,7 @@ public class ClubController {
 
     @DeleteMapping("/deleteClub")
     public ResponseEntity<String> deleteClub(@RequestParam String clubMongoId) {
-        User2 user = user2Repository.findByUsername(getLoggedInUsername());
+        User user = user2Repository.findByUsername(getLoggedInUsername());
         if (user.isAdmin()) {
             Club targetClub = clubService.getClubbyId(clubMongoId);
             if (targetClub == null) {

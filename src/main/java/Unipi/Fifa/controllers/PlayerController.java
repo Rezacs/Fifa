@@ -2,20 +2,13 @@ package Unipi.Fifa.controllers;
 
 import Unipi.Fifa.models.*;
 import Unipi.Fifa.repositories.User2Repository;
-import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.services.PNCNService;
 import Unipi.Fifa.services.PlayerNodeService;
 import Unipi.Fifa.services.PlayerService;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -150,7 +143,7 @@ public class PlayerController {
 
     @DeleteMapping("/deletePlayer")
     public ResponseEntity<String> deletePlayer(@RequestParam String playerId) {
-        User2 user = user2Repository.findByUsername(getLoggedInUsername());
+        User user = user2Repository.findByUsername(getLoggedInUsername());
         if (user.isAdmin()){
             Player targetPlayer = playerService.getPlayerById(playerId);
 

@@ -2,7 +2,7 @@ package Unipi.Fifa.services;
 
 import Unipi.Fifa.models.CoachNode;
 import Unipi.Fifa.models.PlayerNode;
-import Unipi.Fifa.models.User;
+import Unipi.Fifa.models.UserNode;
 import Unipi.Fifa.queryresults.PlayerFollowQueryResult;
 import Unipi.Fifa.queryresults.UserFollowQueryResult;
 import Unipi.Fifa.repositories.CoachNodeRepository;
@@ -33,151 +33,154 @@ public class UserService {
         this.coachNodeRepository = coachNodeRepository;
     }
 
-    public User FindUser(String username){
+    public UserNode FindUser(String username){
         return userRepository.findByUsername(username);
     }
 
-    public List<User> FindFollowings(String username){
-        User user = FindUser(username);
-        return user.getUsers();
+    public List<UserNode> FindFollowings(String username){
+        UserNode userNode = FindUser(username);
+        return userNode.getUsers();
     }
 
-    public User createUser(CreateUserRequest request) {
-        Optional<User> existingUser = Optional.ofNullable(userRepository.findByUsername(request.getUsername()));
+    public UserNode createUser(CreateUserRequest request) {
+        Optional<UserNode> existingUser = Optional.ofNullable(userRepository.findByUsername(request.getUsername()));
         if (existingUser.isPresent()) {
             throw new RuntimeException("Username is already taken.");
         }
         else {
-            User user = new User();
-            user.setUsername(request.getUsername());
-            userRepository.save(user);
-            return user;
+            UserNode userNode = new UserNode();
+            userNode.setUsername(request.getUsername());
+            userRepository.save(userNode);
+            return userNode;
         }
     }
 
     public UserFollowQueryResult follow(String loggedInUsername, String targetUsername) {
         // Fetch the logged-in user and the target user from the repository
-        User loggedInUser = userRepository.findByUsername(loggedInUsername);
-        User targetUser = userRepository.findByUsername(targetUsername);
+        UserNode loggedInUserNode = userRepository.findByUsername(loggedInUsername);
+        UserNode targetUserNode = userRepository.findByUsername(targetUsername);
 
-        if (loggedInUser == null || targetUser == null) {
+        if (loggedInUserNode == null || targetUserNode == null) {
             throw new IllegalArgumentException("User not found.");
         }
 
-        List<User> followings = loggedInUser.getUsers();
-        for (User following : followings) {
+        List<UserNode> followings = loggedInUserNode.getUsers();
+        for (UserNode following : followings) {
             if (following.getUsername().equals(targetUsername)) {
                 throw new IllegalArgumentException("Target User already followed by you.");
             }
         }
         // Add the target user to the logged-in user's 'following' list (or relationship in Neo4j)
-        loggedInUser.getUsers().add(targetUser);
+        loggedInUserNode.getUsers().add(targetUserNode);
 
         // Save the updated user object back into Neo4j
-        userRepository.save(loggedInUser);
+        userRepository.save(loggedInUserNode);
 
         // Return the follow information as a DTO or other format you require
-        return new UserFollowQueryResult(loggedInUser, targetUser, new Date());
+        return new UserFollowQueryResult(loggedInUserNode, targetUserNode, new Date());
     }
 
     public PlayerFollowQueryResult followPlayer(String loggedInUsername, String mongoId) {
-        User loggedInUser = userRepository.findByUsername(loggedInUsername);
+        UserNode loggedInUserNode = userRepository.findByUsername(loggedInUsername);
         PlayerNode targetPlayer = playerNodeRepository.findByMongoId(mongoId);
-        if (loggedInUser == null || targetPlayer == null) {
+        if (loggedInUserNode == null || targetPlayer == null) {
             throw new IllegalArgumentException("User or followingPlayer not found.");
         }
-        if (!loggedInUser.getPlayerNodes().contains(targetPlayer)) {
-            loggedInUser.getPlayerNodes().add(targetPlayer);
+        if (!loggedInUserNode.getPlayerNodes().contains(targetPlayer)) {
+            loggedInUserNode.getPlayerNodes().add(targetPlayer);
         } else {
             throw new IllegalArgumentException("Player is already followed.");
         }
 
         // Save the updated user entity
-        userRepository.save(loggedInUser);
-        return new PlayerFollowQueryResult( loggedInUser, targetPlayer);
+        userRepository.save(loggedInUserNode);
+        return new PlayerFollowQueryResult(loggedInUserNode, targetPlayer);
     }
 
     public void followCoach(String loggedInUsername, String mongoId) {
-        User loggedInUser = userRepository.findByUsername(loggedInUsername);
+        UserNode loggedInUserNode = userRepository.findByUsername(loggedInUsername);
         CoachNode coach = coachNodeRepository.findByMongoId(mongoId);
-        if (loggedInUser == null || coach == null) {
-            throw new IllegalArgumentException("User or followingCoach not found.");
+        if (loggedInUserNode == null) {
+            throw new IllegalArgumentException("User Not found.");
         }
-        if (!loggedInUser.getCoachNodes().contains(coach)) {
-            loggedInUser.getCoachNodes().add(coach);
+        if (coach == null){
+            throw new IllegalArgumentException("Coach not found.");
+        }
+        if (!loggedInUserNode.getCoachNodes().contains(coach)) {
+            loggedInUserNode.getCoachNodes().add(coach);
         } else {
             throw new IllegalArgumentException("Player is already followed.");
         }
-        userRepository.save(loggedInUser);
+        userRepository.save(loggedInUserNode);
     }
 
     public void unFollowCoach(String loggedInUsername, String mongoId) {
-        User loggedInUser = userRepository.findByUsername(loggedInUsername);
+        UserNode loggedInUserNode = userRepository.findByUsername(loggedInUsername);
         CoachNode coach = coachNodeRepository.findByMongoId(mongoId);
-        if (loggedInUser == null || coach == null) {
+        if (loggedInUserNode == null || coach == null) {
             throw new IllegalArgumentException("User or followingCoach not found.");
         }
-        if (loggedInUser.getCoachNodes().contains(coach)) {
-            loggedInUser.getCoachNodes().remove(coach);
+        if (loggedInUserNode.getCoachNodes().contains(coach)) {
+            loggedInUserNode.getCoachNodes().remove(coach);
         } else{
             throw new IllegalArgumentException("Player is already followed.");
         }
-        userRepository.save(loggedInUser);
+        userRepository.save(loggedInUserNode);
     }
 
     public PlayerFollowQueryResult unfollowPlayer(String loggedInUsername, String mongoId) {
         // Fetch the logged-in user from the repository
-        User loggedInUser = userRepository.findByUsername(loggedInUsername);
+        UserNode loggedInUserNode = userRepository.findByUsername(loggedInUsername);
 
         // Fetch the target player from the repository
         PlayerNode targetPlayer = playerNodeRepository.findByMongoId(mongoId);
 
         // Validate the existence of both the logged-in user and target player
-        if (loggedInUser == null || targetPlayer == null) {
+        if (loggedInUserNode == null || targetPlayer == null) {
             throw new IllegalArgumentException("User or followingPlayer not found.");
         }
 
         // Remove the target player from the player's nodes list if it exists
-        if (loggedInUser.getPlayerNodes().contains(targetPlayer)) {
-            loggedInUser.getPlayerNodes().remove(targetPlayer);
+        if (loggedInUserNode.getPlayerNodes().contains(targetPlayer)) {
+            loggedInUserNode.getPlayerNodes().remove(targetPlayer);
         } else {
             throw new IllegalArgumentException("Player is not followed.");
         }
 
         // Save the updated user entity
-        userRepository.save(loggedInUser);
+        userRepository.save(loggedInUserNode);
 
         // Return a result object (assumes PlayerUnfollowQueryResult is defined elsewhere)
-        return new PlayerFollowQueryResult(loggedInUser, targetPlayer);
+        return new PlayerFollowQueryResult(loggedInUserNode, targetPlayer);
     }
 
 
     public UserFollowQueryResult unfollow(String loggedInUsername, String targetUsername) {
         // Fetch the logged-in user and the target user from the repository
-        User loggedInUser = userRepository.findByUsername(loggedInUsername);
-        User targetUser = userRepository.findByUsername(targetUsername);
+        UserNode loggedInUserNode = userRepository.findByUsername(loggedInUsername);
+        UserNode targetUserNode = userRepository.findByUsername(targetUsername);
 
-        if (loggedInUser == null || targetUser == null) {
+        if (loggedInUserNode == null || targetUserNode == null) {
             throw new IllegalArgumentException("User not found.");
         }
 
         // Log the users the logged-in user is following
-        System.out.println("Logged-in user " + loggedInUsername + " is following: " + loggedInUser.getUsers());
+        System.out.println("Logged-in user " + loggedInUsername + " is following: " + loggedInUserNode.getUsers());
 
-        System.out.println("Logged-in user is following: " + loggedInUser.getUsers());
+        System.out.println("Logged-in user is following: " + loggedInUserNode.getUsers());
         // Check if the logged-in user is already following the target user
-        if (!loggedInUser.getUsers().contains(targetUser)) {
+        if (!loggedInUserNode.getUsers().contains(targetUserNode)) {
             throw new IllegalArgumentException("You are not following this user.");
         }
 
         // Remove the target user from the logged-in user's 'following' list (or relationship in Neo4j)
-        loggedInUser.getUsers().remove(targetUser);
+        loggedInUserNode.getUsers().remove(targetUserNode);
 
         // Save the updated user object back into Neo4j
-        userRepository.save(loggedInUser);
+        userRepository.save(loggedInUserNode);
 
         // Return the unfollow information as a DTO or other format you require
-        return new UserFollowQueryResult(loggedInUser, targetUser, new Date());
+        return new UserFollowQueryResult(loggedInUserNode, targetUserNode, new Date());
     }
 
     public static String getLoggedInUsername() {
@@ -190,18 +193,18 @@ public class UserService {
 
 
     public PlayerFollowQueryResult followPlayerEasy(String loggedInUsername, String longName, Integer fifaVersion) {
-        User loggedInUser = userRepository.findByUsername(loggedInUsername);
+        UserNode loggedInUserNode = userRepository.findByUsername(loggedInUsername);
         PlayerNode targetPlayer = playerNodeRepository.findByLongNameAndFifaVersion(longName, fifaVersion);
-        if (loggedInUser == null || targetPlayer == null) {
+        if (loggedInUserNode == null || targetPlayer == null) {
             throw new IllegalArgumentException("User or followingPlayer not found.");
         }
-        if (!loggedInUser.getPlayerNodes().contains(targetPlayer)) {
-            loggedInUser.getPlayerNodes().add(targetPlayer);
+        if (!loggedInUserNode.getPlayerNodes().contains(targetPlayer)) {
+            loggedInUserNode.getPlayerNodes().add(targetPlayer);
         } else {
             throw new IllegalArgumentException("Player is already followed.");
         }
         // Save the updated user entity
-        userRepository.save(loggedInUser);
-        return new PlayerFollowQueryResult( loggedInUser, targetPlayer);
+        userRepository.save(loggedInUserNode);
+        return new PlayerFollowQueryResult(loggedInUserNode, targetPlayer);
     }
 }
