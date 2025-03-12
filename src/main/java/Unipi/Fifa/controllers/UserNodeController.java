@@ -20,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.authentication.AuthenticationManager;
 
 import java.security.Principal;
 import java.util.Date;
@@ -40,10 +41,10 @@ public class UserNodeController {
     private final UserRepository userRepository;
     private final User2Repository user2Repository;
 
-//    private final AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
 
-    public UserNodeController(UserService userService, PlayerFollowingService playerFollowingService, ArticleService articleService, CoachNodeRepository coachNodeRepository, PlayerRepository playerRepository , UserRepository userRepository, User2Repository user2Repository) {
+    public UserNodeController(UserService userService, PlayerFollowingService playerFollowingService, ArticleService articleService, CoachNodeRepository coachNodeRepository, PlayerRepository playerRepository , UserRepository userRepository, User2Repository user2Repository, AuthenticationManager authenticationManager) {
         this.userService = userService;
         this.playerFollowingService = playerFollowingService;
         this.articleService = articleService;
@@ -51,6 +52,7 @@ public class UserNodeController {
         this.playerRepository = playerRepository;
         this.userRepository = userRepository;
         this.user2Repository = user2Repository;
+        this.authenticationManager = authenticationManager;
     }
 
     @PostMapping("/check/{username}")
@@ -77,14 +79,14 @@ public class UserNodeController {
         return ResponseEntity.ok("Logged out successfully");
     }
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
         try {
             // Authenticate the user with the provided username and password
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
 
-            Authentication authentication = authenticationManagerBean().authenticate(authenticationToken); // Changed line here
+            Authentication authentication = authenticationManager.authenticate(authenticationToken);
             // If authentication is successful, set the authentication context
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -255,10 +257,12 @@ public class UserNodeController {
     @PostMapping("/followCoach")
     public ResponseEntity<String> followCoach(@RequestBody CoachFollowRequest request, Principal principal) {
         String loggedInUsername = principal.getName();
+
         String mongoId = request.getMongoId();
         CoachNode coach = coachNodeRepository.findByMongoId(mongoId);
         userService.followCoach(loggedInUsername, request.getMongoId());
-        return new ResponseEntity<>("Coach " + coach.getLongName() + " followed.", HttpStatus.CREATED);
+        return new ResponseEntity<>( "this is user :  " + loggedInUsername + " followed.", HttpStatus.CREATED);
+//        return new ResponseEntity<>("Coach " + coach.getLongName() + " followed.", HttpStatus.CREATED);
     }
 
     @PostMapping("/followCoachEasy")
