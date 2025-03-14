@@ -1,7 +1,7 @@
 package Unipi.Fifa.controllers;
 
 import Unipi.Fifa.models.*;
-import Unipi.Fifa.repositories.User2Repository;
+import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.services.PNCNService;
 import Unipi.Fifa.services.PlayerNodeService;
 import Unipi.Fifa.services.PlayerService;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static Unipi.Fifa.services.UserService.getLoggedInUsername;
+import static Unipi.Fifa.services.UserNodeService.getLoggedInUsername;
 
 @RestController
 @RequestMapping("/api/v1/p")
@@ -28,7 +28,7 @@ public class PlayerController {
     @Autowired
     private PlayerNodeService playerNodeService;
     @Autowired
-    private User2Repository user2Repository;
+    private UserRepository userRepository;
 
     @PostMapping("/players")
     public List<Player> getPlayersByClub(@RequestParam String clubName) {
@@ -143,7 +143,7 @@ public class PlayerController {
 
     @DeleteMapping("/deletePlayer")
     public ResponseEntity<String> deletePlayer(@RequestParam String playerId) {
-        User user = user2Repository.findByUsername(getLoggedInUsername());
+        User user = userRepository.findByUsername(getLoggedInUsername());
         if (user.isAdmin()){
             Player targetPlayer = playerService.getPlayerById(playerId);
 

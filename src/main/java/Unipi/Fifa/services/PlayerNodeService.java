@@ -6,7 +6,7 @@ import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.models.UserNode;
 import Unipi.Fifa.repositories.PlayerNodeRepository;
 import Unipi.Fifa.repositories.PlayerRepository;
-import Unipi.Fifa.repositories.UserRepository;
+import Unipi.Fifa.repositories.UserNodeRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,12 +19,12 @@ public class PlayerNodeService {
 
     private final PlayerNodeRepository playerNodeRepository;
     private final PlayerRepository playerRepository;
-    private UserRepository userRepository;
+    private UserNodeRepository userNodeRepository;
 
-    public PlayerNodeService(PlayerNodeRepository playerNodeRepository, PlayerRepository playerRepository, UserRepository userRepository) {
+    public PlayerNodeService(PlayerNodeRepository playerNodeRepository, PlayerRepository playerRepository, UserNodeRepository userNodeRepository) {
         this.playerNodeRepository = playerNodeRepository;
         this.playerRepository = playerRepository;
-        this.userRepository = userRepository;
+        this.userNodeRepository = userNodeRepository;
     }
 
     public List<PlayerNode> getPlayersByClub(String clubName) {
@@ -154,7 +154,7 @@ public class PlayerNodeService {
         String loggedInUsername = getLoggedInUsername();
 
         // Find the user by the username
-        UserNode userNode = userRepository.findByUsername(loggedInUsername);
+        UserNode userNode = userNodeRepository.findByUsername(loggedInUsername);
         if (userNode == null) {
             throw new IllegalArgumentException("User not found");
         }
@@ -168,13 +168,13 @@ public class PlayerNodeService {
         // Link the PlayerNode to the User
         if (!userNode.getPlayerNodes().contains(playerNode)) {
             userNode.getPlayerNodes().add(playerNode);  // Add the player node to the user's player nodes list
-            userRepository.save(userNode);  // Save the user with the updated list of player nodes
+            userNodeRepository.save(userNode);  // Save the user with the updated list of player nodes
         }
     }
 
     public void unlinkPlayerToLoggedInUser(String mongoId) {
         String loggedInUsername = getLoggedInUsername();
-        UserNode userNode = userRepository.findByUsername(loggedInUsername);
+        UserNode userNode = userNodeRepository.findByUsername(loggedInUsername);
         if (userNode == null) {
             throw new IllegalArgumentException("User not found");
         }
@@ -184,7 +184,7 @@ public class PlayerNodeService {
         }
         if (!userNode.getPlayerNodes().contains(playerNode)) {
             userNode.getPlayerNodes().remove(playerNode);  // Add the player node to the user's player nodes list
-            userRepository.save(userNode);  // Save the user with the updated list of player nodes
+            userNodeRepository.save(userNode);  // Save the user with the updated list of player nodes
         }
     }
 

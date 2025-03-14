@@ -1,8 +1,8 @@
 package Unipi.Fifa.controllers;
 
 import Unipi.Fifa.models.*;
-import Unipi.Fifa.repositories.User2Repository;
 import Unipi.Fifa.repositories.UserRepository;
+import Unipi.Fifa.repositories.UserNodeRepository;
 import Unipi.Fifa.services.CNCNService;
 import Unipi.Fifa.services.ClubService;
 import Unipi.Fifa.services.PNCNService;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static Unipi.Fifa.services.UserService.getLoggedInUsername;
+import static Unipi.Fifa.services.UserNodeService.getLoggedInUsername;
 
 @RestController
 @RequestMapping("/api/v1/c")
@@ -30,9 +30,9 @@ public class ClubController {
     private PNCNService pncnService;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserNodeRepository userNodeRepository;
     @Autowired
-    private User2Repository user2Repository;
+    private UserRepository userRepository;
 
     @GetMapping("/clubs")
     public List<Club> findByName(@RequestParam String name) {
@@ -56,7 +56,7 @@ public class ClubController {
 
     @PutMapping("/edit/{mongoId}")
     public ResponseEntity<String> editClub(@PathVariable String mongoId, @RequestBody Club updatedClub) {
-        UserNode userNode = userRepository.findByUsername(getLoggedInUsername());
+        UserNode userNode = userNodeRepository.findByUsername(getLoggedInUsername());
 //        if (user.isAdmin()) {
             Club existingClub = clubService.getClubbyId(mongoId);
             if (existingClub == null) {
@@ -133,7 +133,7 @@ public class ClubController {
 
     @PostMapping("create-new-club")
     public ResponseEntity<Club> createClub(@RequestBody Club club) {
-        User user = user2Repository.findByUsername(getLoggedInUsername());
+        User user = userRepository.findByUsername(getLoggedInUsername());
         if (user.isAdmin()) {
             try {
                 club.setId(null);
@@ -150,7 +150,7 @@ public class ClubController {
 
     @DeleteMapping("/deleteClub")
     public ResponseEntity<String> deleteClub(@RequestParam String clubMongoId) {
-        User user = user2Repository.findByUsername(getLoggedInUsername());
+        User user = userRepository.findByUsername(getLoggedInUsername());
         if (user.isAdmin()) {
             Club targetClub = clubService.getClubbyId(clubMongoId);
             if (targetClub == null) {

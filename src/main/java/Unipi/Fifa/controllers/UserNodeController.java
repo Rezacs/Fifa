@@ -9,7 +9,7 @@ import Unipi.Fifa.repositories.*;
 import Unipi.Fifa.requests.*;
 import Unipi.Fifa.services.PlayerFollowingService;
 import Unipi.Fifa.services.ArticleService;
-import Unipi.Fifa.services.UserService;
+import Unipi.Fifa.services.UserNodeService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -28,36 +28,36 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static Unipi.Fifa.services.UserService.getLoggedInUsername;
+import static Unipi.Fifa.services.UserNodeService.getLoggedInUsername;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 public class UserNodeController {
-    private final UserService userService;
+    private final UserNodeService userNodeService;
     private final PlayerFollowingService playerFollowingService;
     private final ArticleService articleService;
     private final CoachNodeRepository coachNodeRepository;
     private final PlayerRepository playerRepository;
+    private final UserNodeRepository userNodeRepository;
     private final UserRepository userRepository;
-    private final User2Repository user2Repository;
 
     private final AuthenticationManager authenticationManager;
 
 
-    public UserNodeController(UserService userService, PlayerFollowingService playerFollowingService, ArticleService articleService, CoachNodeRepository coachNodeRepository, PlayerRepository playerRepository , UserRepository userRepository, User2Repository user2Repository, AuthenticationManager authenticationManager) {
-        this.userService = userService;
+    public UserNodeController(UserNodeService userNodeService, PlayerFollowingService playerFollowingService, ArticleService articleService, CoachNodeRepository coachNodeRepository, PlayerRepository playerRepository , UserNodeRepository userNodeRepository, UserRepository userRepository, AuthenticationManager authenticationManager) {
+        this.userNodeService = userNodeService;
         this.playerFollowingService = playerFollowingService;
         this.articleService = articleService;
         this.coachNodeRepository = coachNodeRepository;
         this.playerRepository = playerRepository;
+        this.userNodeRepository = userNodeRepository;
         this.userRepository = userRepository;
-        this.user2Repository = user2Repository;
         this.authenticationManager = authenticationManager;
     }
 
     @PostMapping("/check/{username}")
     public UserNode checkUser(@RequestParam String username) {
-        return userService.FindUser(username);
+        return userNodeService.FindUser(username);
     }
 
     @GetMapping("/me")
@@ -106,7 +106,7 @@ public class UserNodeController {
         String targetUsername = request.getUsername();
 
         // Call the service to create the follow relationship
-        UserFollowQueryResult followResult = userService.follow(loggedInUsername, targetUsername);
+        UserFollowQueryResult followResult = userNodeService.follow(loggedInUsername, targetUsername);
 
         // Create a DTO to return
         UserFollowDTO responseFollow = new UserFollowDTO(
@@ -140,7 +140,7 @@ public class UserNodeController {
 
     @PutMapping("editArticle")
     public ResponseEntity<String> editArticle(@RequestBody ArticleRequest request, Principal principal, String ArticleMongoId) {
-        User user = user2Repository.findByUsername(getLoggedInUsername());
+        User user = userRepository.findByUsername(getLoggedInUsername());
         Article article = articleService.findById(ArticleMongoId);
         if (user.isAdmin() || Objects.equals(article.getInAssociatedWith(), user.getUsername())) {
             article.setContent(request.getContent());
@@ -154,7 +154,7 @@ public class UserNodeController {
 
     @DeleteMapping("deleteArticle")
     public ResponseEntity<String> deleteComment(@RequestBody String commentId, Principal principal) {
-        User user = user2Repository.findByUsername(getLoggedInUsername());
+        User user = userRepository.findByUsername(getLoggedInUsername());
         Article article = articleService.findById(commentId);
         if (user.isAdmin() || article.getInAssociatedWith() == user.getUsername() ) {
             articleService.deleteById(commentId);
@@ -174,7 +174,7 @@ public class UserNodeController {
         String targetUsername = request.getUsername();
 
         // Call the service to remove the follow relationship
-        UserFollowQueryResult unfollowResult = userService.unfollow(loggedInUsername, targetUsername);
+        UserFollowQueryResult unfollowResult = userNodeService.unfollow(loggedInUsername, targetUsername);
 
         return new ResponseEntity<>("User" + targetUsername + "unfollowed", HttpStatus.OK);
     }
@@ -206,7 +206,7 @@ public class UserNodeController {
     @GetMapping("/followingUsers")
     public ResponseEntity<List<UserDTO>> followingUsers(Principal principal) {
         // Fetch the list of User entities the logged-in user is following
-        List<UserNode> userNodes = userService.FindFollowings(principal.getName());
+        List<UserNode> userNodes = userNodeService.FindFollowings(principal.getName());
 
         // Map User entities to UserDTOs
         List<UserDTO> userDTOs = userNodes.stream().map(user -> {
@@ -228,7 +228,7 @@ public class UserNodeController {
         String mongoId = request.getMongoId();
 
         // Call the service to create the follow relationship between the user and the player
-        PlayerFollowQueryResult followResult = userService.followPlayer(loggedInUsername, request.getMongoId());
+        PlayerFollowQueryResult followResult = userNodeService.followPlayer(loggedInUsername, request.getMongoId());
 
         // Create a DTO to return with player follow details
         PlayerFollowDTO responseFollow = new PlayerFollowDTO(
@@ -245,7 +245,7 @@ public class UserNodeController {
         String loggedInUsername = principal.getName();
         String longName = request.getLong_name();
         Integer fifaVersion = request.getFifaVersion();
-        PlayerFollowQueryResult followResult = userService.followPlayerEasy(loggedInUsername, longName, fifaVersion);
+        PlayerFollowQueryResult followResult = userNodeService.followPlayerEasy(loggedInUsername, longName, fifaVersion);
 
         PlayerFollowDTO responseFollow = new PlayerFollowDTO(
                 followResult.getUser().getUsername(),
@@ -260,7 +260,7 @@ public class UserNodeController {
 
         String mongoId = request.getMongoId();
         CoachNode coach = coachNodeRepository.findByMongoId(mongoId);
-        userService.followCoach(loggedInUsername, request.getMongoId());
+        userNodeService.followCoach(loggedInUsername, request.getMongoId());
         return new ResponseEntity<>( "this is user :  " + loggedInUsername + " followed.", HttpStatus.CREATED);
 //        return new ResponseEntity<>("Coach " + coach.getLongName() + " followed.", HttpStatus.CREATED);
     }
@@ -270,7 +270,7 @@ public class UserNodeController {
         String loggedInUsername = principal.getName();
         Integer coachId = request.getCoachId();
         CoachNode coach = coachNodeRepository.findByCoachId(coachId);
-        userService.followCoach(loggedInUsername, coach.getMongoId());
+        userNodeService.followCoach(loggedInUsername, coach.getMongoId());
         return new ResponseEntity<>("Coach " + coach.getLongName() + " followed.", HttpStatus.CREATED);
     }
 
@@ -279,7 +279,7 @@ public class UserNodeController {
         String loggedInUsername = principal.getName();
         String mongoId = request.getMongoId();
         CoachNode coach = coachNodeRepository.findByMongoId(mongoId);
-        userService.unFollowCoach(loggedInUsername, request.getMongoId());
+        userNodeService.unFollowCoach(loggedInUsername, request.getMongoId());
         return new ResponseEntity<>("Coach " + coach.getLongName() + " unfollowed.", HttpStatus.CREATED);
     }
 
@@ -287,7 +287,7 @@ public class UserNodeController {
     public ResponseEntity<String> unfollowPlayer(@RequestBody PlayerFollowRequest request, Principal principal) {
         String loggedInUsername = principal.getName();
         String mongoId = request.getMongoId();
-        PlayerFollowQueryResult unfollowResult = userService.unfollowPlayer(loggedInUsername, request.getMongoId());
+        PlayerFollowQueryResult unfollowResult = userNodeService.unfollowPlayer(loggedInUsername, request.getMongoId());
         PlayerFollowDTO responseFollow = new PlayerFollowDTO(
                 unfollowResult.getUser().getUsername(),
                 unfollowResult.getPlayerNode().getMongoId()

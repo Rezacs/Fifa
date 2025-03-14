@@ -3,7 +3,7 @@ package Unipi.Fifa.services;
 import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.queryresults.PlayerFollowQueryResult;
 import Unipi.Fifa.repositories.PlayerNodeRepository;
-import Unipi.Fifa.repositories.UserRepository;
+import Unipi.Fifa.repositories.UserNodeRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,11 +11,11 @@ import java.util.List;
 @Service
 public class PlayerFollowingService {
     private final PlayerNodeRepository playerNodeRepository;
-    private final UserRepository userRepository;
+    private final UserNodeRepository userNodeRepository;
 
-    public PlayerFollowingService(PlayerNodeRepository playerNodeRepository, UserRepository userRepository) {
+    public PlayerFollowingService(PlayerNodeRepository playerNodeRepository, UserNodeRepository userNodeRepository) {
         this.playerNodeRepository = playerNodeRepository;
-        this.userRepository = userRepository;
+        this.userNodeRepository = userNodeRepository;
     }
 
     public PlayerFollowQueryResult follow(String username, Integer playerId){

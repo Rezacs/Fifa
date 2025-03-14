@@ -1,6 +1,7 @@
 package Unipi.Fifa.config;
 
 
+import Unipi.Fifa.services.MongoUserDetailService;
 import Unipi.Fifa.services.NeoUserDetailService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,9 +20,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
      private final NeoUserDetailService neoUserDetailService;
+     private final MongoUserDetailService mongoUserDetailService;
 
-     public SecurityConfig(NeoUserDetailService neoUserDetailService) {
+     public SecurityConfig(NeoUserDetailService neoUserDetailService, MongoUserDetailService mongoUserDetailService) {
          this.neoUserDetailService = neoUserDetailService;
+         this.mongoUserDetailService = mongoUserDetailService;
      }
 
      @Bean
@@ -34,7 +37,7 @@ public class SecurityConfig {
                                          "api/v1/auth/me","api/v1/enrolments/**"
                                  ).authenticated()
                                  .anyRequest().permitAll()
-                 ).userDetailsService(neoUserDetailService)
+                 ).userDetailsService(mongoUserDetailService)
                  .httpBasic(Customizer.withDefaults())
                  .build();
      }
@@ -57,7 +60,7 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         // Using AuthenticationManagerBuilder to configure AuthenticationManager
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.userDetailsService(neoUserDetailService).passwordEncoder(passwordEncoder());
+        authenticationManagerBuilder.userDetailsService(mongoUserDetailService).passwordEncoder(passwordEncoder());
         return authenticationManagerBuilder.build();
     }
 }

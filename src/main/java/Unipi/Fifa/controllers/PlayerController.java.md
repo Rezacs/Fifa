@@ -117,7 +117,7 @@ This method creates a new player.  The process involves:
 
 This method deletes a player. The process includes:
 
-1. **Authorization:**  It first checks if the logged-in userNode is an admin using `userRepository.findByUsername(getLoggedInUsername())`.  If not, a 403 Forbidden response is returned.
+1. **Authorization:**  It first checks if the logged-in userNode is an admin using `userNodeRepository.findByUsername(getLoggedInUsername())`.  If not, a 403 Forbidden response is returned.
 2. **Player Retrieval:** The player is retrieved using `playerService.getPlayerById(playerId)`. A 404 Not Found response is returned if the player doesn't exist.
 3. **Relationship Deletion:** Existing relationships are removed in Neo4j using `playerNodeService.deletePreviousEdges(playerId)`.
 4. **Node Deletion:** The player node in Neo4j is deleted using `playerNodeService.deletePlayerNodeById(playerId)`.

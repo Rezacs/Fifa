@@ -2,7 +2,7 @@ package Unipi.Fifa.controllers;
 
 
 import Unipi.Fifa.models.*;
-import Unipi.Fifa.repositories.User2Repository;
+import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.services.CNCNService;
 import Unipi.Fifa.services.CoachService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,14 +10,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static Unipi.Fifa.services.UserService.getLoggedInUsername;
+import static Unipi.Fifa.services.UserNodeService.getLoggedInUsername;
 
 @RestController
 @RequestMapping("/api/v1/Coache")
 public class CoachController {
 
 
-    User2Repository user2Repository;
+    UserRepository userRepository;
 
     @Autowired
     private CoachService coachService;
@@ -90,7 +90,7 @@ public class CoachController {
 
     @DeleteMapping("/deleteCoach")
     public ResponseEntity<String> deletePlayer(@RequestParam Integer coachId) {
-        User user = user2Repository.findByUsername(getLoggedInUsername());
+        User user = userRepository.findByUsername(getLoggedInUsername());
         if (user.isAdmin()){
             Coach targetCoach = coachService.getCoachByCoachId(coachId);
             if (targetCoach == null) {

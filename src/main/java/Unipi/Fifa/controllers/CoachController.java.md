@@ -23,7 +23,7 @@ The `CoachController` class utilizes Spring's dependency injection to access nec
 
 | Field Name             | Type                  | Description                                                                 |
 |-------------------------|-----------------------|-----------------------------------------------------------------------------|
-| `userRepository`        | `UserRepository`      | Used to access userNode information, primarily for authorization checks.       |
+| `userNodeRepository`        | `UserRepository`      | Used to access userNode information, primarily for authorization checks.       |
 | `coachService`         | `CoachService`        | Handles business logic related to coach data manipulation in MongoDB.      |
 | `cncnService`          | `CNCNService`         | Manages the creation and update of coach-club relationships in Neo4j.     |
 
@@ -109,7 +109,7 @@ This method creates a new coach.  It first sets the ID to null to prevent confli
 ```java
 @DeleteMapping("/deleteCoach")
 public ResponseEntity<String> deletePlayer(@RequestParam String mongoId) {
-    User userNode = userRepository.findByUsername(getLoggedInUsername());
+    User userNode = userNodeRepository.findByUsername(getLoggedInUsername());
     if (userNode.isAdmin()) {
         Coach targetCoach = coachService.getCoachByMongoId(mongoId).orElse(null);
         if (targetCoach == null) {
