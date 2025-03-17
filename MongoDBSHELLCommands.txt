@@ -1,0 +1,146 @@
+db.Players.aggregate([
+  {
+    $group: {
+      _id: "$player_id",
+      player_id: { $first: "$player_id" },
+      gender: { $first: "$gender" },
+      short_name: { $first: "$short_name" },
+      long_name: { $first: "$long_name" },
+      nationality_id: { $first: "$nationality_id" },
+      nationality_name: { $first: "$nationality_name" },
+      preferred_foot: { $first: "$preferred_foot" }, // Fixed name consistency
+      dob: { $first: "$dob" }, // Fixed `$dob` issue
+      position: { $first: "$player_positions" }, // Fixed missing field
+
+      fifa_versions: {
+        $push: {
+          k: { $concat: ["fifa_stats_", { $toString: "$fifa_version" }] }, // Dynamic key name
+          v: {
+            stats: {
+							release_clause_eur: "$release_clause_eur",
+              club_position: "$club_positions",
+							club_jersey_number: "$club_jersey_number",
+              overall: "$overall",
+              potential: "$potential",
+              value_eur: "$value_eur",
+              wage_eur: "$wage_eur",
+              age: "$age",
+              height_cm: "$height_cm",
+              weight_kg: "$weight_kg",
+              club_team_id: "$club_team_id",
+              club_name: "$club_name",
+              league_id: "$league_id",
+              league_name: "$league_name",
+              club_position: "$club_position",
+              club_jersey_number: "$club_jersey_number",
+              club_joined_date: "$club_joined_date",
+              club_contract_valid_until_year: "$club_contract_valid_until_year",
+              nation_position: "$nation_position",
+							nation_jersey_number: "$nation_jersey_number",
+              release_clause_eur: "$release_clause_eur",
+							nation_team_id: "$nation_team_id" ,
+							nation_position : "$nation_position",
+              pace: "$pace",
+              shooting: "$shooting",
+              passing: "$passing",
+              dribbling: "$dribbling",
+              defending: "$defending",
+              physic: "$physic",
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    $project: {
+      _id: 0,
+      player_id: 1,
+      gender: 1,
+      player_url: 1,
+      short_name: 1,
+      long_name: 1,
+      nationality_id: 1,
+      nationality_name: 1,
+      nation_team_id: 1,
+      preferred_foot: 1,
+      dob: 1, // Added to `$project`
+      position: 1,
+      
+      merged_versions: { $arrayToObject: "$fifa_versions" } // Convert array to key-value object
+    }
+  },
+  { $out: "merged_collection" } // Saves the transformed data to a new collection
+]);
+
+
+
+
+----------------------------------------------------------------
+
+
+
+db.Teams.aggregate([
+  {
+    $group: {
+      _id: "$team_id",
+      team_id: { $first: "$team_id" },
+      gender: { $first: "$gender" },
+      team_name: { $first: "$team_name" },
+      nationality_id: { $first: "$nationality_id" },
+      nationality_name: { $first: "$nationality_name" },
+      home_stadium: { $first: "$home_stadium" },
+      rival_team: { $first: "$rival_team" },
+
+      fifa_versions: {
+        $push: {
+          k: { $concat: ["fifa_stats_", { $toString: "$fifa_version" }] }, // Dynamic key name
+          v: {
+            overall: "$overall",
+            attack: "$attack",
+            midfield: "$midfield",
+            defence: "$defence",
+
+            league_id: "$league_id",
+            league_name: "$league_name",
+            league_level: "$league_level",
+            international_prestige: "$international_prestige",
+            domestic_prestige: "$domestic_prestige", // Fixed typo
+            club_worth_eur: "$club_worth_eur", // Fixed incorrect `$first`
+            starting_xi_average_age: "$starting_xi_average_age", // Fixed syntax
+            whole_team_average_age: "$whole_team_average_age",
+            coach_id: "$coach_id",
+
+            captain: "$captain",
+            penalties_taker: "$penalties",
+          }
+        }
+      }
+    }
+  },
+  {
+    $project: {
+      _id: 0,
+      team_id: 1,
+      gender: 1,
+      team_name: 1,
+      team_url: 1,
+      league_id: 1,
+      league_name: 1,
+      league_level: 1,
+      nationality_id: 1,
+      nationality_name: 1,
+      home_stadium: 1,
+      coach_id: 1,
+      rival_team: 1,
+      international_prestige: 1,
+      domestic_prestige: 1,
+      club_worth_eur: 1,
+      starting_xi_average_age: 1,
+      whole_team_average_age: 1,
+
+      merged_versions: { $arrayToObject: "$fifa_versions" } // Convert array to key-value object
+    }
+  },
+  { $out: "merged_teams" } // Saves the transformed data to a new collection
+]);
