@@ -1,3 +1,11 @@
+First please add gender field to all Male and Female files seperately and then combine them into 1 file .
+so instead of 6 files ( MaleCoach - MalePlayers - MaleTeams - FemaleCoach - FemalePlayers - FemaleTeams )
+we will have just 3 : COaches - Players - Teams
+
+-------------------------------------------
+
+
+
 db.Players.aggregate([
   {
     $group: {
