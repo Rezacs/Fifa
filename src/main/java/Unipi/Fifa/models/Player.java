@@ -93,8 +93,6 @@ public class Player {
     @Field("club_jersey_number")
     private Integer clubJerseyNumber;
 
-    @Field("club_loaned_from")
-    private String clubLoanedFrom;
 
     @Field("club_joined_date")
     private Date clubJoinedDate;
@@ -266,9 +264,6 @@ public class Player {
 
     @Field("goalkeeping_reflexes")
     private Integer goalkeepingReflexes;
-
-    @Field("goalkeeping_speed")
-    private Integer goalkeepingSpeed;
 
     @Field("ls")
     private String ls;
@@ -544,14 +539,6 @@ public class Player {
 
     public void setClubJerseyNumber(Integer clubJerseyNumber) {
         this.clubJerseyNumber = clubJerseyNumber;
-    }
-
-    public String getClubLoanedFrom() {
-        return clubLoanedFrom;
-    }
-
-    public void setClubLoanedFrom(String clubLoanedFrom) {
-        this.clubLoanedFrom = clubLoanedFrom;
     }
 
     public Date getClubJoinedDate() {
@@ -1010,13 +997,6 @@ public class Player {
         this.goalkeepingReflexes = goalkeepingReflexes;
     }
 
-    public Integer getGoalkeepingSpeed() {
-        return goalkeepingSpeed;
-    }
-
-    public void setGoalkeepingSpeed(Integer goalkeepingSpeed) {
-        this.goalkeepingSpeed = goalkeepingSpeed;
-    }
 
     public String getLs() {
         return ls;
