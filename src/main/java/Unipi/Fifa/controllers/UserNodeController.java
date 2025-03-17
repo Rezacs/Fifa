@@ -256,7 +256,11 @@ public class UserNodeController {
 
     @PostMapping("/followCoach")
     public ResponseEntity<String> followCoach(@RequestBody CoachFollowRequest request, Principal principal) {
+        if (principal == null || principal.getName() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not authenticated");
+        }
         String loggedInUsername = principal.getName();
+        System.out.println("Logged-in user: " + loggedInUsername);  // Debugging log
 
         String mongoId = request.getMongoId();
         CoachNode coach = coachNodeRepository.findByMongoId(mongoId);
