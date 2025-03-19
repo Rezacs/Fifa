@@ -93,29 +93,44 @@ public class ClubService {
         ClubNode clubNode = clubNodeRepository.findNodeByMongoId(mongoId);
 
         if (clubNode != null) {
-            // Nullify the relationship for the coach (if exists)
+            // Remove outgoing relationships (coach relationships, player relationships, etc.)
+
+            // Nullify the coach relationship (if exists)
             CoachNode coachNode = coachNodeRepository.findByCoachId(clubNode.getTeamId());
             if (coachNode != null) {
                 coachNode.setManagingRelationships(null);
-                coachNodeRepository.save(coachNode);
+                coachNodeRepository.save(coachNode); // Save changes to coachNode
             }
 
-            // Nullify relationships for players associated with the ClubNode
+            // Remove all player relationships associated with the ClubNode
             List<PlayerNode> playerNodes = playerNodeRepository.findByClubTeamId(clubNode.getTeamId());
             for (PlayerNode playerNode : playerNodes) {
-                // Remove the relationship from player to club (assuming it’s part of ClubRelationship)
+                // Remove the relationship from player to club (assuming it's part of ClubRelationship)
                 playerNode.getClubRelationships().removeIf(relationship ->
                         relationship.getClubNode().equals(clubNode)
                 );
-                playerNodeRepository.save(playerNode);
+                playerNodeRepository.save(playerNode); // Save changes to playerNode
             }
+
+            // Remove any incoming relationships (any other nodes connected to the clubNode)
+            // Assuming you have a similar approach for other types of nodes (e.g., admin, event, etc.)
+            List<OtherRelatedNode> relatedNodes = relatedNodeRepository.findByConnectedClubId(clubNode.getTeamId());
+            for (OtherRelatedNode relatedNode : relatedNodes) {
+                // Remove relationship from related node to clubNode (if applicable)
+                relatedNode.removeClubNodeRelationship(clubNode); // Method to nullify or remove the relationship
+                relatedNodeRepository.save(relatedNode); // Save changes to the relatedNode
+            }
+
+            // Finally, delete the clubNode itself or return it (depending on your use case)
+            clubNodeRepository.delete(clubNode); // Optionally delete the ClubNode if needed
 
             // Return the ClubNode after deleting relationships
             return clubNode;
         } else {
-            return null;  // Return null if the clubNode was not found
+            return null; // Return null if the clubNode was not found
         }
     }
+
 
 
     public ClubNode TransferOneDataToNeo4j(String mongoId) {
@@ -136,8 +151,8 @@ public class ClubService {
         return clubNode;
     }
 
-    public List<Club> getClubbyNameAndFifaVersion(String clubName, Integer fifaVersion) {
-        return clubRepository.findByTeamNameAndMergedVersionsContaining(clubName , fifaVersion);
+    public Club getClubbyNameAndFifaVersion(String clubName, Integer fifaVersion) {
+        return clubRepository.findByTeamNameAndMergedVersionsContaining(clubName , fifaVersion).orElse(null);
     }
 
     public void deleClubNodeByMongoId(String mongoId) {

@@ -58,7 +58,7 @@ public class CNCNService {
                             Integer yearManaged = fifaStats.getFifaVersion(); // Assuming `year` is available in FIFA stats
 
                             // Create the Coach-Club Relationship object
-                            CoachNode.ClubRelationship clubRelationship = new CoachNode.ClubRelationship();
+                            CoachNode.ManagingRelationship clubRelationship = new CoachNode.ManagingRelationship();
                             clubRelationship.setClubNode(club);
                             clubRelationship.setFifaVersion(fifaVersion);
 
@@ -121,7 +121,7 @@ public class CNCNService {
                         // Step 3.3: If this club's FIFA stats match the current coach, create a relationship
                         if (fifaStats.getCoachId() != null && fifaStats.getCoachId().equals(coach.getCoachId())) {
                             // Create the Coach-Club Relationship object
-                            CoachNode.ClubRelationship clubRelationship = new CoachNode.ClubRelationship();
+                            CoachNode.ManagingRelationship clubRelationship = new CoachNode.ManagingRelationship();
                             clubRelationship.setClubNode(club);
                             clubRelationship.setFifaVersion(fifaStats.getFifaVersion()); // Use FIFA version from FIFA stats
 
@@ -178,7 +178,7 @@ public class CNCNService {
                             Integer yearManaged = fifaStats.getFifaVersion(); // Assuming the version year is equivalent to the management year
 
                             // Create the Coach-Club Relationship object
-                            CoachNode.ClubRelationship clubRelationship = new CoachNode.ClubRelationship();
+                            CoachNode.ManagingRelationship clubRelationship = new CoachNode.ManagingRelationship();
                             clubRelationship.setClubNode(clubNode); // Set the clubNode for the relationship
                             clubRelationship.setFifaVersion(fifaVersion); // Use FIFA version from FIFA stats
 

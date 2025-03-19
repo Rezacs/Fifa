@@ -20,5 +20,7 @@ public interface ClubRepository extends MongoRepository<Club, String> {
     List<Club> findByMergedVersionsOverall(Integer overall);
 
     // Custom query to find by team name and FIFA version
-    List<Club> findByTeamNameAndMergedVersionsContaining(String clubName, Integer fifaVersion);
+    Optional<Club> findByTeamNameAndMergedVersionsContaining(String clubName, Integer fifaVersion);
+
+    Optional<Club> findByTeamIdAndGenderAndMergedVersionsContaining(Integer teamId, String gender, Integer fifaVersion);
 }

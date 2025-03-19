@@ -45,7 +45,7 @@ public class ClubController {
     }
 
     @GetMapping("/Mongo/club")
-    public List<Club> findClubByClubName(@RequestParam String clubName , @RequestParam Integer fifa_version) {
+    public Club findClubByClubName(@RequestParam String clubName , @RequestParam Integer fifa_version) {
         return ResponseEntity.ok(clubService.getClubbyNameAndFifaVersion(clubName , fifa_version)).getBody();
     }
 

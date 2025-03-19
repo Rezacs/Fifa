@@ -202,9 +202,9 @@ public class UserNodeService {
     }
 
 
-    public PlayerFollowQueryResult followPlayerEasy(String loggedInUsername, String longName, Integer fifaVersion) {
+    public PlayerFollowQueryResult followPlayerEasy(String loggedInUsername, String longName) {
         UserNode loggedInUserNode = userNodeRepository.findByUsername(loggedInUsername);
-        PlayerNode targetPlayer = playerNodeRepository.findByLongNameAndFifaVersion(longName, fifaVersion);
+        PlayerNode targetPlayer = playerNodeRepository.findByLongName(longName);
         if (loggedInUserNode == null || targetPlayer == null) {
             throw new IllegalArgumentException("User or followingPlayer not found.");
         }

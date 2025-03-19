@@ -17,10 +17,10 @@ public class CoachNode {
     private String gender;
 
     @Relationship(type = "Manages", direction = Relationship.Direction.OUTGOING)
-    private List<ClubRelationship> managingRelationships;
+    private List<ManagingRelationship> managingRelationships;
 
     // Add this class for relationship with the year property
-    public static class ClubRelationship {
+    public static class ManagingRelationship {
         @TargetNode
         private ClubNode clubNode;
 
@@ -60,11 +60,11 @@ public class CoachNode {
         return mongoId != null ? mongoId.hashCode() : 0;
     }
 
-    public List<ClubRelationship> getManagingRelationships() {
+    public List<ManagingRelationship> getManagingRelationships() {
         return managingRelationships;
     }
 
-    public void setManagingRelationships(List<ClubRelationship> managingRelationships) {
+    public void setManagingRelationships(List<ManagingRelationship> managingRelationships) {
         this.managingRelationships = managingRelationships;
     }
 

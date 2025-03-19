@@ -13,10 +13,10 @@ public interface ClubNodeRepository extends Neo4jRepository<ClubNode, Long> {
 
     ClubNode findNodeByMongoId(String mongoId);
     List<ClubNode> findNodeById(Long Id);
+    ClubNode findByTeamIdAndGender(Integer teamId, String gender);
     List<ClubNode> findNodeByTeamName(String name);
     List<ClubNode> findNodeByGender(PlayerNode.Gender gender);
-    Optional<ClubNode> findByTeamIdAndFifaVersionAndGender(Integer teamId, Integer fifaVersion, PlayerNode.Gender gender);
-    Optional<List<ClubNode>> findByCoachId(Integer coachId);
+//    Optional<ClubNode> findByTeamIdAndFifaVersionAndGender(Integer teamId, Integer fifaVersion, PlayerNode.Gender gender);
 
     @Query("MATCH (p:ClubNode) WHERE ID(p) = $nodeId DETACH DELETE p")
     void deleteClubNodeById(@Param("nodeId") Long nodeId);

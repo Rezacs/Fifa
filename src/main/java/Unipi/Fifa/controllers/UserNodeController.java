@@ -242,7 +242,7 @@ public class UserNodeController {
         String loggedInUsername = principal.getName();
         String longName = request.getLong_name();
         Integer fifaVersion = request.getFifaVersion();
-        PlayerFollowQueryResult followResult = userNodeService.followPlayerEasy(loggedInUsername, longName, fifaVersion);
+        PlayerFollowQueryResult followResult = userNodeService.followPlayerEasy(loggedInUsername, longName);
 
         PlayerFollowDTO responseFollow = new PlayerFollowDTO(
                 followResult.getUser().getUsername(),
