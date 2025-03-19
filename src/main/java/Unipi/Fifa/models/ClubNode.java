@@ -30,16 +30,6 @@ public class ClubNode {
         return mongoId != null && mongoId.equals(that.mongoId);
     }
 
-    private List<PlayerNode.ClubRelationship> playerRelationships;
-
-    public List<PlayerNode.ClubRelationship> getPlayerRelationships() {
-        return playerRelationships;
-    }
-
-    public void setPlayerRelationships(List<PlayerNode.ClubRelationship> playerRelationships) {
-        this.playerRelationships = playerRelationships;
-    }
-
     public String getTeamName() {
         return teamName;
     }

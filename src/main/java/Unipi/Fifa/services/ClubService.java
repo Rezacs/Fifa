@@ -46,7 +46,7 @@ public class ClubService {
         clubRepository.deleteById(id);
     }
     public List<Club> getClubsByOverall(Integer overall) {
-        return clubRepository.findByOverall(overall);
+        return clubRepository.findByMergedVersionsOverall(overall);
     }
 
 
@@ -78,34 +78,45 @@ public class ClubService {
             number +=1 ;
             clubNode.setMongoId(club.getId());
             clubNode.setTeamId(club.getTeamId());
-            clubNode.setFifaVersion(club.getFifaVersion());
-            clubNode.setFifaUpdate(club.getFifaUpdate());
             clubNode.setTeamName(club.getTeamName());
             clubNode.setNationalityName(club.getNationalityName());
-            clubNode.setOverall(club.getOverall());
-            clubNode.setCoachId(club.getCoachId());
-            clubNode.setCaptain(club.getCaptain());
-            clubNode.setGender(gender);
+            clubNode.setGender(PlayerNode.Gender.valueOf(club.getGender().toUpperCase()));
+            clubNode.setHomeStadium(club.getHomeStadium());
             // Save the node in Neo4j
             clubNodeRepository.save(clubNode);
         }
         return "The amount of " + clubs.stream().count() + " was checked and " + number + " was changed";
     }
 
-    public Club deletePreviousEdges(String mongoId){
-        Club club = clubRepository.findById(mongoId).orElse(null);
-        CoachNode coachNode = coachNodeRepository.findByCoachId(club.getCoachId());
-        if (coachNode != null) {
-            coachNode.setClubNode(null);
-            coachNodeRepository.save(coachNode);
+    public ClubNode deletePreviousEdges(String mongoId) {
+        // Retrieve the ClubNode by its mongoId
+        ClubNode clubNode = clubNodeRepository.findNodeByMongoId(mongoId);
+
+        if (clubNode != null) {
+            // Nullify the relationship for the coach (if exists)
+            CoachNode coachNode = coachNodeRepository.findByCoachId(clubNode.getTeamId());
+            if (coachNode != null) {
+                coachNode.setManagingRelationships(null);
+                coachNodeRepository.save(coachNode);
+            }
+
+            // Nullify relationships for players associated with the ClubNode
+            List<PlayerNode> playerNodes = playerNodeRepository.findByClubTeamId(clubNode.getTeamId());
+            for (PlayerNode playerNode : playerNodes) {
+                // Remove the relationship from player to club (assuming it’s part of ClubRelationship)
+                playerNode.getClubRelationships().removeIf(relationship ->
+                        relationship.getClubNode().equals(clubNode)
+                );
+                playerNodeRepository.save(playerNode);
+            }
+
+            // Return the ClubNode after deleting relationships
+            return clubNode;
+        } else {
+            return null;  // Return null if the clubNode was not found
         }
-        List<PlayerNode> playerNodes = playerNodeRepository.findByClubTeamId(club.getTeamId());
-        for (PlayerNode node : playerNodes) {
-            node.setClubNode(null);
-            playerNodeRepository.save(node);
-        }
-        return club;
     }
+
 
     public ClubNode TransferOneDataToNeo4j(String mongoId) {
         Club club = clubRepository.findById(mongoId).orElse(null);
@@ -126,7 +137,7 @@ public class ClubService {
     }
 
     public List<Club> getClubbyNameAndFifaVersion(String clubName, Integer fifaVersion) {
-        return clubRepository.findByTeamNameAndFifaVersion(clubName , fifaVersion);
+        return clubRepository.findByTeamNameAndMergedVersionsContaining(clubName , fifaVersion);
     }
 
     public void deleClubNodeByMongoId(String mongoId) {

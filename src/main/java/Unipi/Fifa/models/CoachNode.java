@@ -1,9 +1,7 @@
 package Unipi.Fifa.models;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.neo4j.core.schema.GeneratedValue;
-import org.springframework.data.neo4j.core.schema.Node;
-import org.springframework.data.neo4j.core.schema.Relationship;
+import org.springframework.data.neo4j.core.schema.*;
 
 import java.util.List;
 
@@ -19,9 +17,37 @@ public class CoachNode {
     private String gender;
 
     @Relationship(type = "Manages", direction = Relationship.Direction.OUTGOING)
-    private List<ClubNode> clubNode;
+    private List<ClubRelationship> managingRelationships;
 
-    @Override
+    // Add this class for relationship with the year property
+    public static class ClubRelationship {
+        @TargetNode
+        private ClubNode clubNode;
+
+        @Property("year")
+        private Integer fifaVersion;
+
+        public ClubNode getClubNode() {
+            return clubNode;
+        }
+
+        public void setClubNode(ClubNode clubNode) {
+            this.clubNode = clubNode;
+        }
+
+        public Integer getFifaVersion() {
+            return fifaVersion;
+        }
+
+        public void setFifaVersion(Integer fifaVersion) {
+            this.fifaVersion = fifaVersion;
+        }
+
+    }
+
+
+
+        @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
@@ -34,12 +60,12 @@ public class CoachNode {
         return mongoId != null ? mongoId.hashCode() : 0;
     }
 
-    public List<ClubNode> getClubNode() {
-        return clubNode;
+    public List<ClubRelationship> getManagingRelationships() {
+        return managingRelationships;
     }
 
-    public void setClubNode(List<ClubNode> clubNode) {
-        this.clubNode = clubNode;
+    public void setManagingRelationships(List<ClubRelationship> managingRelationships) {
+        this.managingRelationships = managingRelationships;
     }
 
     public Long getId() {

@@ -56,80 +56,41 @@ public class ClubController {
 
     @PutMapping("/edit/{mongoId}")
     public ResponseEntity<String> editClub(@PathVariable String mongoId, @RequestBody Club updatedClub) {
+        // Find the logged-in user
         UserNode userNode = userNodeRepository.findByUsername(getLoggedInUsername());
-//        if (user.isAdmin()) {
-            Club existingClub = clubService.getClubbyId(mongoId);
-            if (existingClub == null) {
-                return ResponseEntity.notFound().build();
-            }
-            clubService.deletePreviousEdges(mongoId);
 
-            existingClub.setId(existingClub.getId());
-            existingClub.setTeamId(updatedClub.getTeamId());
-            existingClub.setTeamName(updatedClub.getTeamName());
-            existingClub.setTeamUrl(updatedClub.getTeamUrl());
-            existingClub.setFifaVersion(updatedClub.getFifaVersion());
-            existingClub.setFifaUpdate(updatedClub.getFifaUpdate());
-            existingClub.setUpdateAsOf(updatedClub.getUpdateAsOf());
-            existingClub.setLeagueId(updatedClub.getLeagueId());
-            existingClub.setLeagueName(updatedClub.getLeagueName());
-            existingClub.setLeagueLevel(updatedClub.getLeagueLevel());
-            existingClub.setNationalityId(updatedClub.getNationalityId());
-            existingClub.setNationalityName(updatedClub.getNationalityName());
-            existingClub.setOverall(updatedClub.getOverall());
-            existingClub.setAttack(updatedClub.getAttack());
-            existingClub.setMidfield(updatedClub.getMidfield());
-            existingClub.setDefence(updatedClub.getDefence());
-            existingClub.setCoachId(updatedClub.getCoachId());
-            existingClub.setHomeStadium(updatedClub.getHomeStadium());
-            existingClub.setRivalTeam(updatedClub.getRivalTeam());
-            existingClub.setInternationalPrestige(updatedClub.getInternationalPrestige());
-            existingClub.setDomesticPrestige(updatedClub.getDomesticPrestige());
-            existingClub.setTransferBudgetEur(updatedClub.getTransferBudgetEur());
-            existingClub.setClubWorthEur(updatedClub.getClubWorthEur());
-            existingClub.setStartingXiAverageAge(updatedClub.getStartingXiAverageAge());
-            existingClub.setWholeTeamAverageAge(updatedClub.getWholeTeamAverageAge());
-            existingClub.setCaptain(updatedClub.getCaptain());
-            existingClub.setShortFreeKick(updatedClub.getShortFreeKick());
-            existingClub.setLongFreeKick(updatedClub.getLongFreeKick());
-            existingClub.setLeftShortFreeKick(updatedClub.getLeftShortFreeKick());
-            existingClub.setRightShortFreeKick(updatedClub.getRightShortFreeKick());
-            existingClub.setPenalties(updatedClub.getPenalties());
-            existingClub.setLeftCorner(updatedClub.getLeftCorner());
-            existingClub.setRightCorner(updatedClub.getRightCorner());
-            existingClub.setDefStyle(updatedClub.getDefStyle());
-            existingClub.setDefTeamWidth(updatedClub.getDefTeamWidth());
-            existingClub.setDefTeamDepth(updatedClub.getDefTeamDepth());
-            existingClub.setDefDefencePressure(updatedClub.getDefDefencePressure());
-            existingClub.setDefDefenceAggression(updatedClub.getDefDefenceAggression());
-            existingClub.setDefDefenceWidth(updatedClub.getDefDefenceWidth());
-            existingClub.setDefDefenceDefenderLine(updatedClub.getDefDefenceDefenderLine());
-            existingClub.setOffStyle(updatedClub.getOffStyle());
-            existingClub.setOffBuildUpPlay(updatedClub.getOffBuildUpPlay());
-            existingClub.setOffChanceCreation(updatedClub.getOffChanceCreation());
-            existingClub.setOffTeamWidth(updatedClub.getOffTeamWidth());
-            existingClub.setOffPlayersInBox(updatedClub.getOffPlayersInBox());
-            existingClub.setOffCorners(updatedClub.getOffCorners());
-            existingClub.setOffFreeKicks(updatedClub.getOffFreeKicks());
-            existingClub.setBuildUpPlaySpeed(updatedClub.getBuildUpPlaySpeed());
-            existingClub.setBuildUpPlayDribbling(updatedClub.getBuildUpPlayDribbling());
-            existingClub.setBuildUpPlayPassing(updatedClub.getBuildUpPlayPassing());
-            existingClub.setBuildUpPlayPositioning(updatedClub.getBuildUpPlayPositioning());
-            existingClub.setChanceCreationPassing(updatedClub.getChanceCreationPassing());
-            existingClub.setChanceCreationCrossing(updatedClub.getChanceCreationCrossing());
-            existingClub.setChanceCreationShooting(updatedClub.getChanceCreationShooting());
-            existingClub.setChanceCreationPositioning(updatedClub.getChanceCreationPositioning());
-            existingClub.setGender(updatedClub.getGender());
+        // Find the existing club in MongoDB
+        Club existingClub = clubService.getClubbyId(mongoId);
+        if (existingClub == null) {
+            return ResponseEntity.notFound().build();
+        }
 
-            clubService.saveClub(existingClub);
-            ClubNode cd = clubService.TransferOneDataToNeo4j(mongoId);
-            cncnService.createEditedClubCoachRelationships(cd);
-            pncnService.createEditedClubPlayerRelationships(cd);
-            return ResponseEntity.ok("Club updated successfully!");
-//        } else{
-//            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-//        }
+        // Delete previous relationships before updating the club
+        clubService.deletePreviousEdges(mongoId);
+
+        // Update fields with the new values from updatedClub
+        existingClub.setTeamId(updatedClub.getTeamId());
+        existingClub.setTeamName(updatedClub.getTeamName());
+        existingClub.setNationalityId(updatedClub.getNationalityId());
+        existingClub.setNationalityName(updatedClub.getNationalityName());
+        existingClub.setHomeStadium(updatedClub.getHomeStadium());
+        existingClub.setRivalTeam(updatedClub.getRivalTeam());
+        existingClub.setGender(updatedClub.getGender());
+        existingClub.setMergedVersions(updatedClub.getMergedVersions()); // Updating FIFA stats as a whole
+
+        // Save the updated club in MongoDB
+        clubService.saveClub(existingClub);
+
+        // Transfer updated data to Neo4j
+        ClubNode clubNode = clubService.TransferOneDataToNeo4j(mongoId);
+
+        // Recreate coach and player relationships
+        cncnService.createEditedClubCoachRelationships(clubNode);
+        pncnService.createEditedClubPlayerRelationships(clubNode);
+
+        return ResponseEntity.ok("Club updated successfully!");
     }
+
 
     @PostMapping("create-new-club")
     public ResponseEntity<Club> createClub(@RequestBody Club club) {

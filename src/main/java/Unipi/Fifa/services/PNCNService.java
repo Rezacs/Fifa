@@ -69,7 +69,7 @@ public class PNCNService {
                             Integer yearJoined = clubJoinedDate.getYear();  // Extract year from clubJoinedDate
 
                             // Create the ClubRelationship and add it to the player's list of relationships
-                            PlayerNode.ClubRelationship clubRelationship = new PlayerNode.ClubRelationship(club, yearJoined);
+                            PlayerNode.ClubRelationship clubRelationship = new PlayerNode.ClubRelationship(club, stats.getFifaVersion());
 
                             if (playerNode.getClubRelationships() == null) {
                                 playerNode.setClubRelationships(new ArrayList<>());
@@ -130,7 +130,7 @@ public class PNCNService {
                     Integer yearJoined = clubJoinedDate.getYear();  // Extract year from clubJoinedDate
 
                     // Set the relationship between playerNode and clubNode
-                    PlayerNode.ClubRelationship clubRelationship = new PlayerNode.ClubRelationship(clubNode, yearJoined);
+                    PlayerNode.ClubRelationship clubRelationship = new PlayerNode.ClubRelationship(clubNode, stats.getFifaVersion());
 
                     if (playerNode.getClubRelationships() == null) {
                         playerNode.setClubRelationships(new ArrayList<>());
@@ -172,7 +172,10 @@ public class PNCNService {
         if (!players.isEmpty()) {
             for (PlayerNode playerNode : players) {
                 // Find the FIFA version from the mergedVersions map of the Club document
-                Integer fifaVersion = club.getMergedVersions().keySet().stream().findFirst().orElse(null);  // Here you can modify to get the version you need
+                Integer fifaVersion = club.getMergedVersions().values().stream()
+                        .map(fifaStats -> fifaStats.getFifaVersion())  // Extract FIFA version from FIFAStats
+                        .findFirst()  // Pick the first version (you can modify this logic based on your needs)
+                        .orElse(null);  // Default to null if no version is found
 
                 // Step 3: Set the relationship from PlayerNode to ClubNode with FIFA version as an attribute
                 if (fifaVersion != null) {

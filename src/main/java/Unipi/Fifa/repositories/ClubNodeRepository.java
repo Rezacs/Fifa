@@ -1,6 +1,5 @@
 package Unipi.Fifa.repositories;
 
-import Unipi.Fifa.models.Club;
 import Unipi.Fifa.models.ClubNode;
 import Unipi.Fifa.models.PlayerNode;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
@@ -15,7 +14,7 @@ public interface ClubNodeRepository extends Neo4jRepository<ClubNode, Long> {
     ClubNode findNodeByMongoId(String mongoId);
     List<ClubNode> findNodeById(Long Id);
     List<ClubNode> findNodeByTeamName(String name);
-    List<ClubNode> findClubNodeByGender(PlayerNode.Gender gender);
+    List<ClubNode> findNodeByGender(PlayerNode.Gender gender);
     Optional<ClubNode> findByTeamIdAndFifaVersionAndGender(Integer teamId, Integer fifaVersion, PlayerNode.Gender gender);
     Optional<List<ClubNode>> findByCoachId(Integer coachId);
 

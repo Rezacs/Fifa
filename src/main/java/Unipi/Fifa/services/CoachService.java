@@ -88,7 +88,7 @@ public class CoachService {
 
     public void deletePreviousEdges(Integer coachId) {
         CoachNode coachNode = coachNodeRepository.findByCoachId(coachId);
-        coachNode.setClubNode(null);
+        coachNode.setManagingRelationships(null);
         coachNodeRepository.save(coachNode);
     }
 

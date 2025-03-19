@@ -67,32 +67,6 @@ public class PlayerNodeService {
     }
 
 
-//    public PlayerNode transferOneDataToNeo4j(String mongoId) {
-//        Player player = playerRepository.findById(mongoId).orElse(null);
-//        PlayerNode playerNode = playerNodeRepository.findByMongoId(mongoId) ;
-//        if (playerNode == null) {
-//            playerNode = new PlayerNode();
-//        }
-//        if ("MALE".equals(player.getGender())){
-//            playerNode.setGender(PlayerNode.Gender.MALE);
-//        } else{
-//            playerNode.setGender(PlayerNode.Gender.FEMALE);
-//        }
-//        playerNode.setMongoId(mongoId);
-//        playerNode.setPlayerId(player.getPlayerId());
-//        playerNode.setMongoId(String.valueOf(player.getId()));
-//        playerNode.setLong_name(player.getLongName());
-//        playerNode.setNationality(player.getNationalityName());
-//        playerNode.setOverall(player.getOverall());
-//        playerNode.setClubName(player.getClubName());
-//        playerNode.setClubTeamId(player.getClubTeamId());
-//        playerNode.setFifaVersion(player.getFifaVersion());
-//        playerNode.setAge(Double.valueOf(player.getAge()));
-//        playerNodeRepository.save(playerNode);
-//        return playerNode;
-//    }
-
-
     public PlayerNode transferOneDataToNeo4j(String mongoId) {
         // Retrieve data from MongoDB
         Player player = playerRepository.findById(mongoId).orElseThrow(() ->
@@ -122,28 +96,6 @@ public class PlayerNodeService {
         return playerNodeRepository.save(playerNode);
     }
 
-
-    @Transactional
-    public void createEditedPlayerClubRelationships2(ClubNode club) {
-        // Step 1: Find all PlayerNodes associated with the given club's teamId (instead of coachId)
-        List<PlayerNode> existingPlayers = playerNodeRepository.findByClubTeamId(club.getTeamId());
-
-        if (!existingPlayers.isEmpty()) {
-            // Step 2: Remove any existing club relationships for the players
-            for (PlayerNode player : existingPlayers) {
-                // Remove the current relationship with the club (i.e., disconnect the player from the club)
-                player.setClubNode(null); // Break the current relationship
-                playerNodeRepository.save(player); // Save the changes to remove old relationships
-            }
-        }
-
-        // Step 3: Establish the new relationship between the players and the club
-        for (PlayerNode player : existingPlayers) {
-            player.setClubNode(club); // Set the new club relationship
-            playerNodeRepository.save(player); // Save the updated player node
-            System.out.println("Created relationship for Player " + player.getId() + " with Club " + club.getTeamName());
-        }
-    }
 
     public void linkPlayerToLoggedInUser(String mongoId) {
         // Get the username of the logged-in user from Spring Security
@@ -196,7 +148,7 @@ public class PlayerNodeService {
 
     public PlayerNode deletePreviousEdges(String mongoId) {
         PlayerNode playerNode = playerNodeRepository.findByMongoId(mongoId);
-        playerNode.setClubNode(null);
+        playerNode.setClubRelationships(null);
         return playerNodeRepository.save(playerNode);
     }
 

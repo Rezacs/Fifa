@@ -10,7 +10,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Document(collection = "Teams")
+@Document(collection = "OTeams")
 public class Club {
 
     @Id
