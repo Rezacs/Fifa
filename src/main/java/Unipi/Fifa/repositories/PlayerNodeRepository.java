@@ -7,6 +7,7 @@ import org.springframework.data.neo4j.repository.query.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PlayerNodeRepository extends Neo4jRepository<PlayerNode, Long> {
     List<PlayerNode> findByClubName(String clubName);
@@ -36,4 +37,5 @@ public interface PlayerNodeRepository extends Neo4jRepository<PlayerNode, Long> 
     List<PlayerNode> findByClubTeamId(Integer teamId);
 
     List<PlayerNode> findByClubTeamIdAndFifaVersionAndGender(Integer teamId, Integer fifaVersion, PlayerNode.Gender gender);
+
 }

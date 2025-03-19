@@ -45,28 +45,27 @@ public class PlayerNodeService {
 
     public String transferDataToNeo4j(PlayerNode.Gender gender) {
         List<PlayerNode> playerNodes = playerNodeRepository.findAll();
-        List<Player> players = playerRepository.findByGender(String.valueOf(gender));
+        List<Player> players = playerRepository.findByGender(gender.name());
         int number = 0;
         for (Player player : players) {
-            if (playerNodeRepository.existsByMongoId(String.valueOf(player.getId()))){
+            if (playerNodeRepository.existsByMongoId(player.getId().toString())) {
                 continue;
             }
             PlayerNode playerNode = new PlayerNode();
-            number +=1 ;
+            number++;
             playerNode.setGender(gender);
             playerNode.setPlayerId(player.getPlayerId());
-            playerNode.setMongoId(String.valueOf(player.getId()));
-            playerNode.setLong_name(player.getLongName());
+            playerNode.setMongoId(player.getId().toString());
+            playerNode.setLongName(player.getLongName());
             playerNode.setNationality(player.getNationalityName());
-            playerNode.setOverall(player.getOverall());
-            playerNode.setClubName(player.getClubName());
-            playerNode.setClubTeamId(player.getClubTeamId());
-            playerNode.setFifaVersion(player.getFifaVersion());
-            playerNode.setAge(Double.valueOf(player.getAge()));
+            playerNode.setPreferredFoot(player.getPreferredFoot());
+            playerNode.setDob(player.getDob());
+            playerNode.setPosition(player.getPosition());
             playerNodeRepository.save(playerNode);
         }
-        return "The amount of " + players.stream().count() + " was checked and " + number + " was changed";
+        return "The amount of " + players.size() + " was checked and " + number + " was changed";
     }
+
 
 //    public PlayerNode transferOneDataToNeo4j(String mongoId) {
 //        Player player = playerRepository.findById(mongoId).orElse(null);
@@ -96,10 +95,8 @@ public class PlayerNodeService {
 
     public PlayerNode transferOneDataToNeo4j(String mongoId) {
         // Retrieve data from MongoDB
-        Player player = playerRepository.findById(mongoId).orElse(null);
-        if (player == null) {
-            throw new IllegalArgumentException("Player with MongoId " + mongoId + " not found");
-        }
+        Player player = playerRepository.findById(mongoId).orElseThrow(() ->
+                new IllegalArgumentException("Player with MongoId " + mongoId + " not found"));
 
         // Retrieve or create a corresponding Neo4j node
         PlayerNode playerNode = playerNodeRepository.findByMongoId(mongoId);
@@ -110,13 +107,11 @@ public class PlayerNodeService {
         // Map fields from MongoDB to Neo4j
         playerNode.setMongoId(player.getId());
         playerNode.setPlayerId(player.getPlayerId());
-        playerNode.setLong_name(player.getLongName());
+        playerNode.setLongName(player.getLongName());
         playerNode.setNationality(player.getNationalityName());
-        playerNode.setOverall(player.getOverall());
-        playerNode.setClubName(player.getClubName());
-        playerNode.setClubTeamId(player.getClubTeamId());
-        playerNode.setFifaVersion(player.getFifaVersion());
-        playerNode.setAge(Double.valueOf(player.getAge()));
+        playerNode.setPreferredFoot(player.getPreferredFoot());
+        playerNode.setDob(player.getDob());
+        playerNode.setPosition(player.getPosition());
 
         // Handle gender mapping
         playerNode.setGender("MALE".equals(player.getGender())
@@ -126,6 +121,7 @@ public class PlayerNodeService {
         // Save the updated node in Neo4j
         return playerNodeRepository.save(playerNode);
     }
+
 
     @Transactional
     public void createEditedPlayerClubRelationships2(ClubNode club) {

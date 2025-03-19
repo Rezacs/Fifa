@@ -2,10 +2,10 @@ package Unipi.Fifa.models;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.neo4j.core.schema.GeneratedValue;
-import org.springframework.data.neo4j.core.schema.Node;
-import org.springframework.data.neo4j.core.schema.Property;
-import org.springframework.data.neo4j.core.schema.Relationship;
+import org.springframework.data.neo4j.core.schema.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Node
 public class PlayerNode {
@@ -19,18 +19,59 @@ public class PlayerNode {
 
     @Property("long_name")
     private String longName;
-    private String nationality;
-    private Integer overall;
-    private String clubName;
-    private Integer clubTeamId;
-    private Integer fifaVersion;
-    private Double age;
     private Gender gender;
-
+    private String nationality;
+    private String preferredFoot;
+    private LocalDate dob;
+    private String position;
     // Enum for gender options.
     public enum Gender {
         MALE, FEMALE
     }
+
+    @Relationship(type = "BELONGS_TO", direction = Relationship.Direction.OUTGOING)
+    private List<ClubRelationship> clubRelationships;  // Change to List of relationships
+
+    // Add this class for relationship with the year property
+    public static class ClubRelationship {
+        @TargetNode
+        private ClubNode clubNode;
+
+        @Property("year")
+        private Integer year;
+
+        public ClubRelationship(ClubNode clubNode, Integer year) {
+            this.clubNode = clubNode;
+            this.year = year;
+        }
+
+        // Getter and setter methods for clubNode and year
+        public ClubNode getClubNode() {
+            return clubNode;
+        }
+
+        public void setClubNode(ClubNode clubNode) {
+            this.clubNode = clubNode;
+        }
+
+        public Integer getYear() {
+            return year;
+        }
+
+        public void setYear(Integer year) {
+            this.year = year;
+        }
+
+    }
+
+//    private Integer overall;
+//    private String clubName;
+//    private Integer clubTeamId;
+//    private Integer fifaVersion;
+//    private Double age;
+
+
+
 
     @Override
     public boolean equals(Object obj) {
@@ -45,23 +86,45 @@ public class PlayerNode {
         return mongoId != null ? mongoId.hashCode() : 0;
     }
 
-    public Integer getClubTeamId() {
-        return clubTeamId;
+
+    public String getLongName() {
+        return longName;
     }
 
-    public void setClubTeamId(Integer clubTeamId) {
-        this.clubTeamId = clubTeamId;
+    public void setLongName(String longName) {
+        this.longName = longName;
     }
 
-    @Relationship(type = "BelongsTo", direction = Relationship.Direction.OUTGOING)
-    private ClubNode clubNode;
-
-    public ClubNode getClubNode() {
-        return clubNode;
+    public String getPreferredFoot() {
+        return preferredFoot;
     }
 
-    public void setClubNode(ClubNode clubNode) {
-        this.clubNode = clubNode;
+    public void setPreferredFoot(String preferredFoot) {
+        this.preferredFoot = preferredFoot;
+    }
+
+    public LocalDate getDob() {
+        return dob;
+    }
+
+    public void setDob(LocalDate dob) {
+        this.dob = dob;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
+    public List<ClubRelationship> getClubRelationships() {
+        return clubRelationships;
+    }
+
+    public void setClubRelationships(List<ClubRelationship> clubRelationships) {
+        this.clubRelationships = clubRelationships;
     }
 
     public Long getId() {
@@ -102,38 +165,6 @@ public class PlayerNode {
 
     public void setNationality(String nationality) {
         this.nationality = nationality;
-    }
-
-    public Integer getOverall() {
-        return overall;
-    }
-
-    public void setOverall(Integer overall) {
-        this.overall = overall;
-    }
-
-    public String getClubName() {
-        return clubName;
-    }
-
-    public void setClubName(String clubName) {
-        this.clubName = clubName;
-    }
-
-    public Integer getFifaVersion() {
-        return fifaVersion;
-    }
-
-    public void setFifaVersion(Integer fifaVersion) {
-        this.fifaVersion = fifaVersion;
-    }
-
-    public Double getAge() {
-        return age;
-    }
-
-    public void setAge(Double age) {
-        this.age = age;
     }
 
     public Gender getGender() {
