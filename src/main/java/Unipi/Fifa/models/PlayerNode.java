@@ -38,14 +38,13 @@ public class PlayerNode {
         private ClubNode clubNode;
 
         @Property("year")
-        private Integer year;
+        private Integer fifaVersion;
 
-        public ClubRelationship(ClubNode clubNode, Integer year) {
+        public ClubRelationship(ClubNode clubNode, Integer fifaVersion) {
             this.clubNode = clubNode;
-            this.year = year;
+            this.fifaVersion = fifaVersion;
         }
 
-        // Getter and setter methods for clubNode and year
         public ClubNode getClubNode() {
             return clubNode;
         }
@@ -54,14 +53,13 @@ public class PlayerNode {
             this.clubNode = clubNode;
         }
 
-        public Integer getYear() {
-            return year;
+        public Integer getFifaVersion() {
+            return fifaVersion;
         }
 
-        public void setYear(Integer year) {
-            this.year = year;
+        public void setFifaVersion(Integer fifaVersion) {
+            this.fifaVersion = fifaVersion;
         }
-
     }
 
 //    private Integer overall;

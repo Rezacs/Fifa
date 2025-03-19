@@ -38,4 +38,5 @@ public interface PlayerNodeRepository extends Neo4jRepository<PlayerNode, Long> 
 
     List<PlayerNode> findByClubTeamIdAndFifaVersionAndGender(Integer teamId, Integer fifaVersion, PlayerNode.Gender gender);
 
+    List<PlayerNode> findByTeamIdAndGender(Integer teamId, String gender);
 }

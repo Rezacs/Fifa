@@ -1,0 +1,196 @@
+{
+  "_id": {
+    "$oid": "67d83ea2e79e80938045942b"
+  },
+  "player_id": 226177,
+  "gender": "FEMALE",
+  "short_name": "B. Sauerbrunn",
+  "long_name": "Rebecca Elizabeth Sauerbrunn",
+  "nationality_id": 95,
+  "nationality_name": "United States",
+  "preferred_foot": "Right",
+  "dob": {
+    "$date": "1985-06-06T00:00:00.000Z"
+  },
+  "position": "CB",
+  "merged_versions": {
+    "fifa_stats_24": {
+      "stats": {
+        "release_clause_eur": 20000000,
+        "club_position": "RES",
+        "club_jersey_number": 4,
+        "overall": 85,
+        "potential": 85,
+        "value_eur": 9500000,
+        "wage_eur": 1000,
+        "age": 38,
+        "height_cm": 170,
+        "weight_kg": 64,
+        "club_team_id": 116302,
+        "club_name": "Portland Thorns W",
+        "league_id": 2221,
+        "league_name": "NWSL",
+        "club_joined_date": {
+          "$date": "2020-01-01T00:00:00.000Z"
+        },
+        "club_contract_valid_until_year": 2023,
+        "pace": 61,
+        "shooting": 44,
+        "passing": 61,
+        "dribbling": 69,
+        "defending": 87,
+        "physic": 83
+      }
+    },
+    "fifa_stats_23": {
+      "stats": {
+        "overall": 85,
+        "potential": 85,
+        "age": 37,
+        "height_cm": 170,
+        "weight_kg": 64,
+        "nation_position": "LCB",
+        "nation_jersey_number": 4,
+        "nation_team_id": 113009,
+        "pace": 72,
+        "shooting": 39,
+        "passing": 62,
+        "dribbling": 63,
+        "defending": 87,
+        "physic": 85
+      }
+    },
+    "fifa_stats_22": {
+      "stats": {
+        "overall": 88,
+        "potential": 88,
+        "age": 36,
+        "height_cm": 170,
+        "weight_kg": 64,
+        "nation_position": "LCB",
+        "nation_jersey_number": 4,
+        "nation_team_id": 113009,
+        "pace": 73,
+        "shooting": 37,
+        "passing": 62,
+        "dribbling": 63,
+        "defending": 88,
+        "physic": 85
+      }
+    },
+    "fifa_stats_21": {
+      "stats": {
+        "overall": 88,
+        "potential": 88,
+        "age": 35,
+        "height_cm": 170,
+        "weight_kg": 64,
+        "nation_position": "LCB",
+        "nation_jersey_number": 4,
+        "nation_team_id": 113009,
+        "pace": 73,
+        "shooting": 37,
+        "passing": 62,
+        "dribbling": 61,
+        "defending": 88,
+        "physic": 86
+      }
+    },
+    "fifa_stats_20": {
+      "stats": {
+        "overall": 88,
+        "potential": 88,
+        "age": 34,
+        "height_cm": 170,
+        "weight_kg": 64,
+        "nation_position": "LCB",
+        "nation_jersey_number": 4,
+        "nation_team_id": 113009,
+        "pace": 74,
+        "shooting": 37,
+        "passing": 61,
+        "dribbling": 60,
+        "defending": 87,
+        "physic": 87
+      }
+    },
+    "fifa_stats_19": {
+      "stats": {
+        "overall": 87,
+        "potential": 87,
+        "age": 33,
+        "height_cm": 170,
+        "weight_kg": 64,
+        "nation_position": "RCB",
+        "nation_jersey_number": 4,
+        "nation_team_id": 113009,
+        "pace": 72,
+        "shooting": 35,
+        "passing": 59,
+        "dribbling": 58,
+        "defending": 87,
+        "physic": 85
+      }
+    },
+    "fifa_stats_18": {
+      "stats": {
+        "overall": 87,
+        "potential": 87,
+        "age": 32,
+        "height_cm": 170,
+        "weight_kg": 64,
+        "nation_position": "LCB",
+        "nation_jersey_number": 4,
+        "nation_team_id": 113009,
+        "pace": 73,
+        "shooting": 31,
+        "passing": 49,
+        "dribbling": 55,
+        "defending": 86,
+        "physic": 85
+      }
+    },
+    "fifa_stats_17": {
+      "stats": {
+        "overall": 87,
+        "potential": 87,
+        "age": 31,
+        "height_cm": 170,
+        "weight_kg": 64,
+        "nation_position": "LCB",
+        "nation_jersey_number": 4,
+        "nation_team_id": 113009,
+        "pace": 73,
+        "shooting": 31,
+        "passing": 49,
+        "dribbling": 55,
+        "defending": 86,
+        "physic": 85
+      }
+    },
+    "fifa_stats_16": {
+      "stats": {
+        "overall": 86,
+        "potential": 87,
+        "age": 30,
+        "height_cm": 170,
+        "weight_kg": 64,
+        "nation_position": "RCB",
+        "nation_jersey_number": 4,
+        "nation_team_id": 113009,
+        "pace": 73,
+        "shooting": 31,
+        "passing": 49,
+        "dribbling": 55,
+        "defending": 86,
+        "physic": 85
+      }
+    }
+  }
+}
+
+
+-------------------------------------
+
+
+Player.FifaStats fifaStats = playerDocument.getMergedVersions().get(player.getFifaVersion());

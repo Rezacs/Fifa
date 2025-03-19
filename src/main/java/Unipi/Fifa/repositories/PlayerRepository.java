@@ -2,6 +2,7 @@ package Unipi.Fifa.repositories;
 
 import Unipi.Fifa.models.Club;
 import Unipi.Fifa.models.Player;
+import Unipi.Fifa.models.PlayerNode;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -12,7 +13,7 @@ public interface PlayerRepository extends MongoRepository<Player, String> {
     List<Player> findByClubName(String clubName);
     List<Player> findByOverall(Integer overallRating);
     List<Player> findByPlayerId(Integer playerid);
-    List<Player> findByGender(String gender);
+    List<Player> findByGender(PlayerNode.Gender gender);
     List<Player> findByLongName(String longName);
     Optional<Player> findById(ObjectId id);
 }

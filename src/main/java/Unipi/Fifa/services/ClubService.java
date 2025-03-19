@@ -118,13 +118,8 @@ public class ClubService {
         }
         clubNode.setMongoId(mongoId);
         clubNode.setTeamId(club.getTeamId());
-        clubNode.setFifaVersion(club.getFifaVersion());
-        clubNode.setFifaUpdate(club.getFifaUpdate());
         clubNode.setTeamName(club.getTeamName());
         clubNode.setNationalityName(club.getNationalityName());
-        clubNode.setOverall(club.getOverall());
-        clubNode.setCoachId(club.getCoachId());
-        clubNode.setCaptain(club.getCaptain());
         clubNode.setGender(PlayerNode.Gender.valueOf(club.getGender()));
         clubNodeRepository.save(clubNode);
         return clubNode;

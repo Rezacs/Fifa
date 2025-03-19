@@ -1,9 +1,11 @@
 package Unipi.Fifa.services;
 
+import Unipi.Fifa.models.Club;
 import Unipi.Fifa.models.ClubNode;
 import Unipi.Fifa.models.Player;
 import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.repositories.ClubNodeRepository;
+import Unipi.Fifa.repositories.ClubRepository;
 import Unipi.Fifa.repositories.PlayerNodeRepository;
 import Unipi.Fifa.repositories.PlayerRepository;
 import jakarta.transaction.Transactional;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -26,135 +29,175 @@ public class PNCNService {
     @Autowired
     private ClubNodeRepository clubNodeRepository;
 
+    @Autowired
+    private ClubRepository clubRepository;
+
     @Transactional
     public void createPlayerClubRelationships(PlayerNode.Gender gender) {
         // Step 1: Get all players by gender
-        List<PlayerNode> players = playerNodeRepository.findByGender(gender);
+        List<PlayerNode> playerNodes = playerNodeRepository.findByGender(gender);
+        List<Player> players = playerRepository.findByGender(gender);
 
         // Step 2: Iterate over players to find matching clubs and create relationships
-        for (PlayerNode player : players) {
-            // Step 2.1: Get the corresponding Player document from MongoDB
-            Player playerDocument = playerRepository.findById(player.getMongoId()).orElse(null);
+        for (Player player : players) {
+            // Step 2.1: Get the corresponding PlayerNode from Neo4j using the player's mongoId
+            PlayerNode playerNode = playerNodes.stream()
+                    .filter(pn -> pn.getMongoId().equals(player.getId()))
+                    .findFirst()
+                    .orElse(null);
 
-            if (playerDocument != null) {
-                // Step 2.2: Extract the relevant FifaStats based on FIFA version (from the mergedVersions map)
-                Player.FifaStats fifaStats = playerDocument.getMergedVersions().get(player.getFifaVersion());
-                if (fifaStats != null) {
-                    // Step 2.3: Extract the club information from the FifaStats
-                    Integer clubTeamId = fifaStats.getStats().getClubTeamId();
-                    String clubName = fifaStats.getStats().getClubName();
-                    LocalDate clubJoinedDate = fifaStats.getStats().getClubJoinedDate();
+            if (playerNode != null) {
+                // Step 2.2: Loop over all FIFA versions for the player
+                List<Player.FifaStats> fifaStatsList = player.getFifaVersions();
+
+                for (Player.FifaStats fifaStats : fifaStatsList) {
+                    // Step 2.3: Extract club information from the FIFA stats for the current version
+                    Player.Stats stats = fifaStats.getStats();
+                    Integer clubTeamId = stats.getClubTeamId();
+                    String clubName = stats.getClubName();
+                    Integer fifaVersion = stats.getFifaVersion();
+                    LocalDate clubJoinedDate = stats.getClubJoinedDate();
 
                     if (clubTeamId != null && clubName != null && clubJoinedDate != null) {
-                        // Step 3: Check if the corresponding club exists in Neo4j
+                        // Step 3: Check if the corresponding club exists in Neo4j based on the clubTeamId, FIFA version, and gender
                         ClubNode club = clubNodeRepository.findByTeamIdAndFifaVersionAndGender(
-                                clubTeamId, player.getFifaVersion(), gender
+                                clubTeamId, fifaVersion , gender  // Constructing FIFA version key
                         ).orElse(null);
 
                         if (club != null) {
-                            // Step 4: Create relationship (BelongsTo) with the year the player joined the club
+                            // Step 4: Create relationship (BELONGS_TO) with the year the player joined the club
                             Integer yearJoined = clubJoinedDate.getYear();  // Extract year from clubJoinedDate
 
                             // Create the ClubRelationship and add it to the player's list of relationships
                             PlayerNode.ClubRelationship clubRelationship = new PlayerNode.ClubRelationship(club, yearJoined);
-                            if (player.getClubRelationships() == null) {
-                                player.setClubRelationships(new ArrayList<>());
+
+                            if (playerNode.getClubRelationships() == null) {
+                                playerNode.setClubRelationships(new ArrayList<>());
                             }
-                            player.getClubRelationships().add(clubRelationship);
+                            playerNode.getClubRelationships().add(clubRelationship);
 
                             // Save the updated player node with the new relationship
-                            playerNodeRepository.save(player);
-                            System.out.println("Created relationship for Player " + player.getId() + " with Club " + club.getTeamName() + " for year " + yearJoined);
+                            playerNodeRepository.save(playerNode);
+
+                            System.out.println("Created relationship for Player " + playerNode.getId() + " with Club " + club.getTeamName() + " for year " + yearJoined + " (FIFA Version: " + player.getId() + ")");
                         } else {
-                            System.out.println("No matching club found for Player " + player.getId());
+                            System.out.println("No matching club found for Player " + playerNode.getId() + " in FIFA version " + player.getId());
                         }
                     } else {
-                        System.out.println("Missing club information for Player " + player.getId());
+                        System.out.println("Missing club information for Player " + playerNode.getId());
                     }
-                } else {
-                    System.out.println("No FIFA stats found for Player " + player.getId());
                 }
             } else {
-                System.out.println("Player document not found for PlayerNode " + player.getId());
+                System.out.println("PlayerNode not found for Player " + player.getId());
+            }
+        }
+    }
+
+    @Transactional
+    public void createEditedPlayerClubRelationships(PlayerNode playerNode) {
+        // Validate the PlayerNode
+        if (playerNode == null) {
+            throw new IllegalArgumentException("Invalid player or missing club team ID or FIFA version");
+        }
+
+        // Step 1: Get the player document from MongoDB based on the player's mongoId
+        Player player = playerRepository.findById(playerNode.getMongoId()).orElse(null);
+        if (player == null) {
+            System.out.println("Player not found in MongoDB for PlayerNode: " + playerNode.getId());
+            return;
+        }
+
+        // Step 2: Loop over all FIFA versions for the player
+        List<Player.FifaStats> fifaStatsList = player.getFifaVersions();
+
+        for (Player.FifaStats fifaStats : fifaStatsList) {
+            // Step 3: Extract club information from the FIFA stats for the current version
+            Player.Stats stats = fifaStats.getStats();
+            Integer clubTeamId = stats.getClubTeamId();
+            String clubName = stats.getClubName();
+            Integer fifaVersion = stats.getFifaVersion(); // Ensure this is the correct version based on your model
+            LocalDate clubJoinedDate = stats.getClubJoinedDate();
+
+            // Step 4: Validate club information
+            if (clubTeamId != null && clubName != null && clubJoinedDate != null) {
+                // Step 5: Find the corresponding ClubNode in Neo4j based on the clubTeamId, FIFA version, and gender
+                ClubNode clubNode = clubNodeRepository.findByTeamIdAndFifaVersionAndGender(
+                        clubTeamId, fifaVersion, playerNode.getGender()
+                ).orElse(null);
+
+                if (clubNode != null) {
+                    // Step 6: Create the relationship (BELONGS_TO) with the year the player joined the club
+                    Integer yearJoined = clubJoinedDate.getYear();  // Extract year from clubJoinedDate
+
+                    // Set the relationship between playerNode and clubNode
+                    PlayerNode.ClubRelationship clubRelationship = new PlayerNode.ClubRelationship(clubNode, yearJoined);
+
+                    if (playerNode.getClubRelationships() == null) {
+                        playerNode.setClubRelationships(new ArrayList<>());
+                    }
+
+                    playerNode.getClubRelationships().add(clubRelationship);
+
+                    // Step 7: Save the updated playerNode with the new relationship
+                    playerNodeRepository.save(playerNode);
+
+                    System.out.println("Created/Updated relationship for Player "
+                            + playerNode.getLongName() + " with Club " + clubNode.getTeamName()
+                            + " for year " + yearJoined + " (FIFA Version: " + fifaVersion + ")");
+                } else {
+                    System.out.println("No matching ClubNode found for PlayerNode: "
+                            + playerNode.getLongName() + " in FIFA Version " + fifaVersion);
+                }
+            } else {
+                System.out.println("Missing club information for PlayerNode: " + playerNode.getLongName());
             }
         }
     }
 
 
-
-
-//    @Transactional
-//    public void createEditedPlayerClubRelationships(PlayerNode player) {
-//            // Step 2.1: Check the corresponding club
-//            ClubNode club = clubNodeRepository.findByTeamIdAndFifaVersionAndGender(
-//                    player.getClubTeamId(), player.getFifaVersion(), player.getGender()
-//            ).orElse(null);
-//
-//            if (club != null) {
-//                // Step 3: Create relationship (BelongsTo)
-//                player.setClubNode(club);
-//                playerNodeRepository.save(player);
-//                System.out.println("Created relationship for Player " + player.getId() + " with Club " + club.getTeamName());
-//            } else {
-//                System.out.println("No matching club found for Player " + player.getId());
-//            }
-//    }
-
     @Transactional
-    public void createEditedPlayerClubRelationships(PlayerNode player) {
-        // Validate the PlayerNode
-        if (player == null || player.getClubTeamId() == null) {
-            throw new IllegalArgumentException("Invalid player or club team ID");
+    public void createEditedClubPlayerRelationships(ClubNode clubNode) {
+        Club club = clubRepository.findById(clubNode.getMongoId()).orElse(null);
+        // Validate the Club document
+        if (club == null || club.getTeamId() == null) {
+            throw new IllegalArgumentException("Invalid club or missing club team ID");
         }
 
-        // Find the corresponding ClubNode
-        ClubNode club = clubNodeRepository.findByTeamIdAndFifaVersionAndGender(
-                player.getClubTeamId(), player.getFifaVersion(), player.getGender()
-        ).orElse(null);
-
-        if (club != null) {
-            // Set the relationship
-            player.setClubNode(club);
-
-            // Save the relationship in Neo4j
-            playerNodeRepository.save(player);
-
-            System.out.println("Created/Updated relationship for Player "
-                    + player.getLong_name() + " with Club " + club.getTeamName());
-        } else {
-            System.out.println("No matching ClubNode found for PlayerNode: "
-                    + player.getLong_name());
-        }
-    }
-
-    @Transactional
-    public void createEditedClubPlayerRelationships(ClubNode club) {
-        // Validate the ClubNode
-        // || club.getTeamId() == null
-        if (club == null ) {
-            throw new IllegalArgumentException("Invalid club or club team ID");
-        }
-
-        // Find the corresponding PlayerNodes based on the club's details
-        List<PlayerNode> players = playerNodeRepository.findByClubTeamIdAndFifaVersionAndGender(
-                club.getTeamId(), club.getFifaVersion(), club.getGender()
+        // Step 1: Find the corresponding PlayerNodes based on the club's details
+        List<PlayerNode> players = playerNodeRepository.findByTeamIdAndGender(
+                club.getTeamId(), club.getGender()
         );
 
+        // Step 2: If players exist, create/update the relationship between PlayerNodes and the ClubNode
         if (!players.isEmpty()) {
-            for (PlayerNode player : players) {
-                // Set the relationship from Player to Club
-                player.setClubNode(club);
+            for (PlayerNode playerNode : players) {
+                // Find the FIFA version from the mergedVersions map of the Club document
+                Integer fifaVersion = club.getMergedVersions().keySet().stream().findFirst().orElse(null);  // Here you can modify to get the version you need
 
-                // Save the updated player with the club relationship in Neo4j
-                playerNodeRepository.save(player);
+                // Step 3: Set the relationship from PlayerNode to ClubNode with FIFA version as an attribute
+                if (fifaVersion != null) {
+                    PlayerNode.ClubRelationship clubRelationship = new PlayerNode.ClubRelationship(clubNode, fifaVersion);
 
-                System.out.println("Created/Updated relationship for Player "
-                        + player.getLong_name() + " with Club " + club.getTeamName());
+                    if (playerNode.getClubRelationships() == null) {
+                        playerNode.setClubRelationships(new ArrayList<>());
+                    }
+
+                    // Add the relationship to the player node
+                    playerNode.getClubRelationships().add(clubRelationship);
+
+                    // Step 4: Save the updated playerNode with the new relationship to the ClubNode
+                    playerNodeRepository.save(playerNode);
+
+                    System.out.println("Created/Updated relationship for Player "
+                            + playerNode.getLongName() + " with Club " + club.getTeamName()
+                            + " and FIFA Version " + fifaVersion);
+                }
             }
         } else {
-            System.out.println("No matching PlayerNodes found for ClubNode: "
-                    + club.getTeamName());
+            System.out.println("No matching PlayerNodes found for Club: " + club.getTeamName());
         }
     }
+
+
 
 }

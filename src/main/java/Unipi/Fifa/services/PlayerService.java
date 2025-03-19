@@ -6,6 +6,7 @@ import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 //@RequiredArgsConstructor
@@ -57,5 +58,29 @@ public class PlayerService {
 
     public List<Player> getPlayerByLongName(String playerName) {
         return playerRepository.findByLongName(playerName);
+    }
+
+    public void accessFifaStatsVersions(String playerId) {
+        // Step 1: Retrieve the Player document from the repository by playerId
+        Player playerDocument = playerRepository.findById(playerId).orElse(null);
+
+        if (playerDocument != null) {
+            // Step 2: Get the merged_versions map from the Player document
+            Map<String, Player.FifaStats> mergedVersions = playerDocument.getMergedVersions();
+
+            // Step 3: Iterate through the keys (fifa_stats_XX versions) to access each FIFA stat version
+            for (String fifaVersionKey : mergedVersions.keySet()) {
+                // Extract the FIFA version key (fifa_stats_24, fifa_stats_23, etc.)
+                System.out.println("Found FIFA version: " + fifaVersionKey);
+
+                // Access the stats for the corresponding version
+                Player.FifaStats fifaStats = mergedVersions.get(fifaVersionKey);
+
+                // Print or use the stats as needed
+                System.out.println("Stats for " + fifaVersionKey + ": " + fifaStats.getStats());
+            }
+        } else {
+            System.out.println("Player with ID " + playerId + " not found.");
+        }
     }
 }

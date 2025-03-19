@@ -1,49 +1,29 @@
 package Unipi.Fifa.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.time.LocalDate;
-import java.util.Date;
+import java.util.Map;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Document(collection = "Teams")
 public class Club {
+
     @Id
     private String id; // MongoDB default ID field
 
     @Field("team_id")
     private Integer teamId;
 
-    @Field("team_url")
-    private String teamUrl;
-
-    @Field("fifa_version")
-    private Integer fifaVersion;
-
-    @Field("fifa_update")
-    private Integer fifaUpdate;
-
-    @Field("update_as_of")
-    private Date updateAsOf;
+    @Field("gender")
+    private String gender;
 
     @Field("team_name")
     private String teamName;
-
-    @Field("league_id")
-    private Integer leagueId;
-
-    @Field("league_name")
-    private String leagueName;
-
-    @Field("league_level")
-    private Integer leagueLevel;
 
     @Field("nationality_id")
     private Integer nationalityId;
@@ -51,144 +31,196 @@ public class Club {
     @Field("nationality_name")
     private String nationalityName;
 
-    @Field("overall")
-    private Integer overall;
-
-    @Field("attack")
-    private Integer attack;
-
-    @Field("midfield")
-    private Integer midfield;
-
-    @Field("defence")
-    private Integer defence;
-
-    @Field("coach_id")
-    private Integer coachId;
-
     @Field("home_stadium")
-    private Object homeStadium; // Mixed type in MongoDB
+    private String homeStadium; // Assumes homeStadium is a String
 
     @Field("rival_team")
     private Integer rivalTeam;
 
-    @Field("international_prestige")
-    private Integer internationalPrestige;
+    // Field to hold FIFA stats for multiple versions
+    @Field("merged_versions")
+    private Map<String, FIFAStats> mergedVersions;
 
-    @Field("domestic_prestige")
-    private Double domesticPrestige;
+    // Nested class to represent FIFA stats for each version
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class FIFAStats {
+        @Field("fifa_version")
+        private Integer fifaVersion;
 
-    @Field("transfer_budget_eur")
-    private Double transferBudgetEur;
+        @Field("overall")
+        private Integer overall;
 
-    @Field("club_worth_eur")
-    private Double clubWorthEur;
+        @Field("attack")
+        private Integer attack;
 
-    @Field("starting_xi_average_age")
-    private Double startingXiAverageAge;
+        @Field("midfield")
+        private Integer midfield;
 
-    @Field("whole_team_average_age")
-    private Double wholeTeamAverageAge;
+        @Field("defence")
+        private Integer defence;
 
-    @Field("captain")
-    private Integer captain;
+        @Field("league_id")
+        private Integer leagueId;
 
-    @Field("short_free_kick")
-    private Number shortFreeKick;
+        @Field("league_name")
+        private String leagueName;
 
-    @Field("long_free_kick")
-    private Number longFreeKick;
+        @Field("league_level")
+        private Integer leagueLevel;
 
-    @Field("left_short_free_kick")
-    private Number leftShortFreeKick;
+        @Field("international_prestige")
+        private Integer internationalPrestige;
 
-    @Field("right_short_free_kick")
-    private Number rightShortFreeKick;
+        @Field("domestic_prestige")
+        private Double domesticPrestige;
 
-    @Field("penalties")
-    private Double penalties;
+        @Field("club_worth_eur")
+        private Double clubWorthEur;
 
-    @Field("left_corner")
-    private Number leftCorner;
+        @Field("starting_xi_average_age")
+        private Double startingXiAverageAge;
 
-    @Field("right_corner")
-    private Number rightCorner;
+        @Field("whole_team_average_age")
+        private Double wholeTeamAverageAge;
 
-    @Field("def_style")
-    private String defStyle;
+        @Field("coach_id")
+        private Integer coachId;
 
-    @Field("def_team_width")
-    private Integer defTeamWidth;
+        @Field("captain")
+        private Integer captain;
 
-    @Field("def_team_depth")
-    private Integer defTeamDepth;
+        @Field("penalties_taker")
+        private Integer penaltiesTaker;
 
-    @Field("def_defence_pressure")
-    private Integer defDefencePressure;
+        public Integer getFifaVersion() {
+            return fifaVersion;
+        }
 
-    @Field("def_defence_aggression")
-    private Integer defDefenceAggression;
+        public void setFifaVersion(Integer fifaVersion) {
+            this.fifaVersion = fifaVersion;
+        }
 
-    @Field("def_defence_width")
-    private Integer defDefenceWidth;
+        public Integer getOverall() {
+            return overall;
+        }
 
-    @Field("def_defence_defender_line")
-    private String defDefenceDefenderLine;
+        public void setOverall(Integer overall) {
+            this.overall = overall;
+        }
 
-    @Field("off_style")
-    private String offStyle;
+        public Integer getAttack() {
+            return attack;
+        }
 
-    @Field("off_build_up_play")
-    private String offBuildUpPlay;
+        public void setAttack(Integer attack) {
+            this.attack = attack;
+        }
 
-    @Field("off_chance_creation")
-    private String offChanceCreation;
+        public Integer getMidfield() {
+            return midfield;
+        }
 
-    @Field("off_team_width")
-    private Integer offTeamWidth;
+        public void setMidfield(Integer midfield) {
+            this.midfield = midfield;
+        }
 
-    @Field("off_players_in_box")
-    private Integer offPlayersInBox;
+        public Integer getDefence() {
+            return defence;
+        }
 
-    @Field("off_corners")
-    private Integer offCorners;
+        public void setDefence(Integer defence) {
+            this.defence = defence;
+        }
 
-    @Field("off_free_kicks")
-    private Integer offFreeKicks;
+        public Integer getLeagueId() {
+            return leagueId;
+        }
 
-    @Field("build_up_play_speed")
-    private Integer buildUpPlaySpeed;
+        public void setLeagueId(Integer leagueId) {
+            this.leagueId = leagueId;
+        }
 
-    @Field("build_up_play_dribbling")
-    private Integer buildUpPlayDribbling;
+        public String getLeagueName() {
+            return leagueName;
+        }
 
-    @Field("build_up_play_passing")
-    private Integer buildUpPlayPassing;
+        public void setLeagueName(String leagueName) {
+            this.leagueName = leagueName;
+        }
 
-    @Field("build_up_play_positioning")
-    private String buildUpPlayPositioning;
+        public Integer getLeagueLevel() {
+            return leagueLevel;
+        }
 
-    @Field("chance_creation_passing")
-    private Integer chanceCreationPassing;
+        public void setLeagueLevel(Integer leagueLevel) {
+            this.leagueLevel = leagueLevel;
+        }
 
-    @Field("chance_creation_crossing")
-    private Integer chanceCreationCrossing;
+        public Integer getInternationalPrestige() {
+            return internationalPrestige;
+        }
 
-    @Field("chance_creation_shooting")
-    private Integer chanceCreationShooting;
+        public void setInternationalPrestige(Integer internationalPrestige) {
+            this.internationalPrestige = internationalPrestige;
+        }
 
-    @Field("chance_creation_positioning")
-    private String chanceCreationPositioning;
+        public Double getDomesticPrestige() {
+            return domesticPrestige;
+        }
 
-    @Field("gender")
-    private String gender;
+        public void setDomesticPrestige(Double domesticPrestige) {
+            this.domesticPrestige = domesticPrestige;
+        }
 
-    public String getGender() {
-        return gender;
-    }
+        public Double getClubWorthEur() {
+            return clubWorthEur;
+        }
 
-    public void setGender(String gender) {
-        this.gender = gender;
+        public void setClubWorthEur(Double clubWorthEur) {
+            this.clubWorthEur = clubWorthEur;
+        }
+
+        public Double getStartingXiAverageAge() {
+            return startingXiAverageAge;
+        }
+
+        public void setStartingXiAverageAge(Double startingXiAverageAge) {
+            this.startingXiAverageAge = startingXiAverageAge;
+        }
+
+        public Double getWholeTeamAverageAge() {
+            return wholeTeamAverageAge;
+        }
+
+        public void setWholeTeamAverageAge(Double wholeTeamAverageAge) {
+            this.wholeTeamAverageAge = wholeTeamAverageAge;
+        }
+
+        public Integer getCoachId() {
+            return coachId;
+        }
+
+        public void setCoachId(Integer coachId) {
+            this.coachId = coachId;
+        }
+
+        public Integer getCaptain() {
+            return captain;
+        }
+
+        public void setCaptain(Integer captain) {
+            this.captain = captain;
+        }
+
+        public Integer getPenaltiesTaker() {
+            return penaltiesTaker;
+        }
+
+        public void setPenaltiesTaker(Integer penaltiesTaker) {
+            this.penaltiesTaker = penaltiesTaker;
+        }
     }
 
     public String getId() {
@@ -207,36 +239,12 @@ public class Club {
         this.teamId = teamId;
     }
 
-    public String getTeamUrl() {
-        return teamUrl;
+    public String getGender() {
+        return gender;
     }
 
-    public void setTeamUrl(String teamUrl) {
-        this.teamUrl = teamUrl;
-    }
-
-    public Integer getFifaVersion() {
-        return fifaVersion;
-    }
-
-    public void setFifaVersion(Integer fifaVersion) {
-        this.fifaVersion = fifaVersion;
-    }
-
-    public Integer getFifaUpdate() {
-        return fifaUpdate;
-    }
-
-    public void setFifaUpdate(Integer fifaUpdate) {
-        this.fifaUpdate = fifaUpdate;
-    }
-
-    public Date getUpdateAsOf() {
-        return updateAsOf;
-    }
-
-    public void setUpdateAsOf(Date updateAsOf) {
-        this.updateAsOf = updateAsOf;
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getTeamName() {
@@ -245,30 +253,6 @@ public class Club {
 
     public void setTeamName(String teamName) {
         this.teamName = teamName;
-    }
-
-    public Integer getLeagueId() {
-        return leagueId;
-    }
-
-    public void setLeagueId(Integer leagueId) {
-        this.leagueId = leagueId;
-    }
-
-    public String getLeagueName() {
-        return leagueName;
-    }
-
-    public void setLeagueName(String leagueName) {
-        this.leagueName = leagueName;
-    }
-
-    public Integer getLeagueLevel() {
-        return leagueLevel;
-    }
-
-    public void setLeagueLevel(Integer leagueLevel) {
-        this.leagueLevel = leagueLevel;
     }
 
     public Integer getNationalityId() {
@@ -287,51 +271,11 @@ public class Club {
         this.nationalityName = nationalityName;
     }
 
-    public Integer getOverall() {
-        return overall;
-    }
-
-    public void setOverall(Integer overall) {
-        this.overall = overall;
-    }
-
-    public Integer getAttack() {
-        return attack;
-    }
-
-    public void setAttack(Integer attack) {
-        this.attack = attack;
-    }
-
-    public Integer getMidfield() {
-        return midfield;
-    }
-
-    public void setMidfield(Integer midfield) {
-        this.midfield = midfield;
-    }
-
-    public Integer getDefence() {
-        return defence;
-    }
-
-    public void setDefence(Integer defence) {
-        this.defence = defence;
-    }
-
-    public Integer getCoachId() {
-        return coachId;
-    }
-
-    public void setCoachId(Integer coachId) {
-        this.coachId = coachId;
-    }
-
-    public Object getHomeStadium() {
+    public String getHomeStadium() {
         return homeStadium;
     }
 
-    public void setHomeStadium(Object homeStadium) {
+    public void setHomeStadium(String homeStadium) {
         this.homeStadium = homeStadium;
     }
 
@@ -343,291 +287,11 @@ public class Club {
         this.rivalTeam = rivalTeam;
     }
 
-    public Integer getInternationalPrestige() {
-        return internationalPrestige;
+    public Map<String, FIFAStats> getMergedVersions() {
+        return mergedVersions;
     }
 
-    public void setInternationalPrestige(Integer internationalPrestige) {
-        this.internationalPrestige = internationalPrestige;
-    }
-
-    public Double getDomesticPrestige() {
-        return domesticPrestige;
-    }
-
-    public void setDomesticPrestige(Double domesticPrestige) {
-        this.domesticPrestige = domesticPrestige;
-    }
-
-    public Double getTransferBudgetEur() {
-        return transferBudgetEur;
-    }
-
-    public void setTransferBudgetEur(Double transferBudgetEur) {
-        this.transferBudgetEur = transferBudgetEur;
-    }
-
-    public Double getClubWorthEur() {
-        return clubWorthEur;
-    }
-
-    public void setClubWorthEur(Double clubWorthEur) {
-        this.clubWorthEur = clubWorthEur;
-    }
-
-    public Double getStartingXiAverageAge() {
-        return startingXiAverageAge;
-    }
-
-    public void setStartingXiAverageAge(Double startingXiAverageAge) {
-        this.startingXiAverageAge = startingXiAverageAge;
-    }
-
-    public Double getWholeTeamAverageAge() {
-        return wholeTeamAverageAge;
-    }
-
-    public void setWholeTeamAverageAge(Double wholeTeamAverageAge) {
-        this.wholeTeamAverageAge = wholeTeamAverageAge;
-    }
-
-    public Integer getCaptain() {
-        return captain;
-    }
-
-    public void setCaptain(Integer captain) {
-        this.captain = captain;
-    }
-
-    public Number getShortFreeKick() {
-        return shortFreeKick;
-    }
-
-    public void setShortFreeKick(Number shortFreeKick) {
-        this.shortFreeKick = shortFreeKick;
-    }
-
-    public Number getLongFreeKick() {
-        return longFreeKick;
-    }
-
-    public void setLongFreeKick(Number longFreeKick) {
-        this.longFreeKick = longFreeKick;
-    }
-
-    public Number getLeftShortFreeKick() {
-        return leftShortFreeKick;
-    }
-
-    public void setLeftShortFreeKick(Number leftShortFreeKick) {
-        this.leftShortFreeKick = leftShortFreeKick;
-    }
-
-    public Number getRightShortFreeKick() {
-        return rightShortFreeKick;
-    }
-
-    public void setRightShortFreeKick(Number rightShortFreeKick) {
-        this.rightShortFreeKick = rightShortFreeKick;
-    }
-
-    public Double getPenalties() {
-        return penalties;
-    }
-
-    public void setPenalties(Double penalties) {
-        this.penalties = penalties;
-    }
-
-    public Number getLeftCorner() {
-        return leftCorner;
-    }
-
-    public void setLeftCorner(Number leftCorner) {
-        this.leftCorner = leftCorner;
-    }
-
-    public Number getRightCorner() {
-        return rightCorner;
-    }
-
-    public void setRightCorner(Number rightCorner) {
-        this.rightCorner = rightCorner;
-    }
-
-    public String getDefStyle() {
-        return defStyle;
-    }
-
-    public void setDefStyle(String defStyle) {
-        this.defStyle = defStyle;
-    }
-
-    public Integer getDefTeamWidth() {
-        return defTeamWidth;
-    }
-
-    public void setDefTeamWidth(Integer defTeamWidth) {
-        this.defTeamWidth = defTeamWidth;
-    }
-
-    public Integer getDefTeamDepth() {
-        return defTeamDepth;
-    }
-
-    public void setDefTeamDepth(Integer defTeamDepth) {
-        this.defTeamDepth = defTeamDepth;
-    }
-
-    public Integer getDefDefencePressure() {
-        return defDefencePressure;
-    }
-
-    public void setDefDefencePressure(Integer defDefencePressure) {
-        this.defDefencePressure = defDefencePressure;
-    }
-
-    public Integer getDefDefenceAggression() {
-        return defDefenceAggression;
-    }
-
-    public void setDefDefenceAggression(Integer defDefenceAggression) {
-        this.defDefenceAggression = defDefenceAggression;
-    }
-
-    public Integer getDefDefenceWidth() {
-        return defDefenceWidth;
-    }
-
-    public void setDefDefenceWidth(Integer defDefenceWidth) {
-        this.defDefenceWidth = defDefenceWidth;
-    }
-
-    public String getDefDefenceDefenderLine() {
-        return defDefenceDefenderLine;
-    }
-
-    public void setDefDefenceDefenderLine(String defDefenceDefenderLine) {
-        this.defDefenceDefenderLine = defDefenceDefenderLine;
-    }
-
-    public String getOffStyle() {
-        return offStyle;
-    }
-
-    public void setOffStyle(String offStyle) {
-        this.offStyle = offStyle;
-    }
-
-    public String getOffBuildUpPlay() {
-        return offBuildUpPlay;
-    }
-
-    public void setOffBuildUpPlay(String offBuildUpPlay) {
-        this.offBuildUpPlay = offBuildUpPlay;
-    }
-
-    public String getOffChanceCreation() {
-        return offChanceCreation;
-    }
-
-    public void setOffChanceCreation(String offChanceCreation) {
-        this.offChanceCreation = offChanceCreation;
-    }
-
-    public Integer getOffTeamWidth() {
-        return offTeamWidth;
-    }
-
-    public void setOffTeamWidth(Integer offTeamWidth) {
-        this.offTeamWidth = offTeamWidth;
-    }
-
-    public Integer getOffPlayersInBox() {
-        return offPlayersInBox;
-    }
-
-    public void setOffPlayersInBox(Integer offPlayersInBox) {
-        this.offPlayersInBox = offPlayersInBox;
-    }
-
-    public Integer getOffCorners() {
-        return offCorners;
-    }
-
-    public void setOffCorners(Integer offCorners) {
-        this.offCorners = offCorners;
-    }
-
-    public Integer getOffFreeKicks() {
-        return offFreeKicks;
-    }
-
-    public void setOffFreeKicks(Integer offFreeKicks) {
-        this.offFreeKicks = offFreeKicks;
-    }
-
-    public Integer getBuildUpPlaySpeed() {
-        return buildUpPlaySpeed;
-    }
-
-    public void setBuildUpPlaySpeed(Integer buildUpPlaySpeed) {
-        this.buildUpPlaySpeed = buildUpPlaySpeed;
-    }
-
-    public Integer getBuildUpPlayDribbling() {
-        return buildUpPlayDribbling;
-    }
-
-    public void setBuildUpPlayDribbling(Integer buildUpPlayDribbling) {
-        this.buildUpPlayDribbling = buildUpPlayDribbling;
-    }
-
-    public Integer getBuildUpPlayPassing() {
-        return buildUpPlayPassing;
-    }
-
-    public void setBuildUpPlayPassing(Integer buildUpPlayPassing) {
-        this.buildUpPlayPassing = buildUpPlayPassing;
-    }
-
-    public String getBuildUpPlayPositioning() {
-        return buildUpPlayPositioning;
-    }
-
-    public void setBuildUpPlayPositioning(String buildUpPlayPositioning) {
-        this.buildUpPlayPositioning = buildUpPlayPositioning;
-    }
-
-    public Integer getChanceCreationPassing() {
-        return chanceCreationPassing;
-    }
-
-    public void setChanceCreationPassing(Integer chanceCreationPassing) {
-        this.chanceCreationPassing = chanceCreationPassing;
-    }
-
-    public Integer getChanceCreationCrossing() {
-        return chanceCreationCrossing;
-    }
-
-    public void setChanceCreationCrossing(Integer chanceCreationCrossing) {
-        this.chanceCreationCrossing = chanceCreationCrossing;
-    }
-
-    public Integer getChanceCreationShooting() {
-        return chanceCreationShooting;
-    }
-
-    public void setChanceCreationShooting(Integer chanceCreationShooting) {
-        this.chanceCreationShooting = chanceCreationShooting;
-    }
-
-    public String getChanceCreationPositioning() {
-        return chanceCreationPositioning;
-    }
-
-    public void setChanceCreationPositioning(String chanceCreationPositioning) {
-        this.chanceCreationPositioning = chanceCreationPositioning;
+    public void setMergedVersions(Map<String, FIFAStats> mergedVersions) {
+        this.mergedVersions = mergedVersions;
     }
 }

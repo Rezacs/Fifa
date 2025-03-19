@@ -1,12 +1,12 @@
 package Unipi.Fifa.models;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @NoArgsConstructor
@@ -18,6 +18,8 @@ public class Player {
     @Id
     private String id;
 
+    @Getter
+    @Setter
     private int playerId;
     private String gender;
     private String shortName;
@@ -30,6 +32,11 @@ public class Player {
 
     private Map<String, FifaStats> mergedVersions;
 
+    // Method to get all FIFA versions (FifaStats objects) from mergedVersions
+    public List<FifaStats> getFifaVersions() {
+        return new ArrayList<>(mergedVersions.values());
+    }
+
     @NoArgsConstructor
     @AllArgsConstructor
     @Data
@@ -41,6 +48,7 @@ public class Player {
     @AllArgsConstructor
     @Data
     public static class Stats {
+        private Integer fifaVersion;
         private Integer releaseClauseEur;
         private String clubPosition;
         private Integer clubJerseyNumber;
@@ -66,6 +74,14 @@ public class Player {
         private String nationPosition;
         private Integer nationJerseyNumber;
         private Integer nationTeamId;
+
+        public Integer getFifaVersion() {
+            return fifaVersion;
+        }
+
+        public void setFifaVersion(Integer fifaVersion) {
+            this.fifaVersion = fifaVersion;
+        }
 
         public Integer getReleaseClauseEur() {
             return releaseClauseEur;
@@ -274,14 +290,6 @@ public class Player {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public int getPlayerId() {
-        return playerId;
-    }
-
-    public void setPlayerId(int playerId) {
-        this.playerId = playerId;
     }
 
     public String getGender() {

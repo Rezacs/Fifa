@@ -192,9 +192,6 @@ public class UserNodeController {
             playerNodeDTO.setPlayerId(playerNode.getPlayerId());
             playerNodeDTO.setLongName(playerNode.getLong_name());
             playerNodeDTO.setNationality(playerNode.getNationality());
-            playerNodeDTO.setOverall(playerNode.getOverall());
-            playerNodeDTO.setClubName(playerNode.getClubName());
-            playerNodeDTO.setAge(playerNode.getAge());
             playerNodeDTO.setGender(playerNode.getGender() != null ? playerNode.getGender().name() : null); // Convert enum to String
             return playerNodeDTO;
         }).collect(Collectors.toList());

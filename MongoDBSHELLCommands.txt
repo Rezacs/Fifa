@@ -25,9 +25,10 @@ db.Players.aggregate([
           k: { $concat: ["fifa_stats_", { $toString: "$fifa_version" }] }, // Dynamic key name
           v: {
             stats: {
-							release_clause_eur: "$release_clause_eur",
+              fifa_version:"$fifa_version",
+			  release_clause_eur: "$release_clause_eur",
               club_position: "$club_positions",
-							club_jersey_number: "$club_jersey_number",
+			  club_jersey_number: "$club_jersey_number",
               overall: "$overall",
               potential: "$potential",
               value_eur: "$value_eur",
@@ -104,10 +105,12 @@ db.Teams.aggregate([
         $push: {
           k: { $concat: ["fifa_stats_", { $toString: "$fifa_version" }] }, // Dynamic key name
           v: {
+            fifa_version:"$fifa_version",
             overall: "$overall",
             attack: "$attack",
             midfield: "$midfield",
             defence: "$defence",
+
 
             league_id: "$league_id",
             league_name: "$league_name",
@@ -150,5 +153,5 @@ db.Teams.aggregate([
       merged_versions: { $arrayToObject: "$fifa_versions" } // Convert array to key-value object
     }
   },
-  { $out: "merged_teams" } // Saves the transformed data to a new collection
+  { $out: "OTeams" } // Saves the transformed data to a new collection
 ]);

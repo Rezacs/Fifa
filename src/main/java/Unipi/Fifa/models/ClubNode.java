@@ -6,6 +6,8 @@ import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
 
+import java.util.List;
+
 @Node
 public class ClubNode {
 
@@ -14,17 +16,12 @@ public class ClubNode {
     private Long id;
     private String mongoId;
     private Integer teamId;
-    private Integer fifaVersion;
-    private Integer fifaUpdate;
+    private PlayerNode.Gender gender;
     private String teamName;
     private String nationalityName;
-    private Integer overall;
-    private Integer coachId;
-    private Integer captain;
-    private PlayerNode.Gender gender;
-    public Integer getFifaUpdate() {
-        return fifaUpdate;
-    }
+    private String homeStadium;
+
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -33,29 +30,22 @@ public class ClubNode {
         return mongoId != null && mongoId.equals(that.mongoId);
     }
 
-    @Override
-    public int hashCode() {
-        return mongoId != null ? mongoId.hashCode() : 0;
+    private List<PlayerNode.ClubRelationship> playerRelationships;
+
+    public List<PlayerNode.ClubRelationship> getPlayerRelationships() {
+        return playerRelationships;
     }
 
-    public void setFifaUpdate(Integer fifaUpdate) {
-        this.fifaUpdate = fifaUpdate;
+    public void setPlayerRelationships(List<PlayerNode.ClubRelationship> playerRelationships) {
+        this.playerRelationships = playerRelationships;
     }
 
-    public Integer getTeamId() {
-        return teamId;
+    public String getTeamName() {
+        return teamName;
     }
 
-    public void setTeamId(Integer teamId) {
-        this.teamId = teamId;
-    }
-
-    public PlayerNode.Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(PlayerNode.Gender gender) {
-        this.gender = gender;
+    public void setTeamName(String teamName) {
+        this.teamName = teamName;
     }
 
     public Long getId() {
@@ -74,20 +64,20 @@ public class ClubNode {
         this.mongoId = mongoId;
     }
 
-    public Integer getFifaVersion() {
-        return fifaVersion;
+    public Integer getTeamId() {
+        return teamId;
     }
 
-    public void setFifaVersion(Integer fifaVersion) {
-        this.fifaVersion = fifaVersion;
+    public void setTeamId(Integer teamId) {
+        this.teamId = teamId;
     }
 
-    public String getTeamName() {
-        return teamName;
+    public PlayerNode.Gender getGender() {
+        return gender;
     }
 
-    public void setTeamName(String teamName) {
-        this.teamName = teamName;
+    public void setGender(PlayerNode.Gender gender) {
+        this.gender = gender;
     }
 
     public String getNationalityName() {
@@ -98,29 +88,11 @@ public class ClubNode {
         this.nationalityName = nationalityName;
     }
 
-    public Integer getOverall() {
-        return overall;
+    public String getHomeStadium() {
+        return homeStadium;
     }
 
-    public void setOverall(Integer overall) {
-        this.overall = overall;
+    public void setHomeStadium(String homeStadium) {
+        this.homeStadium = homeStadium;
     }
-
-    public Integer getCoachId() {
-        return coachId;
-    }
-
-    public void setCoachId(Integer coachId) {
-        this.coachId = coachId;
-    }
-
-    public Integer getCaptain() {
-        return captain;
-    }
-
-    public void setCaptain(Integer captain) {
-        this.captain = captain;
-    }
-
-
 }

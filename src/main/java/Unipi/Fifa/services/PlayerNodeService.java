@@ -45,7 +45,7 @@ public class PlayerNodeService {
 
     public String transferDataToNeo4j(PlayerNode.Gender gender) {
         List<PlayerNode> playerNodes = playerNodeRepository.findAll();
-        List<Player> players = playerRepository.findByGender(gender.name());
+        List<Player> players = playerRepository.findByGender(gender);
         int number = 0;
         for (Player player : players) {
             if (playerNodeRepository.existsByMongoId(player.getId().toString())) {
