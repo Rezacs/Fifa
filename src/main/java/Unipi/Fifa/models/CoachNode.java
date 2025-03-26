@@ -16,48 +16,6 @@ public class CoachNode {
     private String nationalityName;
     private String gender;
 
-    @Relationship(type = "Manages", direction = Relationship.Direction.OUTGOING)
-    private List<ManagingRelationship> managingRelationships;
-
-    // Add this class for relationship with the year property
-    public static class ManagingRelationship {
-
-        @Id
-        @GeneratedValue
-        private Long relationshipId;
-
-        @TargetNode
-        private ClubNode clubNode;
-
-        @Property("year")
-        private Integer fifaVersion;
-
-        public Long getRelationshipId() {
-            return relationshipId;
-        }
-
-        public void setRelationshipId(Long relationshipId) {
-            this.relationshipId = relationshipId;
-        }
-
-        public ClubNode getClubNode() {
-            return clubNode;
-        }
-
-        public void setClubNode(ClubNode clubNode) {
-            this.clubNode = clubNode;
-        }
-
-        public Integer getFifaVersion() {
-            return fifaVersion;
-        }
-
-        public void setFifaVersion(Integer fifaVersion) {
-            this.fifaVersion = fifaVersion;
-        }
-
-    }
-
 
 
         @Override
@@ -71,14 +29,6 @@ public class CoachNode {
     @Override
     public int hashCode() {
         return mongoId != null ? mongoId.hashCode() : 0;
-    }
-
-    public List<ManagingRelationship> getManagingRelationships() {
-        return managingRelationships;
-    }
-
-    public void setManagingRelationships(List<ManagingRelationship> managingRelationships) {
-        this.managingRelationships = managingRelationships;
     }
 
     public Long getId() {
