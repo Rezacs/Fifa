@@ -180,7 +180,7 @@ public class PNCNService {
             }
 
             // Step 3: Find PlayerNodes matching the teamId, gender, and FIFA version from the club's stats
-            Player playerDocument = playerRepository.findByTeamIdAndGenderAndMergedVersionsContaining(
+            Player playerDocument = playerRepository.findByClubTeamIdAndGenderAndFifaVersion(
                     club.getTeamId(),
                     gender,
                     fifaVersion

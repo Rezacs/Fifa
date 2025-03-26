@@ -27,17 +27,10 @@ public class PlayerNodeService {
         this.userNodeRepository = userNodeRepository;
     }
 
-    public List<PlayerNode> getPlayersByClub(String clubName) {
-        return playerNodeRepository.findByClubName(clubName);
-    }
-
     public PlayerNode getPlayerByMongoId(String mongoId){
         return playerNodeRepository.findByMongoId(mongoId);
     }
 
-    public List<PlayerNode> getPlayerByOverall(Integer overall) {
-        return playerNodeRepository.findByOverall(overall);
-    }
 
     public List<PlayerNode> getPlayerByPlayerId(Integer playerId) {
         return playerNodeRepository.findByPlayerId(playerId);

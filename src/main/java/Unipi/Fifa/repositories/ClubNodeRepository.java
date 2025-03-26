@@ -22,6 +22,4 @@ public interface ClubNodeRepository extends Neo4jRepository<ClubNode, Long> {
     void deleteClubNodeById(@Param("nodeId") Long nodeId);
 
     boolean existsByMongoId(String id);
-
-    ;
 }

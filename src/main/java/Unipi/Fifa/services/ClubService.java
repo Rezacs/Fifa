@@ -5,6 +5,7 @@ import Unipi.Fifa.models.ClubNode;
 import Unipi.Fifa.models.CoachNode;
 import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.repositories.*;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -88,44 +89,27 @@ public class ClubService {
         return "The amount of " + clubs.stream().count() + " was checked and " + number + " was changed";
     }
 
+    @Transactional
     public ClubNode deletePreviousEdges(String mongoId) {
         // Retrieve the ClubNode by its mongoId
         ClubNode clubNode = clubNodeRepository.findNodeByMongoId(mongoId);
-
-        if (clubNode != null) {
-            // Remove outgoing relationships (coach relationships, player relationships, etc.)
-
-            // Nullify the coach relationship (if exists)
-            CoachNode coachNode = coachNodeRepository.findByCoachId(clubNode.getTeamId());
-            if (coachNode != null) {
-                // Remove 'Manages' relationships for the coach (the club managed by the coach)
-                if (coachNode.getManagingRelationships() != null) {
-                    coachNode.getManagingRelationships().removeIf(relationship ->
-                            relationship.getClubNode().equals(clubNode)
-                    );
-                    coachNodeRepository.save(coachNode); // Save changes to coachNode
-                }
-            }
-
-            // Remove all player relationships associated with the ClubNode
-            List<PlayerNode> playerNodes = playerNodeRepository.findByClubTeamId(clubNode.getTeamId());
-            for (PlayerNode playerNode : playerNodes) {
-                // Remove the relationship from player to club (assuming it's part of ClubRelationship)
-                playerNode.getClubRelationships().removeIf(relationship ->
-                        relationship.getClubNode().equals(clubNode)
-                );
-                playerNodeRepository.save(playerNode); // Save changes to playerNode
-            }
-
-            // Finally, delete the clubNode itself (or return it depending on your use case)
-            clubNodeRepository.delete(clubNode); // Optionally delete the ClubNode if needed
-
-            // Return the ClubNode after deleting relationships
-            return clubNode;
-        } else {
-            return null; // Return null if the clubNode was not found
+        if (clubNode == null) {
+            return null; // If no club found, return null
         }
+
+        // Step 1: Remove MANAGES relationships between coaches and the club
+        coachNodeRepository.deleteCoachClubRelationships(mongoId);
+
+        // Step 2: Remove BELONGS_TO relationships between players and the club
+        playerNodeRepository.deleteClubRelationships(mongoId);
+
+        // Step 3: Delete the ClubNode itself
+        clubNodeRepository.delete(clubNode);
+
+        // Return the deleted ClubNode (optional, depends on use case)
+        return clubNode;
     }
+
 
 
 

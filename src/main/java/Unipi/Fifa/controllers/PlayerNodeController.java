@@ -22,11 +22,6 @@ public class PlayerNodeController {
         return (List<PlayerNode>) ResponseEntity.ok(playerNodeService.getPlayerByPlayerId(playerId)).getBody();
     }
 
-    @PostMapping("/{clubName}")
-    public List<PlayerNode> findPlayersByClub(@PathVariable String clubName) {
-        return ResponseEntity.ok(playerNodeService.getPlayersByClub(clubName)).getBody();
-    }
-
     @PostMapping("/transfer-all-to-neo4j/{gender}")
     public ResponseEntity<String> transferAllDataToNeo4j(@PathVariable PlayerNode.Gender gender) {
         String response = playerNodeService.transferDataToNeo4j(gender);

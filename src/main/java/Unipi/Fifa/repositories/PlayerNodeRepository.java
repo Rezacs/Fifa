@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PlayerNodeRepository extends Neo4jRepository<PlayerNode, Long> {
-    List<PlayerNode> findByClubName(String clubName);
-    List<PlayerNode> findByOverall(Integer overall);
     List<PlayerNode> findByPlayerId(Integer playerId);
     PlayerNode findByMongoId(String mongoId);
     List<PlayerNode> findByGender(PlayerNode.Gender gender);
@@ -31,7 +29,9 @@ public interface PlayerNodeRepository extends Neo4jRepository<PlayerNode, Long> 
 
     boolean existsByMongoId(String mongoId);
 
-    List<PlayerNode> findByClubTeamId(Integer teamId);
-
     PlayerNode findByLongName(String longName);
+
+    @Query("MATCH (p:PlayerNode)-[r:BELONGS_TO]->(c:ClubNode) WHERE p.mongoId = $mongoId DELETE r")
+    void deleteClubRelationships(@Param("mongoId") String mongoId);
+
 }
