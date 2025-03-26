@@ -33,7 +33,5 @@ public interface PlayerNodeRepository extends Neo4jRepository<PlayerNode, Long> 
 
     List<PlayerNode> findByClubTeamId(Integer teamId);
 
-    List<PlayerNode> findByTeamIdAndGender(Integer teamId, String gender);
-
     PlayerNode findByLongName(String longName);
 }

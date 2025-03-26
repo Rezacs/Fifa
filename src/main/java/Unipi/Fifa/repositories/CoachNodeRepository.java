@@ -17,6 +17,19 @@ public interface CoachNodeRepository extends Neo4jRepository<CoachNode, Long> {
     @Query("MATCH (p:CoachNode) WHERE ID(p) = $nodeId DETACH DELETE p")
     void deleteCoachNodeById(@Param("nodeId") Long nodeId);
 
+    // Find all CoachNodes that have a relationship with the given ClubNode (by mongoId)
+    @Query("MATCH (c:CoachNode)-[r:MANAGES]->(club:ClubNode) " +
+            "WHERE club.mongoId = $mongoId " +
+            "RETURN c")
+    List<CoachNode> findCoachesByClubMongoId(String mongoId);
+
+    // Delete the MANAGES relationship between coaches and the club
+    @Query("MATCH (c:CoachNode)-[r:MANAGES]->(club:ClubNode) " +
+            "WHERE club.mongoId = $mongoId " +
+            "DELETE r")
+    void deleteCoachClubRelationships(String mongoId);
+
+
     boolean existsByMongoId(String s);
 
     CoachNode findByMongoId(String mongoId);

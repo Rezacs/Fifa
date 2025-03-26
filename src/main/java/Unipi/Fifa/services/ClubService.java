@@ -98,8 +98,13 @@ public class ClubService {
             // Nullify the coach relationship (if exists)
             CoachNode coachNode = coachNodeRepository.findByCoachId(clubNode.getTeamId());
             if (coachNode != null) {
-                coachNode.setManagingRelationships(null);
-                coachNodeRepository.save(coachNode); // Save changes to coachNode
+                // Remove 'Manages' relationships for the coach (the club managed by the coach)
+                if (coachNode.getManagingRelationships() != null) {
+                    coachNode.getManagingRelationships().removeIf(relationship ->
+                            relationship.getClubNode().equals(clubNode)
+                    );
+                    coachNodeRepository.save(coachNode); // Save changes to coachNode
+                }
             }
 
             // Remove all player relationships associated with the ClubNode
@@ -112,16 +117,7 @@ public class ClubService {
                 playerNodeRepository.save(playerNode); // Save changes to playerNode
             }
 
-            // Remove any incoming relationships (any other nodes connected to the clubNode)
-            // Assuming you have a similar approach for other types of nodes (e.g., admin, event, etc.)
-            List<OtherRelatedNode> relatedNodes = relatedNodeRepository.findByConnectedClubId(clubNode.getTeamId());
-            for (OtherRelatedNode relatedNode : relatedNodes) {
-                // Remove relationship from related node to clubNode (if applicable)
-                relatedNode.removeClubNodeRelationship(clubNode); // Method to nullify or remove the relationship
-                relatedNodeRepository.save(relatedNode); // Save changes to the relatedNode
-            }
-
-            // Finally, delete the clubNode itself or return it (depending on your use case)
+            // Finally, delete the clubNode itself (or return it depending on your use case)
             clubNodeRepository.delete(clubNode); // Optionally delete the ClubNode if needed
 
             // Return the ClubNode after deleting relationships
@@ -130,6 +126,8 @@ public class ClubService {
             return null; // Return null if the clubNode was not found
         }
     }
+
+
 
 
 

@@ -59,7 +59,7 @@ public class PlayerController {
         playerNodeService.deletePreviousEdges(mongoId);
 
         // Update the fields of the existing player with the new values
-//        existingPlayer.setId(new ObjectId(mongoId));
+        // existingPlayer.setId(new ObjectId(mongoId));
         existingPlayer.setPlayerId(updatedPlayer.getPlayerId());
         existingPlayer.setGender(updatedPlayer.getGender());
         existingPlayer.setShortName(updatedPlayer.getShortName());
