@@ -13,11 +13,7 @@ public class PlayerNode {
     @GeneratedValue
     private Long id;
     private Integer playerId;
-
-    @Property("mongoId")
     private String mongoId;
-
-    @Property("long_name")
     private String longName;
     private Gender gender;
     private String nationality;

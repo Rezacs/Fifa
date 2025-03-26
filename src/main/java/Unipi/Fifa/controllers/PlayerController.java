@@ -30,19 +30,9 @@ public class PlayerController {
     @Autowired
     private UserRepository userRepository;
 
-    @PostMapping("/players")
-    public List<Player> getPlayersByClub(@RequestParam String clubName) {
-        return playerService.getPlayersByClub(clubName);
-    }
-
     @PostMapping("{playerId}")
     public ResponseEntity<List<Player>> findByPlayerId(@PathVariable Integer playerId ){
         return ResponseEntity.ok(playerService.findByPlayerId(playerId));
-    }
-
-    @PostMapping("/overall")
-    public ResponseEntity<List<Player>> getByOverall(@RequestParam Integer overall){
-        return ResponseEntity.ok(playerService.getPlayersByOverall(overall));
     }
 
     @GetMapping("/{playerName}")

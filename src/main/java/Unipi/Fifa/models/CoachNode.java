@@ -21,11 +21,24 @@ public class CoachNode {
 
     // Add this class for relationship with the year property
     public static class ManagingRelationship {
+
+        @Id
+        @GeneratedValue
+        private Long relationshipId;
+
         @TargetNode
         private ClubNode clubNode;
 
         @Property("year")
         private Integer fifaVersion;
+
+        public Long getRelationshipId() {
+            return relationshipId;
+        }
+
+        public void setRelationshipId(Long relationshipId) {
+            this.relationshipId = relationshipId;
+        }
 
         public ClubNode getClubNode() {
             return clubNode;

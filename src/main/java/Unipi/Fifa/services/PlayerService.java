@@ -35,13 +35,6 @@ public class PlayerService {
         playerRepository.deleteById(id);
     }
 
-    public List<Player> getPlayersByClub(String clubName) {
-        return playerRepository.findByClubName(clubName);
-    }
-
-    public List<Player> getPlayersByOverall(Integer overallRating) {
-        return playerRepository.findByOverall(overallRating);
-    }
 
     public Player getPlayerById(String id) {
         return playerRepository.findById(id).orElse(null);
