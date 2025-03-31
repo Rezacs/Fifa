@@ -141,7 +141,7 @@ public class PlayerNodeService {
 
     public PlayerNode deletePreviousEdges(String mongoId) {
         PlayerNode playerNode = playerNodeRepository.findByMongoId(mongoId);
-        playerNode.setClubRelationships(null);
+        playerNodeRepository.deleteClubRelationships(mongoId);
         return playerNodeRepository.save(playerNode);
     }
 

@@ -25,38 +25,6 @@ public class PlayerNode {
         MALE, FEMALE
     }
 
-    @Relationship(type = "BELONGS_TO", direction = Relationship.Direction.OUTGOING)
-    private List<ClubRelationship> clubRelationships;  // Change to List of relationships
-
-    // Add this class for relationship with the year property
-    public static class ClubRelationship {
-        @TargetNode
-        private ClubNode clubNode;
-
-        @Property("year")
-        private Integer fifaVersion;
-
-        public ClubRelationship(ClubNode clubNode, Integer fifaVersion) {
-            this.clubNode = clubNode;
-            this.fifaVersion = fifaVersion;
-        }
-
-        public ClubNode getClubNode() {
-            return clubNode;
-        }
-
-        public void setClubNode(ClubNode clubNode) {
-            this.clubNode = clubNode;
-        }
-
-        public Integer getFifaVersion() {
-            return fifaVersion;
-        }
-
-        public void setFifaVersion(Integer fifaVersion) {
-            this.fifaVersion = fifaVersion;
-        }
-    }
 
     @Override
     public boolean equals(Object obj) {
@@ -102,14 +70,6 @@ public class PlayerNode {
 
     public void setPosition(String position) {
         this.position = position;
-    }
-
-    public List<ClubRelationship> getClubRelationships() {
-        return clubRelationships;
-    }
-
-    public void setClubRelationships(List<ClubRelationship> clubRelationships) {
-        this.clubRelationships = clubRelationships;
     }
 
     public Long getId() {
