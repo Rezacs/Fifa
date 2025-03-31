@@ -34,4 +34,10 @@ public interface PlayerNodeRepository extends Neo4jRepository<PlayerNode, Long> 
     @Query("MATCH (p:PlayerNode)-[r:BELONGS_TO]->(c:ClubNode) WHERE p.mongoId = $mongoId DELETE r")
     void deleteClubRelationships(@Param("mongoId") String mongoId);
 
+    @Query("MATCH (player:PlayerNode), (club:ClubNode) " +
+            "WHERE player.playerId = $playerId AND club.id = $clubId " +
+            "CREATE (player)-[:BELONGS_TO {year: $fifaVersion}]->(club) " +
+            "RETURN player, club")
+    String createPlayerClubRelationship(Integer playerId, Integer teamId, Integer fifaVersion);
+
 }

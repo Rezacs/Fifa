@@ -58,15 +58,6 @@ public class PlayerNode {
         }
     }
 
-//    private Integer overall;
-//    private String clubName;
-//    private Integer clubTeamId;
-//    private Integer fifaVersion;
-//    private Double age;
-
-
-
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

@@ -144,16 +144,8 @@ public class CNCNService {
                             Integer fifaVersion = fifaStats.getFifaVersion();
                             Integer yearManaged = fifaStats.getFifaVersion(); // Assuming the version year is equivalent to the management year
 
-                            // Create the Coach-Club Relationship object
-                            CoachNode.ManagingRelationship clubRelationship = new CoachNode.ManagingRelationship();
-                            clubRelationship.setClubNode(clubNode); // Set the clubNode for the relationship
-                            clubRelationship.setFifaVersion(fifaVersion); // Use FIFA version from FIFA stats
+                            coachNodeRepository.createManagingRelationship(coachNode.getCoachId(), clubNode.getTeamId(), fifaVersion);
 
-                            // Step 4: Add the relationship to the coach's club relationships
-                            if (coachNode.getManagingRelationships() == null) {
-                                coachNode.setManagingRelationships(new ArrayList<>());
-                            }
-                            coachNode.getManagingRelationships().add(clubRelationship); // Add the new relationship
 
                             // Step 5: Save the updated coach with the new relationship
                             coachNodeRepository.save(coachNode);
