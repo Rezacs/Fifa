@@ -31,7 +31,7 @@ public class PlayerController {
     private UserRepository userRepository;
 
     @PostMapping("{playerId}")
-    public ResponseEntity<List<Player>> findByPlayerId(@PathVariable Integer playerId ){
+    public ResponseEntity<Player> findByPlayerId(@PathVariable Integer playerId ){
         return ResponseEntity.ok(playerService.findByPlayerId(playerId));
     }
 

@@ -22,6 +22,18 @@ public interface UserNodeRepository extends Neo4jRepository<UserNode, Long> {
             "RETURN user1 AS follower , user2 as followed")
     UserFollowQueryResult createFollowRelationship(String username1, String username2);
 
+    @Query("MATCH (u:UserNode), (p:PlayerNode) " +
+            "WHERE u.username = $loggedInUsername AND p.playerId = $playerId " +
+            "CREATE (u)-[:INTERACTS_WITH {fifaVersion: $fifaVersion}]->(p)")
+    void createUserPlayerInteraction(String loggedInUsername, Integer playerId, Integer fifaVersion);
+
+    @Query("MATCH (u:UserNode)-[r:INTERACTS_WITH]->(p:PlayerNode) " +
+            "WHERE u.username = $loggedInUsername AND p.playerId = $playerId AND r.fifaVersion = $fifaVersion " +
+            "DELETE r")
+    void deleteUserPlayerInteraction(String loggedInUsername, Integer playerId, Integer fifaVersion);
+
+
+
     @Query("MATCH (p:User) WHERE ID(p) = $nodeId DETACH DELETE p")
     void deleteUserNodeById(@Param("nodeId") Long nodeId);
 

@@ -23,7 +23,7 @@ public class PlayerService {
         return playerRepository.save(player).getPlayerId();
     }
 
-    public List<Player> findByPlayerId(Integer playerid) {
+    public Player findByPlayerId(Integer playerid) {
         return playerRepository.findByPlayerId(playerid);
     }
 

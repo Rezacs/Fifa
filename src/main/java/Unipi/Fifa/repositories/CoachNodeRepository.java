@@ -36,12 +36,11 @@ public interface CoachNodeRepository extends Neo4jRepository<CoachNode, Long> {
             "DELETE r")
     void deleteCoachClubRelationships(String mongoId);
 
-    // Custom query to create the "Manages" relationship between Coach and Club nodes with FIFA version
     @Query("MATCH (c:CoachNode), (cl:ClubNode) " +
             "WHERE c.coachId = $coachId AND cl.teamId = $teamId " +
-            "MERGE (c)-[r:MANAGES]->(cl) " +
-            "SET r.fifaVersion = $fifaVersion")
+            "CREATE (c)-[:MANAGES {fifaVersion: $fifaVersion}]->(cl)")
     void createManagingRelationship(Integer coachId, Integer teamId, Integer fifaVersion);
+
 
 
     boolean existsByMongoId(String s);

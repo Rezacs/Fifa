@@ -28,40 +28,37 @@ public class CNCNService {
     @Transactional
     public void createCoachClubRelationships(PlayerNode.Gender gender) {
         // Step 1: Get all coaches of the given gender
-        List<CoachNode> coachNodes = coachNodeRepository.findByGender(gender);
         List<Coach> coaches = coachRepository.findByGender(gender);
 
         // Step 2: Iterate over each coach to establish relationships with clubs
         for (Coach coach : coaches) {
             // Step 2.1: Find the corresponding CoachNode from Neo4j using the coach's mongoId
-//            CoachNode coachNode = coachNodes.stream()
-//                    .filter(cn -> cn.getMongoId().equals(coach.getId()))
-//                    .findFirst()
-//                    .orElse(null);
             CoachNode coachNode = coachNodeRepository.findByMongoId(coach.getId());
 
             if (coachNode != null) {
-                // Step 2.2: Loop over all clubs to check if they are associated with this coach
+                // Step 2.2: Retrieve all clubs for the given gender
                 List<ClubNode> clubs = clubNodeRepository.findNodeByGender(gender);
 
                 for (ClubNode club : clubs) {
-                    // Step 2.3: Loop over all FIFA stats for the current club (this is where the relationship info is stored)
+                    // Step 2.3: Find the corresponding club in MongoDB
                     Club mongoClub = clubRepository.findById(club.getMongoId()).orElse(null);
-                    Map<String, Club.FIFAStats> mergedVersions = mongoClub.getMergedVersions();
 
-                    for (Map.Entry<String, Club.FIFAStats> entry : mergedVersions.entrySet()) {
-                        Club.FIFAStats fifaStats = entry.getValue();
-
-                        // Step 2.4: Check if the current FIFA stats are linked to the coach
-                        if (fifaStats.getCoachId() != null && fifaStats.getCoachId().equals(coach.getCoachId())) {
-                            // Step 3: Create relationship (MANAGES) with the year the coach managed the club
+                    if (mongoClub != null && mongoClub.getMergedVersions() != null) {
+                        // Step 2.4: Iterate over all FIFA stats versions for this club
+                        for (Map.Entry<String, Club.FIFAStats> entry : mongoClub.getMergedVersions().entrySet()) {
+                            Club.FIFAStats fifaStats = entry.getValue();
                             Integer fifaVersion = fifaStats.getFifaVersion();
 
-                            // Call the repository's custom query to create the relationship directly in Neo4j
-                            coachNodeRepository.createManagingRelationship(coach.getCoachId(), club.getTeamId(), fifaVersion);
+                            // Step 2.5: Check if the coach was managing this club in this FIFA version
+                            if (fifaStats.getCoachId() != null && fifaStats.getCoachId().equals(coach.getCoachId())) {
+                                // Step 3: Create multiple relationships (one per FIFA version)
+                                coachNodeRepository.createManagingRelationship(
+                                        coach.getCoachId(), club.getTeamId(), fifaVersion
+                                );
 
-                            // Log success message
-                            System.out.println("Created relationship for Coach " + coachNode.getId() + " with Club " + club.getTeamName() + " for FIFA Version " + fifaVersion);
+                                System.out.println("Created relationship for Coach " + coachNode.getId() +
+                                        " with Club " + club.getTeamName() + " for FIFA Version " + fifaVersion);
+                            }
                         }
                     }
                 }
@@ -70,6 +67,8 @@ public class CNCNService {
             }
         }
     }
+
+
 
 
     @Transactional

@@ -1,12 +1,14 @@
 package Unipi.Fifa.services;
 
 import Unipi.Fifa.models.CoachNode;
+import Unipi.Fifa.models.Player;
 import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.models.UserNode;
 import Unipi.Fifa.queryresults.PlayerFollowQueryResult;
 import Unipi.Fifa.queryresults.UserFollowQueryResult;
 import Unipi.Fifa.repositories.CoachNodeRepository;
 import Unipi.Fifa.repositories.PlayerNodeRepository;
+import Unipi.Fifa.repositories.PlayerRepository;
 import Unipi.Fifa.repositories.UserNodeRepository;
 import Unipi.Fifa.requests.CreateUserRequest;
 import org.springframework.security.core.Authentication;
@@ -25,12 +27,14 @@ public class UserNodeService {
     private final PasswordEncoder passwordEncoder;
     private final PlayerNodeRepository playerNodeRepository;
     private final CoachNodeRepository coachNodeRepository;
+    private final PlayerRepository playerRepository;
 
-    public UserNodeService(UserNodeRepository userNodeRepository, PasswordEncoder passwordEncoder, PlayerNodeRepository playerNodeRepository, CoachNodeRepository coachNodeRepository) {
+    public UserNodeService(UserNodeRepository userNodeRepository, PasswordEncoder passwordEncoder, PlayerNodeRepository playerNodeRepository, CoachNodeRepository coachNodeRepository, PlayerRepository playerRepository) {
         this.userNodeRepository = userNodeRepository;
         this.passwordEncoder = passwordEncoder;
         this.playerNodeRepository = playerNodeRepository;
         this.coachNodeRepository = coachNodeRepository;
+        this.playerRepository = playerRepository;
     }
 
     public UserNode FindUser(String username){
@@ -80,22 +84,20 @@ public class UserNodeService {
         return new UserFollowQueryResult(loggedInUserNode, targetUserNode, new Date());
     }
 
-    public PlayerFollowQueryResult followPlayer(String loggedInUsername, String mongoId) {
+    public PlayerFollowQueryResult followPlayer(String loggedInUsername, String mongoId, Integer fifaVersion) {
         UserNode loggedInUserNode = userNodeRepository.findByUsername(loggedInUsername);
         PlayerNode targetPlayer = playerNodeRepository.findByMongoId(mongoId);
+
         if (loggedInUserNode == null || targetPlayer == null) {
             throw new IllegalArgumentException("User or followingPlayer not found.");
         }
-        if (!loggedInUserNode.getPlayerNodes().contains(targetPlayer)) {
-            loggedInUserNode.getPlayerNodes().add(targetPlayer);
-        } else {
-            throw new IllegalArgumentException("Player is already followed.");
-        }
 
-        // Save the updated user entity
-        userNodeRepository.save(loggedInUserNode);
+        // Create the relationship using the repository method
+        userNodeRepository.createUserPlayerInteraction(loggedInUsername, targetPlayer.getPlayerId(), fifaVersion);
+
         return new PlayerFollowQueryResult(loggedInUserNode, targetPlayer);
     }
+
 
     public void followCoach(String loggedInUsername, String mongoId) {
         UserNode loggedInUserNode = userNodeRepository.findByUsername(loggedInUsername);
@@ -128,31 +130,27 @@ public class UserNodeService {
         userNodeRepository.save(loggedInUserNode);
     }
 
-    public PlayerFollowQueryResult unfollowPlayer(String loggedInUsername, String mongoId) {
+    public PlayerFollowQueryResult unfollowPlayer(String loggedInUsername, Integer playerId, Integer fifaVersion) {
         // Fetch the logged-in user from the repository
         UserNode loggedInUserNode = userNodeRepository.findByUsername(loggedInUsername);
 
         // Fetch the target player from the repository
-        PlayerNode targetPlayer = playerNodeRepository.findByMongoId(mongoId);
+        Player player = playerRepository.findByPlayerId(playerId);
+        PlayerNode targetPlayer = playerNodeRepository.findByMongoId(player.getId());
 
         // Validate the existence of both the logged-in user and target player
         if (loggedInUserNode == null || targetPlayer == null) {
             throw new IllegalArgumentException("User or followingPlayer not found.");
         }
 
-        // Remove the target player from the player's nodes list if it exists
-        if (loggedInUserNode.getPlayerNodes().contains(targetPlayer)) {
-            loggedInUserNode.getPlayerNodes().remove(targetPlayer);
-        } else {
-            throw new IllegalArgumentException("Player is not followed.");
-        }
+        // Remove the relationship using the repository method with the @Query annotation
+        userNodeRepository.deleteUserPlayerInteraction(loggedInUsername, playerId, fifaVersion);
 
-        // Save the updated user entity
-        userNodeRepository.save(loggedInUserNode);
-
-        // Return a result object (assumes PlayerUnfollowQueryResult is defined elsewhere)
+        // Return a result object
         return new PlayerFollowQueryResult(loggedInUserNode, targetPlayer);
     }
+
+
 
 
     public UserFollowQueryResult unfollow(String loggedInUsername, String targetUsername) {
@@ -202,19 +200,18 @@ public class UserNodeService {
     }
 
 
-    public PlayerFollowQueryResult followPlayerEasy(String loggedInUsername, String longName) {
+    public PlayerFollowQueryResult followPlayerEasy(String loggedInUsername, String longName, Integer fifaVersion) {
         UserNode loggedInUserNode = userNodeRepository.findByUsername(loggedInUsername);
         PlayerNode targetPlayer = playerNodeRepository.findByLongName(longName);
+
         if (loggedInUserNode == null || targetPlayer == null) {
             throw new IllegalArgumentException("User or followingPlayer not found.");
         }
-        if (!loggedInUserNode.getPlayerNodes().contains(targetPlayer)) {
-            loggedInUserNode.getPlayerNodes().add(targetPlayer);
-        } else {
-            throw new IllegalArgumentException("Player is already followed.");
-        }
-        // Save the updated user entity
-        userNodeRepository.save(loggedInUserNode);
+
+        // Create the relationship using the repository method
+        userNodeRepository.createUserPlayerInteraction(loggedInUsername, targetPlayer.getPlayerId(), fifaVersion);
+
         return new PlayerFollowQueryResult(loggedInUserNode, targetPlayer);
     }
+
 }

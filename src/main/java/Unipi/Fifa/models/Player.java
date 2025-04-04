@@ -40,6 +40,7 @@ public class Player {
     @Field("position")
     private String position;
 
+    @Field("merged_versions")
     private Map<String, FifaStats> mergedVersions;
 
     // Method to get all FIFA versions (FifaStats objects) from mergedVersions

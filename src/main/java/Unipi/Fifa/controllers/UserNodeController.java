@@ -223,14 +223,17 @@ public class UserNodeController {
 
         // The playerId to follow, provided in the request body
         String mongoId = request.getMongoId();
+        Integer fifaVersion = request.getFifaVersion();
 
         // Call the service to create the follow relationship between the user and the player
-        PlayerFollowQueryResult followResult = userNodeService.followPlayer(loggedInUsername, request.getMongoId());
+        PlayerFollowQueryResult followResult = userNodeService.followPlayer(loggedInUsername, request.getMongoId(), fifaVersion);
 
         // Create a DTO to return with player follow details
         PlayerFollowDTO responseFollow = new PlayerFollowDTO(
                 followResult.getUser().getUsername(),
-                followResult.getPlayerNode().getMongoId()
+                followResult.getPlayerNode().getMongoId(),
+                fifaVersion
+
         );
 
         // Return the PlayerFollowDTO wrapped in a ResponseEntity with CREATED status
@@ -242,14 +245,18 @@ public class UserNodeController {
         String loggedInUsername = principal.getName();
         String longName = request.getLong_name();
         Integer fifaVersion = request.getFifaVersion();
-        PlayerFollowQueryResult followResult = userNodeService.followPlayerEasy(loggedInUsername, longName);
+
+        PlayerFollowQueryResult followResult = userNodeService.followPlayerEasy(loggedInUsername, longName, fifaVersion);
 
         PlayerFollowDTO responseFollow = new PlayerFollowDTO(
                 followResult.getUser().getUsername(),
-                followResult.getPlayerNode().getMongoId()
+                followResult.getPlayerNode().getMongoId(),
+                fifaVersion // Include FIFA version in response if needed
         );
-        return new ResponseEntity<>(responseFollow, HttpStatus.CREATED);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseFollow);
     }
+
 
     @PostMapping("/followCoach")
     public ResponseEntity<String> followCoach(@RequestBody CoachFollowRequest request, Principal principal) {
@@ -287,14 +294,21 @@ public class UserNodeController {
     @DeleteMapping("UnfollowPlayer")
     public ResponseEntity<String> unfollowPlayer(@RequestBody PlayerFollowRequest request, Principal principal) {
         String loggedInUsername = principal.getName();
-        String mongoId = request.getMongoId();
-        PlayerFollowQueryResult unfollowResult = userNodeService.unfollowPlayer(loggedInUsername, request.getMongoId());
-        PlayerFollowDTO responseFollow = new PlayerFollowDTO(
-                unfollowResult.getUser().getUsername(),
-                unfollowResult.getPlayerNode().getMongoId()
-        );
-        return new ResponseEntity<>("User " + loggedInUsername + "Unfollowed : " + unfollowResult.getPlayerNode().getMongoId(), HttpStatus.CREATED);
+        Integer playerId = request.getPlayerId();
+        Integer fifaVersion = request.getFifaVersion();
+
+            
+
+        // Call the service method to unfollow the player
+        PlayerFollowQueryResult unfollowResult = userNodeService.unfollowPlayer(loggedInUsername, playerId, fifaVersion);
+
+        // Construct a response message indicating the result of the unfollow action
+        String responseMessage = "User " + loggedInUsername + " unfollowed player with ID: " + playerId + " for FIFA version " + fifaVersion;
+
+        // Return the response entity with an appropriate message and status
+        return new ResponseEntity<>(responseMessage, HttpStatus.OK);
     }
+
 
     @GetMapping("roles")
     public List<String> getLoggedInUserRoles() {

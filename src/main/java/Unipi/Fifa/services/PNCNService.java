@@ -41,13 +41,10 @@ public class PNCNService {
         // Step 2: Iterate over players to find matching clubs and create relationships
         for (Player player : players) {
             // Step 2.1: Get the corresponding PlayerNode from Neo4j using the player's mongoId
-//            PlayerNode playerNode = playerNodes.stream()
-//                    .filter(pn -> pn.getMongoId().equals(player.getId()))
-//                    .findFirst()
-//                    .orElse(null);
             PlayerNode playerNode = playerNodeRepository.findByMongoId(player.getId());
 
-            if (playerNode != null && player.getMergedVersions() != null) {
+            // Check if PlayerNode is found and mergedVersions is not null or empty
+            if (playerNode != null && player.getMergedVersions() != null && !player.getMergedVersions().isEmpty()) {
                 // Step 2.2: Loop over all FIFA versions for the player
                 for (Map.Entry<String, Player.FifaStats> entry : player.getMergedVersions().entrySet()) {
                     Player.FifaStats fifaStats = entry.getValue();
@@ -73,15 +70,23 @@ public class PNCNService {
                                 System.out.println("No matching club found for Player " + playerNode.getId() + " in FIFA version " + fifaVersion);
                             }
                         } else {
-                            System.out.println("Missing club information for Player " + playerNode.getId());
+                            System.out.println("Missing club information for Player " + playerNode.getId() + " in FIFA version " + fifaVersion);
                         }
+                    } else {
+                        System.out.println("Missing stats for Player " + playerNode.getId());
                     }
                 }
             } else {
-                System.out.println("PlayerNode not found or mergedVersions is null for Player " + player.getId());
+                if (playerNode == null) {
+                    System.out.println("PlayerNode not found for Player " + player.getId());
+                } else {
+                    System.out.println("Player's mergedVersions is null or empty for Player " + player.getId());
+                }
             }
         }
     }
+
+
 
 
     @Transactional

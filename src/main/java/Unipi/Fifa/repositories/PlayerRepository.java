@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PlayerRepository extends MongoRepository<Player, String> {
-    List<Player> findByPlayerId(Integer playerid);
+    Player findByPlayerId(Integer playerid);
     List<Player> findByGender(PlayerNode.Gender gender);
     List<Player> findByLongName(String longName);
     Optional<Player> findById(String id);
