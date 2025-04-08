@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.authentication.AuthenticationManager;
 
 import java.security.Principal;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -191,27 +192,27 @@ public class UserNodeController {
 
     @GetMapping("/followingPlayers")
     public ResponseEntity<List<PlayerNodeDTO>> followings(Principal principal) {
-        // Fetch the list of PlayerNode entities the user is following
-//        List<PlayerNode> playerNodes = playerFollowingService.getAllFollowingPlayers(principal.getName());
         List<PlayerNode> playerNodes = userNodeService.findPlayersByUsername(principal.getName());
 
         if (playerNodes.isEmpty()) {
             System.out.println("No players found for user: " + principal.getName());
-        } else {
-            List<PlayerNodeDTO> followings = playerNodes.stream().map(playerNode -> {
-                PlayerNodeDTO playerNodeDTO = new PlayerNodeDTO();
-                playerNodeDTO.setId(playerNode.getId());
-                playerNodeDTO.setPlayerId(playerNode.getPlayerId());
-                playerNodeDTO.setLongName(playerNode.getLongName());
-                playerNodeDTO.setNationality(playerNode.getNationality());
-                playerNodeDTO.setGender(playerNode.getGender() != null ? playerNode.getGender().name() : null);
-                return playerNodeDTO;
-            }).collect(Collectors.toList());
-            return ResponseEntity.ok(followings);
+            return ResponseEntity.ok(Collections.emptyList());
         }
-        return null;
 
+        List<PlayerNodeDTO> followings = playerNodes.stream()
+                .map(playerNode -> new PlayerNodeDTO(
+                        playerNode.getId(),
+                        playerNode.getPlayerId(),
+                        playerNode.getLongName(),
+                        playerNode.getGender(),
+                        playerNode.getNationality(),
+                        playerNode.getDob()
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(followings);
     }
+
 
     @GetMapping("/followingUsers")
     public ResponseEntity<List<UserDTO>> followingUsers(Principal principal) {
