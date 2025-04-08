@@ -231,4 +231,8 @@ public class UserNodeService {
     }
 
 
+    public List<PlayerNode> findPlayersByUsername(String name) {
+        userNodeRepository.findPlayersByUsername(name);
+        return userNodeRepository.findPlayersByUsername(name);
+    }
 }
