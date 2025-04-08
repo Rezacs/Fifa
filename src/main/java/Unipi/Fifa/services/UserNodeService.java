@@ -209,10 +209,26 @@ public class UserNodeService {
             throw new IllegalArgumentException("User or followingPlayer not found.");
         }
 
+        // Fetch the Player entity from MongoDB
+        Player mongoPlayer = playerRepository.findByPlayerId(targetPlayer.getPlayerId());
+        if (mongoPlayer == null) {
+            throw new IllegalArgumentException("Player not found in MongoDB.");
+        }
+
+        // Check if the provided fifaVersion exists in mergedVersions
+        boolean versionExists = mongoPlayer.getMergedVersions().values().stream()
+                .anyMatch(fifaStats -> fifaStats.getStats() != null &&
+                        fifaVersion.equals(fifaStats.getStats().getFifaVersion()));
+
+        if (!versionExists) {
+            throw new IllegalArgumentException("The provided FIFA version does not exist for this player.");
+        }
+
         // Create the relationship using the repository method
         userNodeRepository.createUserPlayerInteraction(loggedInUsername, targetPlayer.getPlayerId(), fifaVersion);
 
         return new PlayerFollowQueryResult(loggedInUserNode, targetPlayer);
     }
+
 
 }

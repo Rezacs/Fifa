@@ -18,7 +18,7 @@ public interface UserNodeRepository extends Neo4jRepository<UserNode, Long> {
 
     @Query("MATCH (u:UserNode), (p:PlayerNode) " +
             "WHERE u.username = $loggedInUsername AND p.playerId = $playerId " +
-            "CREATE (u)-[:INTERACTS_WITH {fifaVersion: $fifaVersion}]->(p)")
+            "MERGE (u)-[:INTERACTS_WITH {fifaVersion: $fifaVersion}]->(p)")
     void createUserPlayerInteraction(String loggedInUsername, Integer playerId, Integer fifaVersion);
 
     @Query("MATCH (u:UserNode)-[r:INTERACTS_WITH]->(p:PlayerNode) " +
