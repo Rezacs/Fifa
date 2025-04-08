@@ -10,6 +10,7 @@ import Unipi.Fifa.requests.*;
 import Unipi.Fifa.services.PlayerFollowingService;
 import Unipi.Fifa.services.ArticleService;
 import Unipi.Fifa.services.UserNodeService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -66,18 +67,24 @@ public class UserNodeController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
-        // Invalidate session
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate();
         }
 
-        // Remove authentication details
         SecurityContextHolder.clearContext();
 
-        return ResponseEntity.ok("Logged out successfully");
+        Cookie cookie = new Cookie("JSESSIONID", null);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Force logout prompt on Swagger
     }
+
+
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {

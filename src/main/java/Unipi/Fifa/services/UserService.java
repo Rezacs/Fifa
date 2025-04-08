@@ -18,6 +18,9 @@ public class UserService {
     private UserNodeRepository userNodeRepository;
 
     @Autowired
+    private UserNodeService userNodeService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     public User createUser(CreateUserRequest request) {

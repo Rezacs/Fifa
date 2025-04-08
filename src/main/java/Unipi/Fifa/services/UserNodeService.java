@@ -11,6 +11,7 @@ import Unipi.Fifa.repositories.PlayerNodeRepository;
 import Unipi.Fifa.repositories.PlayerRepository;
 import Unipi.Fifa.repositories.UserNodeRepository;
 import Unipi.Fifa.requests.CreateUserRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +24,7 @@ import java.util.Optional;
 
 @Service
 public class UserNodeService {
+    @Autowired
     private final UserNodeRepository userNodeRepository;
     private final PasswordEncoder passwordEncoder;
     private final PlayerNodeRepository playerNodeRepository;
@@ -51,13 +53,12 @@ public class UserNodeService {
         if (existingUser.isPresent()) {
             throw new RuntimeException("Username is already taken.");
         }
-        else {
-            UserNode userNode = new UserNode();
-            userNode.setUsername(request.getUsername());
-            userNodeRepository.save(userNode);
-            return userNode;
-        }
+        UserNode userNode = new UserNode();
+        userNode.setUsername(request.getUsername());
+        userNodeRepository.save(userNode);  // This saves the node automatically
+        return userNode;
     }
+
 
     public UserFollowQueryResult follow(String loggedInUsername, String targetUsername) {
         // Fetch the logged-in user and the target user from the repository

@@ -10,12 +10,6 @@ import java.util.Optional;
 
 public interface UserNodeRepository extends Neo4jRepository<UserNode, Long> {
     UserNode findByUsername(String username);
-    Optional<UserNode> findFullByUsername(String username);
-
-
-//    @Query("MATCH (user1:User {username: $username1}) , (user2:User {username: $username2}) " +
-//            "MERGE (user1)-[:FOLLOW]->(user2) RETURN user1, user2")
-//    UserFollowQueryResult createFollowRelationship(String username1, String username2 );
 
     @Query("MATCH (user1:User {username: $username1}) , (user2:User {username: $username2}) " +
             "MERGE (user1)-[:FOLLOW]->(user2) " +
@@ -36,7 +30,4 @@ public interface UserNodeRepository extends Neo4jRepository<UserNode, Long> {
 
     @Query("MATCH (p:User) WHERE ID(p) = $nodeId DETACH DELETE p")
     void deleteUserNodeById(@Param("nodeId") Long nodeId);
-
-
-
 }

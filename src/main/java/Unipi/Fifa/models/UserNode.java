@@ -8,17 +8,10 @@ import java.util.*;
 
 @Node
 public class UserNode {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long id;
     private String username;
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
 
     public Long getId() {
         return id;
@@ -28,17 +21,33 @@ public class UserNode {
         this.id = id;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public List<UserNode> getUserNodes() {
+        return userNodes;
+    }
+
+    public void setUserNodes(List<UserNode> userNodes) {
+        this.userNodes = userNodes;
+    }
+
     @Relationship(type = "FOLLOWS", direction = Relationship.Direction.OUTGOING)
-    private List<PlayerNode> playerNodes;
+    private List<PlayerNode> playerNodes = new ArrayList<>();
 
     @Relationship(type = "Seguire", direction = Relationship.Direction.OUTGOING)
-    private List<UserNode> userNodes;
+    private List<UserNode> userNodes = new ArrayList<>();
 
     @Relationship(type="Piace", direction = Relationship.Direction.OUTGOING)
-    private List<ClubNode> clubNodes;
+    private List<ClubNode> clubNodes = new ArrayList<>();
 
     @Relationship(type="FollowCoach", direction = Relationship.Direction.OUTGOING)
-    private List<CoachNode> coachNodes;
+    private List<CoachNode> coachNodes = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

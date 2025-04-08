@@ -13,6 +13,9 @@ public class CreateUserRequest {
         this.roles = roles;
     }
 
+    public CreateUserRequest() {}
+
+
     public String getName() {
         return name;
     }
