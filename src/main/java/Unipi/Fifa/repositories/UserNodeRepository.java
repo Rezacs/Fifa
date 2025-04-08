@@ -1,11 +1,13 @@
 package Unipi.Fifa.repositories;
 
+import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.models.UserNode;
 import Unipi.Fifa.queryresults.UserFollowQueryResult;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserNodeRepository extends Neo4jRepository<UserNode, Long> {
@@ -30,4 +32,9 @@ public interface UserNodeRepository extends Neo4jRepository<UserNode, Long> {
 
     @Query("MATCH (p:User) WHERE ID(p) = $nodeId DETACH DELETE p")
     void deleteUserNodeById(@Param("nodeId") Long nodeId);
+
+    @Query("MATCH (u:UserNode)-[:INTERACTS_WITH]->(p:PlayerNode) " +
+            "WHERE u.username = $loggedInUsername " +
+            "RETURN p")
+    List<PlayerNode> findPlayersByUsername(String loggedInUsername);
 }

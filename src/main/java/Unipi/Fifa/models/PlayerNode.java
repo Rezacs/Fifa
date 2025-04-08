@@ -40,12 +40,52 @@ public class PlayerNode {
     }
 
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Integer getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(Integer playerId) {
+        this.playerId = playerId;
+    }
+
+    public String getMongoId() {
+        return mongoId;
+    }
+
+    public void setMongoId(String mongoId) {
+        this.mongoId = mongoId;
+    }
+
     public String getLongName() {
         return longName;
     }
 
     public void setLongName(String longName) {
         this.longName = longName;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public String getNationality() {
+        return nationality;
+    }
+
+    public void setNationality(String nationality) {
+        this.nationality = nationality;
     }
 
     public String getPreferredFoot() {
@@ -71,56 +111,4 @@ public class PlayerNode {
     public void setPosition(String position) {
         this.position = position;
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Integer getPlayerId() {
-        return playerId;
-    }
-
-    public void setPlayerId(Integer playerId) {
-        this.playerId = playerId;
-    }
-
-    public String getMongoId() {
-        return mongoId;
-    }
-
-    public void setMongoId(String mongoId) {
-        this.mongoId = mongoId;
-    }
-
-    public String getLong_name() {
-        return longName;
-    }
-
-    public void setLong_name(String long_name) {
-        this.longName = long_name;
-    }
-
-    public String getNationality() {
-        return nationality;
-    }
-
-    public void setNationality(String nationality) {
-        this.nationality = nationality;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-
-
-
 }

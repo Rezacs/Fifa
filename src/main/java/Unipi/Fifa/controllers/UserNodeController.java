@@ -40,18 +40,20 @@ public class UserNodeController {
     private final CoachNodeRepository coachNodeRepository;
     private final PlayerRepository playerRepository;
     private final UserNodeRepository userNodeRepository;
+    private final PlayerNodeRepository playerNodeRepository;
     private final UserRepository userRepository;
 
     private final AuthenticationManager authenticationManager;
 
 
-    public UserNodeController(UserNodeService userNodeService, PlayerFollowingService playerFollowingService, ArticleService articleService, CoachNodeRepository coachNodeRepository, PlayerRepository playerRepository , UserNodeRepository userNodeRepository, UserRepository userRepository, AuthenticationManager authenticationManager) {
+    public UserNodeController(UserNodeService userNodeService, PlayerFollowingService playerFollowingService, ArticleService articleService, CoachNodeRepository coachNodeRepository, PlayerRepository playerRepository , UserNodeRepository userNodeRepository, PlayerNodeRepository playerNodeRepository, UserRepository userRepository, AuthenticationManager authenticationManager) {
         this.userNodeService = userNodeService;
         this.playerFollowingService = playerFollowingService;
         this.articleService = articleService;
         this.coachNodeRepository = coachNodeRepository;
         this.playerRepository = playerRepository;
         this.userNodeRepository = userNodeRepository;
+        this.playerNodeRepository = playerNodeRepository;
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
     }
@@ -188,23 +190,28 @@ public class UserNodeController {
 
 
     @GetMapping("/followingPlayers")
-    public ResponseEntity<List<PlayerNodeDTO>> followings(Principal principal) {
+    public ResponseEntity<List<PlayerNode>> followings(Principal principal) {
         // Fetch the list of PlayerNode entities the user is following
-        List<PlayerNode> playerNodes = playerFollowingService.getAllFollowingPlayers(principal.getName());
+//        List<PlayerNode> playerNodes = playerFollowingService.getAllFollowingPlayers(principal.getName());
+        List<PlayerNode> playerNodes = userNodeRepository.findPlayersByUsername(principal.getName());
 
-        // Map PlayerNode entities to PlayerNodeDTOs
-        List<PlayerNodeDTO> followings = playerNodes.stream().map(playerNode -> {
-            PlayerNodeDTO playerNodeDTO = new PlayerNodeDTO();
-            playerNodeDTO.setId(playerNode.getId());
-            playerNodeDTO.setPlayerId(playerNode.getPlayerId());
-            playerNodeDTO.setLongName(playerNode.getLong_name());
-            playerNodeDTO.setNationality(playerNode.getNationality());
-            playerNodeDTO.setGender(playerNode.getGender() != null ? playerNode.getGender().name() : null); // Convert enum to String
-            return playerNodeDTO;
-        }).collect(Collectors.toList());
+        if (playerNodes.isEmpty()) {
+            System.out.println("No players found for user: " + principal.getName());
+        } else {
+//            List<PlayerNodeDTO> followings = playerNodes.stream().map(playerNode -> {
+//                PlayerNodeDTO playerNodeDTO = new PlayerNodeDTO();
+//                playerNodeDTO.setId(playerNode.getId());
+//                playerNodeDTO.setPlayerId(playerNode.getPlayerId());
+//                playerNodeDTO.setLongName(playerNode.getLongName());
+//                playerNodeDTO.setNationality(playerNode.getNationality());
+//                playerNodeDTO.setGender(playerNode.getGender() != null ? playerNode.getGender().name() : null);
+//                return playerNodeDTO;
+//            }).collect(Collectors.toList());
+//            return ResponseEntity.ok(followings);
+            return ResponseEntity.ok(playerNodes);
+        }
+        return null;
 
-        // Return the DTO list wrapped in a ResponseEntity
-        return ResponseEntity.ok(followings);
     }
 
     @GetMapping("/followingUsers")
