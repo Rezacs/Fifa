@@ -191,7 +191,7 @@ public class UserNodeController {
 
 
     @GetMapping("/followingPlayers")
-    public ResponseEntity<List<PlayerNodeDTO>> followings(Principal principal) {
+    public ResponseEntity<List<PlayerNode>> followings(Principal principal) {
         List<PlayerNode> playerNodes = userNodeService.findPlayersByUsername(principal.getName());
 
         if (playerNodes.isEmpty()) {
@@ -199,19 +199,10 @@ public class UserNodeController {
             return ResponseEntity.ok(Collections.emptyList());
         }
 
-        List<PlayerNodeDTO> followings = playerNodes.stream()
-                .map(playerNode -> new PlayerNodeDTO(
-                        playerNode.getId(),
-                        playerNode.getPlayerId(),
-                        playerNode.getLongName(),
-                        playerNode.getGender(),
-                        playerNode.getNationality(),
-                        playerNode.getDob()
-                ))
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(followings);
+        return ResponseEntity.ok(playerNodes);
     }
+
+
 
 
     @GetMapping("/followingUsers")

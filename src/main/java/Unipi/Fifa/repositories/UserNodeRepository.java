@@ -33,8 +33,4 @@ public interface UserNodeRepository extends Neo4jRepository<UserNode, Long> {
     @Query("MATCH (p:User) WHERE ID(p) = $nodeId DETACH DELETE p")
     void deleteUserNodeById(@Param("nodeId") Long nodeId);
 
-    @Query("MATCH (u:UserNode)-[:INTERACTS_WITH]->(p:PlayerNode) " +
-            "WHERE u.username = $loggedInUsername " +
-            "RETURN p")
-    List<PlayerNode> findPlayersByUsername(String loggedInUsername);
 }

@@ -49,6 +49,8 @@ public interface PlayerNodeRepository extends Neo4jRepository<PlayerNode, Long> 
                                      @Param("teamId") int teamId,
                                      @Param("yearJoined") int yearJoined,
                                      @Param("fifaVersion") int fifaVersion);
-
-
+    @Query("MATCH (u:UserNode)-[:INTERACTS_WITH]->(p:PlayerNode) " +
+            "WHERE u.username = $loggedInUsername " +
+            "RETURN p")
+    List<PlayerNode> findPlayersByUsername(String loggedInUsername);
 }
