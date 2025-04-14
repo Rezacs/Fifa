@@ -106,4 +106,16 @@ public class CoachController {
         }
     }
 
+    @GetMapping("/getByCoachId/{coachId}")
+    public ResponseEntity<Coach> getCoachByCoachId(@PathVariable Integer coachId) {
+        Coach coach = coachService.getCoachByCoachId(coachId);
+
+        if (coach == null) {
+            return ResponseEntity.notFound().build(); // 404 if not found
+        }
+
+        return ResponseEntity.ok(coach);
+    }
+
+
 }

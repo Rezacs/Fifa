@@ -2,13 +2,15 @@ package Unipi.Fifa.repositories;
 
 import Unipi.Fifa.models.Club;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ClubRepository extends MongoRepository<Club, String> {
+public interface ClubRepository extends MongoRepository<Club, String>, ClubRepositoryCustom  {
     List<Club> findByTeamName(String name);
     Optional<Club> findById(String id);
     List<Club> findByGender(String gender);
@@ -19,8 +21,9 @@ public interface ClubRepository extends MongoRepository<Club, String> {
     // Custom query to retrieve clubs by FIFA version and overall rating
     List<Club> findByMergedVersionsOverall(Integer overall);
 
-    // Custom query to find by team name and FIFA version
-    Optional<Club> findByTeamNameAndMergedVersionsContaining(String clubName, Integer fifaVersion);
+    @Query(value = "{ 'team_name': ?0, '#mergedKey.fifa_version': ?1 }")
+    Optional<Club> findByTeamNameAndMergedVersionsContaining(String teamName, Integer fifaVersion, @Param("mergedKey") String mergedKey);
+
 
     Optional<Club> findByTeamIdAndGenderAndMergedVersionsContaining(Integer teamId, String gender, Integer fifaVersion);
 }

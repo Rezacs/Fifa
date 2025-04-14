@@ -38,7 +38,7 @@ public interface CoachNodeRepository extends Neo4jRepository<CoachNode, Long> {
 
     @Query("MATCH (c:CoachNode), (cl:ClubNode) " +
             "WHERE c.coachId = $coachId AND cl.teamId = $teamId " +
-            "CREATE (c)-[:MANAGES {fifaVersion: $fifaVersion}]->(cl)")
+            "MERGE (c)-[:MANAGES {fifaVersion: $fifaVersion}]->(cl)")
     void createManagingRelationship(Integer coachId, Integer teamId, Integer fifaVersion);
 
 

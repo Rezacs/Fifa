@@ -133,9 +133,13 @@ public class ClubService {
         return clubNode;
     }
 
+
+    @Transactional
     public Club getClubbyNameAndFifaVersion(String clubName, Integer fifaVersion) {
-        return clubRepository.findByTeamNameAndMergedVersionsContaining(clubName , fifaVersion).orElse(null);
+        return clubRepository.findByTeamNameAndFifaVersion(clubName, fifaVersion).orElse(null);
     }
+
+
 
     public void deleClubNodeByMongoId(String mongoId) {
         ClubNode target = clubNodeRepository.findNodeByMongoId(mongoId);

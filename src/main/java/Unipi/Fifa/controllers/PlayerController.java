@@ -73,7 +73,7 @@ public class PlayerController {
 
 
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("create-new-player")
     public ResponseEntity<Player> createNewPlayer(@RequestBody Player player) {
         try{
@@ -88,6 +88,7 @@ public class PlayerController {
         }
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/deletePlayer")
     public ResponseEntity<String> deletePlayer(@RequestParam String playerId) {
         User user = userRepository.findByUsername(getLoggedInUsername());
