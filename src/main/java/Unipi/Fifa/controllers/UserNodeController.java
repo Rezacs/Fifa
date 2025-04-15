@@ -150,7 +150,7 @@ public class UserNodeController {
 
     @PutMapping("editArticle")
     public ResponseEntity<String> editArticle(@RequestBody ArticleRequest request, Principal principal, String ArticleMongoId) {
-        User user = userRepository.findByUsername(getLoggedInUsername());
+        User user = userRepository.findByUsername(getLoggedInUsername()).orElse(null);
         Article article = articleService.findById(ArticleMongoId);
         if (user.isAdmin() || Objects.equals(article.getInAssociatedWith(), user.getUsername())) {
             article.setContent(request.getContent());
@@ -164,7 +164,7 @@ public class UserNodeController {
 
     @DeleteMapping("deleteArticle")
     public ResponseEntity<String> deleteComment(@RequestBody String commentId, Principal principal) {
-        User user = userRepository.findByUsername(getLoggedInUsername());
+        User user = userRepository.findByUsername(getLoggedInUsername()).orElse(null);
         Article article = articleService.findById(commentId);
         if (user.isAdmin() || article.getInAssociatedWith() == user.getUsername() ) {
             articleService.deleteById(commentId);

@@ -94,7 +94,7 @@ public class ClubController {
 
     @PostMapping("create-new-club")
     public ResponseEntity<Club> createClub(@RequestBody Club club) {
-        User user = userRepository.findByUsername(getLoggedInUsername());
+        User user = userRepository.findByUsername(getLoggedInUsername()).orElse(null);
         if (user.isAdmin()) {
             try {
                 club.setId(null);
@@ -111,7 +111,7 @@ public class ClubController {
 
     @DeleteMapping("/deleteClub")
     public ResponseEntity<String> deleteClub(@RequestParam String clubMongoId) {
-        User user = userRepository.findByUsername(getLoggedInUsername());
+        User user = userRepository.findByUsername(getLoggedInUsername()).orElse(null);
         if (user.isAdmin()) {
             Club targetClub = clubService.getClubbyId(clubMongoId);
             if (targetClub == null) {

@@ -93,10 +93,10 @@ public class PlayerController {
         }
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/deletePlayer")
     public ResponseEntity<String> deletePlayer(@RequestParam String playerId) {
-        User user = userRepository.findByUsername(getLoggedInUsername());
+        User user = userRepository.findByUsername(getLoggedInUsername()).orElse(null);
         if (user.isAdmin()){
             Player targetPlayer = playerService.getPlayerById(playerId);
 

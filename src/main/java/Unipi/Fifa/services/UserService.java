@@ -25,7 +25,7 @@ public class UserService {
 
     public User createUser(CreateUserRequest request) {
 //        User2 existingUser = user2Repository.findByUsername(request.getUsername()) ;
-        User existingUser = userRepository.findByUsername(request.getUsername());
+        User existingUser = userRepository.findByUsername(request.getUsername()).orElse(null);
 
         if (existingUser != null && existingUser.isEnabled()) {
             throw new RuntimeException("Username is already taken.");
@@ -40,7 +40,7 @@ public class UserService {
     }
 
     public void deleteByUsername(String uname) {
-        User existingUser = userRepository.findByUsername(uname);
+        User existingUser = userRepository.findByUsername(uname).orElse(null);
         UserNode userNode = userNodeRepository.findByUsername(uname);
         if (existingUser == null) {
             throw new RuntimeException("User not found.");

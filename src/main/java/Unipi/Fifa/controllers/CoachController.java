@@ -90,7 +90,7 @@ public class CoachController {
 
     @DeleteMapping("/deleteCoach")
     public ResponseEntity<String> deletePlayer(@RequestParam Integer coachId) {
-        User user = userRepository.findByUsername(getLoggedInUsername());
+        User user = userRepository.findByUsername(getLoggedInUsername()).orElse(null);
         if (user.isAdmin()){
             Coach targetCoach = coachService.getCoachByCoachId(coachId);
             if (targetCoach == null) {

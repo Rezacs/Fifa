@@ -1,6 +1,7 @@
 package Unipi.Fifa.config;
 
 
+import Unipi.Fifa.services.CustomUserDetailsService;
 import Unipi.Fifa.services.MongoUserDetailService;
 import Unipi.Fifa.services.NeoUserDetailService;
 import org.springframework.context.annotation.Bean;
@@ -23,40 +24,36 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
      private final NeoUserDetailService neoUserDetailService;
      private final MongoUserDetailService mongoUserDetailService;
+     private final CustomUserDetailsService userDetailsService;
 
-     public SecurityConfig(NeoUserDetailService neoUserDetailService, MongoUserDetailService mongoUserDetailService) {
+     public SecurityConfig(NeoUserDetailService neoUserDetailService, MongoUserDetailService mongoUserDetailService, CustomUserDetailsService userDetailsService) {
          this.neoUserDetailService = neoUserDetailService;
+         this.userDetailsService = userDetailsService;
          this.mongoUserDetailService = mongoUserDetailService;
      }
 
-     @Bean
-     SecurityFilterChain configure(HttpSecurity http, HttpSecurity httpSecurity) throws Exception {
-         return httpSecurity
-                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                 .csrf(AbstractHttpConfigurer::disable)
-                 .cors(Customizer.withDefaults())
-                 .authorizeHttpRequests(auth -> auth.requestMatchers(
-                                         "api/v1/auth/me","api/v1/enrolments/**"
-                                 ).authenticated()
-                                 .anyRequest().permitAll()
-                 ).userDetailsService(mongoUserDetailService)
-                 .httpBasic(Customizer.withDefaults())
-                 .build();
-     }
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/p/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/auth/me", "/api/v1/enrolments/**").authenticated()
+                        .anyRequest().permitAll()
+                )
+                .httpBasic(Customizer.withDefaults());
+
+        return http.build();
+    }
+
 
     @Bean
     PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
-//    @Bean
-//    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-//        return http.getSharedObject(AuthenticationManagerBuilder.class)
-//                .userDetailsService(neoUserDetailService)
-//                .passwordEncoder(passwordEncoder())
-//                .and()
-//                .build();
-//    }
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {

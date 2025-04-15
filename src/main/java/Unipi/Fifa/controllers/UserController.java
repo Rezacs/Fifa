@@ -39,7 +39,7 @@ public class UserController {
 
     @DeleteMapping("deleteUser")
     public ResponseEntity<String> deleteUser(Principal principal) {
-        User user = userRepository.findByUsername(getLoggedInUsername());
+        User user = userRepository.findByUsername(getLoggedInUsername()).orElse(null);
         String uname = getLoggedInUsername();
         UserNode userNode = userNodeService.FindUser(uname);
         if (user.isAdmin() || userNode.getUsername().equals(uname)) {
