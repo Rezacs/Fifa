@@ -5,6 +5,7 @@ import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.services.PNCNService;
 import Unipi.Fifa.services.PlayerNodeService;
 import Unipi.Fifa.services.PlayerService;
+import Unipi.Fifa.services.UserNodeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,9 @@ public class PlayerController {
     private PNCNService pncnService;
 
     @Autowired
+    private UserNodeService userNodeService;
+
+    @Autowired
     private PlayerNodeService playerNodeService;
     @Autowired
     private UserRepository userRepository;
@@ -41,6 +45,7 @@ public class PlayerController {
         return ResponseEntity.ok(playerService.getPlayerByLongName(playerName));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/edit/{mongoId}")
     public ResponseEntity<String> editPlayer(@PathVariable String mongoId, @RequestBody Player updatedPlayer) {
         Player existingPlayer = playerService.getPlayerById(mongoId);
@@ -66,8 +71,8 @@ public class PlayerController {
         playerService.savePlayer(existingPlayer);
         playerNodeService.transferOneDataToNeo4j(mongoId);
         PlayerNode node = playerNodeService.getPlayerByMongoId(mongoId);
-        pncnService.createEditedPlayerClubRelationships(node);
-
+        pncnService.createPlayerClubRelationshipsForPlayerNode(node);
+        playerNodeService.checkUserEdges(node);
         return ResponseEntity.ok("Player updated successfully!");
     }
 

@@ -8,11 +8,16 @@ import Unipi.Fifa.repositories.PlayerNodeRepository;
 import Unipi.Fifa.repositories.PlayerRepository;
 import Unipi.Fifa.repositories.UserNodeRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.neo4j.core.Neo4jTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PlayerNodeService {
@@ -20,6 +25,8 @@ public class PlayerNodeService {
     private final PlayerNodeRepository playerNodeRepository;
     private final PlayerRepository playerRepository;
     private UserNodeRepository userNodeRepository;
+    @Autowired
+    private Neo4jTemplate neo4jTemplate;
 
     public PlayerNodeService(PlayerNodeRepository playerNodeRepository, PlayerRepository playerRepository, UserNodeRepository userNodeRepository) {
         this.playerNodeRepository = playerNodeRepository;
@@ -150,4 +157,28 @@ public class PlayerNodeService {
         PlayerNode target = playerNodeRepository.findByMongoId(playerId);
         playerNodeRepository.deletePlayerNodeById(target.getId());
     }
+
+    @Transactional
+    public void checkUserEdges(PlayerNode node) {
+        // Step 1: Initialize list to store FIFA versions
+        List<Integer> fifaVersions = new ArrayList<>();
+
+        // Step 2: Get the player from the repository
+        Player player = playerRepository.findById(node.getMongoId()).orElse(null);
+
+        // Step 3: Check if the player and merged versions exist
+        if (player != null && player.getMergedVersions() != null) {
+            for (Player.FifaStats fifaStats : player.getFifaVersions()) {
+                Player.Stats stats = fifaStats.getStats();
+                if (stats != null && stats.getFifaVersion() != null) {
+                    fifaVersions.add(stats.getFifaVersion());
+                }
+            }
+        }
+
+        if (!fifaVersions.isEmpty()) {
+            playerNodeRepository.deleteIncomingEdgesNotInFifaVersions(node.getPlayerId(), fifaVersions);
+        }
+    }
+
 }

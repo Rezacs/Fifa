@@ -86,6 +86,75 @@ public class PNCNService {
         }
     }
 
+    @Transactional
+    public void createPlayerClubRelationshipsForPlayerNode(PlayerNode playerNode) {
+        if (playerNode == null) {
+            System.out.println("Provided PlayerNode is null.");
+            return;
+        }
+
+        // Step 1: Get the corresponding Player from MongoDB by mongoId
+        Player player = playerRepository.findById(playerNode.getMongoId()).orElse(null);
+
+        if (player == null) {
+            System.out.println("No matching Player found for PlayerNode with mongoId: " + playerNode.getMongoId());
+            return;
+        }
+
+        Map<String, Player.FifaStats> mergedVersions = player.getMergedVersions();
+        if (mergedVersions == null || mergedVersions.isEmpty()) {
+            System.out.println("No mergedVersions found for Player " + player.getId());
+            return;
+        }
+
+        // Step 2: Loop through all versions
+        for (Map.Entry<String, Player.FifaStats> entry : mergedVersions.entrySet()) {
+            String versionKey = entry.getKey();
+            Player.FifaStats fifaStats = entry.getValue();
+
+            if (fifaStats == null || fifaStats.getStats() == null) {
+                System.out.println("Stats missing for version " + versionKey + " for Player " + player.getId());
+                continue;
+            }
+
+            Player.Stats stats = fifaStats.getStats();
+            Integer clubTeamId = stats.getClubTeamId();
+            Integer fifaVersion = stats.getFifaVersion();
+            LocalDate clubJoinedDate = stats.getClubJoinedDate();
+
+            if (clubTeamId == null) {
+                System.out.println("No clubTeamId for version " + versionKey + " for Player " + player.getId());
+                continue;
+            }
+
+            // Get gender from PlayerNode
+            String gender = String.valueOf(playerNode.getGender());
+
+            // Step 3: Find the ClubNode in Neo4j
+            ClubNode clubNode = clubNodeRepository.findByTeamIdAndGender(clubTeamId, gender);
+
+            if (clubNode == null) {
+                System.out.println("No ClubNode found with teamId " + clubTeamId + " for gender " + gender);
+                continue;
+            }
+
+            // Step 4: Create BELONGS_TO relationship
+            Integer yearJoined = (clubJoinedDate != null) ? clubJoinedDate.getYear() : null;
+
+            playerNodeRepository.createBelongsToRelationship(
+                    playerNode.getPlayerId(),
+                    clubNode.getTeamId(),
+                    yearJoined,
+                    fifaVersion
+            );
+
+            System.out.println("Created BELONGS_TO for Player " + playerNode.getPlayerId() +
+                    " -> Club " + clubNode.getTeamName() +
+                    " | Year Joined: " + (yearJoined != null ? yearJoined : "2222-22-30") +
+                    " | FIFA Version: " + fifaVersion);
+        }
+    }
+
 
 
 

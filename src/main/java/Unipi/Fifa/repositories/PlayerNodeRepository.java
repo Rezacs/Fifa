@@ -53,4 +53,14 @@ public interface PlayerNodeRepository extends Neo4jRepository<PlayerNode, Long> 
             "WHERE u.username = $loggedInUsername " +
             "RETURN p")
     List<PlayerNode> findPlayersByUsername(String loggedInUsername);
+
+    // Custom query to delete the edges if they don't exist in the list of FIFA versions
+    @Query("""
+    MATCH (source)-[r]->(p:PlayerNode {playerId: $playerId})
+    WHERE type(r) IN ['INTERACTS_WITH', 'BELONGS_TO']
+      AND NOT r.fifaVersion IN $fifaVersions
+    DELETE r
+    """)
+    void deleteIncomingEdgesNotInFifaVersions(Integer playerId, List<Integer> fifaVersions);
+
 }
