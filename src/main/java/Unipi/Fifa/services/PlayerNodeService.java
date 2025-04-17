@@ -4,12 +4,14 @@ import Unipi.Fifa.models.ClubNode;
 import Unipi.Fifa.models.Player;
 import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.models.UserNode;
+import Unipi.Fifa.relations.FollowsPlayer;
 import Unipi.Fifa.repositories.PlayerNodeRepository;
 import Unipi.Fifa.repositories.PlayerRepository;
 import Unipi.Fifa.repositories.UserNodeRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.core.Neo4jTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -97,7 +99,7 @@ public class PlayerNodeService {
     }
 
 
-    public void linkPlayerToLoggedInUser(String mongoId) {
+    public void linkPlayerToLoggedInUser(String mongoId, Integer fifaVersion) {
         // Get the username of the logged-in user from Spring Security
         String loggedInUsername = getLoggedInUsername();
 
@@ -107,18 +109,29 @@ public class PlayerNodeService {
             throw new IllegalArgumentException("User not found");
         }
 
-        // Find the PlayerNode by playerId
+        // Find the PlayerNode by mongoId
         PlayerNode playerNode = playerNodeRepository.findByMongoId(mongoId);
         if (playerNode == null) {
             throw new IllegalArgumentException("PlayerNode not found");
         }
 
-        // Link the PlayerNode to the User
-        if (!userNode.getPlayerNodes().contains(playerNode)) {
-            userNode.getPlayerNodes().add(playerNode);  // Add the player node to the user's player nodes list
-            userNodeRepository.save(userNode);  // Save the user with the updated list of player nodes
+        // Check if already follows
+        boolean alreadyLinked = userNode.getPlayerNodes().stream()
+                .anyMatch(f -> f.getPlayer().getMongoId().equals(mongoId));
+
+        if (!alreadyLinked) {
+            // Create new relationship with provided fifaVersion and today's date
+            FollowsPlayer follows = new FollowsPlayer();
+            follows.setPlayer(playerNode);
+            follows.setFifaVersion(fifaVersion);
+            follows.setDateJoinedClub(java.time.LocalDate.now().toString());
+
+            userNode.getPlayerNodes().add(follows);
+            userNodeRepository.save(userNode);
         }
     }
+
+
 
     public void unlinkPlayerToLoggedInUser(String mongoId) {
         String loggedInUsername = getLoggedInUsername();
@@ -137,14 +150,33 @@ public class PlayerNodeService {
     }
 
 
+//    private String getLoggedInUsername() {
+//        // Retrieve the logged-in username from the security context
+//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        if (principal instanceof UserDetails) {
+//            return ((UserDetails) principal).getUsername();
+//        }
+//        return null; // Or throw an exception if no user is logged in
+//    }
+
     private String getLoggedInUsername() {
-        // Retrieve the logged-in username from the security context
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("No authenticated user found");
+        }
+
+        Object principal = authentication.getPrincipal();
         if (principal instanceof UserDetails) {
             return ((UserDetails) principal).getUsername();
+        } else if (principal instanceof String) {
+            return (String) principal; // in case principal is just a username
+        } else {
+            throw new IllegalStateException("Unknown principal type: " + principal.getClass());
         }
-        return null; // Or throw an exception if no user is logged in
     }
+
+
+
 
     public PlayerNode deletePreviousEdges(String mongoId) {
         PlayerNode playerNode = playerNodeRepository.findByMongoId(mongoId);

@@ -1,8 +1,9 @@
 package Unipi.Fifa.models;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,9 +14,11 @@ import java.util.Date;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @Document(collection = "Coaches")
 public class Coach {
+
     @Id
     @GeneratedValue
     private String id;
@@ -46,84 +49,4 @@ public class Coach {
 
     @Field("gender")
     private String gender;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Integer getCoachId() {
-        return coachId;
-    }
-
-    public void setCoachId(Integer coachId) {
-        this.coachId = coachId;
-    }
-
-    public String getCoachUrl() {
-        return coachUrl;
-    }
-
-    public void setCoachUrl(String coachUrl) {
-        this.coachUrl = coachUrl;
-    }
-
-    public String getShortName() {
-        return shortName;
-    }
-
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
-    }
-
-    public String getLongName() {
-        return longName;
-    }
-
-    public void setLongName(String longName) {
-        this.longName = longName;
-    }
-
-    public Date getDob() {
-        return dob;
-    }
-
-    public void setDob(Date dob) {
-        this.dob = dob;
-    }
-
-    public String getNationalityName() {
-        return nationalityName;
-    }
-
-    public void setNationalityName(String nationalityName) {
-        this.nationalityName = nationalityName;
-    }
-
-    public String getCoachFaceUrl() {
-        return coachFaceUrl;
-    }
-
-    public void setCoachFaceUrl(String coachFaceUrl) {
-        this.coachFaceUrl = coachFaceUrl;
-    }
-
-    public String getNationFlagUrl() {
-        return nationFlagUrl;
-    }
-
-    public void setNationFlagUrl(String nationFlagUrl) {
-        this.nationFlagUrl = nationFlagUrl;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
 }

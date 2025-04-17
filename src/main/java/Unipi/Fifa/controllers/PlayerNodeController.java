@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -35,9 +36,11 @@ public class PlayerNodeController {
     }
 
     @PostMapping("/followByMongoId")
-    public String linkPlayerToUser(@RequestBody PlayerFollowRequest request){
+    public String linkPlayerToUser(@RequestBody PlayerFollowRequest request) {
         String mongoId = request.getMongoId();
-        playerNodeService.linkPlayerToLoggedInUser(mongoId);
+        Integer fifaVersion = request.getFifaVersion();
+
+        playerNodeService.linkPlayerToLoggedInUser(mongoId, fifaVersion);
         return "Player linked to logged-in User successfully";
     }
 

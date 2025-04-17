@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -45,8 +46,10 @@ public class UserNodeService {
 
     public List<UserNode> FindFollowings(String username){
         UserNode userNode = FindUser(username);
-        return userNode.getUsers();
+//        return userNode.getUsers();
+        return userNode.getUserNodes();
     }
+
 
     public UserNode createUser(CreateUserRequest request) {
         Optional<UserNode> existingUser = Optional.ofNullable(userNodeRepository.findByUsername(request.getUsername()));
@@ -69,14 +72,14 @@ public class UserNodeService {
             throw new IllegalArgumentException("User not found.");
         }
 
-        List<UserNode> followings = loggedInUserNode.getUsers();
+        List<UserNode> followings = loggedInUserNode.getUserNodes();
         for (UserNode following : followings) {
             if (following.getUsername().equals(targetUsername)) {
                 throw new IllegalArgumentException("Target User already followed by you.");
             }
         }
         // Add the target user to the logged-in user's 'following' list (or relationship in Neo4j)
-        loggedInUserNode.getUsers().add(targetUserNode);
+        loggedInUserNode.getUserNodes().add(targetUserNode);
 
         // Save the updated user object back into Neo4j
         userNodeRepository.save(loggedInUserNode);
@@ -164,16 +167,16 @@ public class UserNodeService {
         }
 
         // Log the users the logged-in user is following
-        System.out.println("Logged-in user " + loggedInUsername + " is following: " + loggedInUserNode.getUsers());
+        System.out.println("Logged-in user " + loggedInUsername + " is following: " + loggedInUserNode.getUserNodes());
 
-        System.out.println("Logged-in user is following: " + loggedInUserNode.getUsers());
+        System.out.println("Logged-in user is following: " + loggedInUserNode.getUserNodes());
         // Check if the logged-in user is already following the target user
-        if (!loggedInUserNode.getUsers().contains(targetUserNode)) {
+        if (!loggedInUserNode.getUserNodes().contains(targetUserNode)) {
             throw new IllegalArgumentException("You are not following this user.");
         }
 
         // Remove the target user from the logged-in user's 'following' list (or relationship in Neo4j)
-        loggedInUserNode.getUsers().remove(targetUserNode);
+        loggedInUserNode.getUserNodes().remove(targetUserNode);
 
         // Save the updated user object back into Neo4j
         userNodeRepository.save(loggedInUserNode);

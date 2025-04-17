@@ -299,16 +299,17 @@ public class UserNodeController {
     @DeleteMapping("UnfollowPlayer")
     public ResponseEntity<String> unfollowPlayer(@RequestBody PlayerFollowRequest request, Principal principal) {
         String loggedInUsername = principal.getName();
-        Integer playerId = request.getPlayerId();
+        String mongoId = request.getMongoId();
+        Player player = playerRepository.findById(mongoId).orElse(null);
         Integer fifaVersion = request.getFifaVersion();
 
             
 
         // Call the service method to unfollow the player
-        PlayerFollowQueryResult unfollowResult = userNodeService.unfollowPlayer(loggedInUsername, playerId, fifaVersion);
+        PlayerFollowQueryResult unfollowResult = userNodeService.unfollowPlayer(loggedInUsername, player.getPlayerId(), fifaVersion);
 
         // Construct a response message indicating the result of the unfollow action
-        String responseMessage = "User " + loggedInUsername + " unfollowed player with ID: " + playerId + " for FIFA version " + fifaVersion;
+        String responseMessage = "User " + loggedInUsername + " unfollowed player with ID: " + player.getPlayerId() + " for FIFA version " + fifaVersion;
 
         // Return the response entity with an appropriate message and status
         return new ResponseEntity<>(responseMessage, HttpStatus.OK);

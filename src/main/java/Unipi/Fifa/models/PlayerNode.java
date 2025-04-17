@@ -1,17 +1,22 @@
 package Unipi.Fifa.models;
 
-import org.bson.types.ObjectId;
+import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.neo4j.core.schema.*;
+import org.springframework.data.neo4j.core.schema.GeneratedValue;
+import org.springframework.data.neo4j.core.schema.Node;
 
 import java.time.LocalDate;
-import java.util.List;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Node
 public class PlayerNode {
+
     @Id
     @GeneratedValue
     private Long id;
+
     private Integer playerId;
     private String mongoId;
     private String longName;
@@ -20,11 +25,11 @@ public class PlayerNode {
     private String preferredFoot;
     private LocalDate dob;
     private String position;
-    // Enum for gender options.
+
+    // Enum for gender options
     public enum Gender {
         MALE, FEMALE
     }
-
 
     @Override
     public boolean equals(Object obj) {
@@ -37,78 +42,5 @@ public class PlayerNode {
     @Override
     public int hashCode() {
         return mongoId != null ? mongoId.hashCode() : 0;
-    }
-
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Integer getPlayerId() {
-        return playerId;
-    }
-
-    public void setPlayerId(Integer playerId) {
-        this.playerId = playerId;
-    }
-
-    public String getMongoId() {
-        return mongoId;
-    }
-
-    public void setMongoId(String mongoId) {
-        this.mongoId = mongoId;
-    }
-
-    public String getLongName() {
-        return longName;
-    }
-
-    public void setLongName(String longName) {
-        this.longName = longName;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public String getNationality() {
-        return nationality;
-    }
-
-    public void setNationality(String nationality) {
-        this.nationality = nationality;
-    }
-
-    public String getPreferredFoot() {
-        return preferredFoot;
-    }
-
-    public void setPreferredFoot(String preferredFoot) {
-        this.preferredFoot = preferredFoot;
-    }
-
-    public LocalDate getDob() {
-        return dob;
-    }
-
-    public void setDob(LocalDate dob) {
-        this.dob = dob;
-    }
-
-    public String getPosition() {
-        return position;
-    }
-
-    public void setPosition(String position) {
-        this.position = position;
     }
 }

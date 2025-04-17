@@ -1,24 +1,29 @@
 package Unipi.Fifa.models;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.neo4j.core.schema.*;
+import org.springframework.data.neo4j.core.schema.GeneratedValue;
+import org.springframework.data.neo4j.core.schema.Node;
 
-import java.util.List;
-
+@Getter
+@Setter
+@ToString
 @Node
 public class CoachNode {
+
     @Id
     @GeneratedValue
     private Long id;
+
     private String mongoId;
     private Integer coachId;
     private String longName;
     private String nationalityName;
     private String gender;
 
-
-
-        @Override
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
@@ -30,54 +35,4 @@ public class CoachNode {
     public int hashCode() {
         return mongoId != null ? mongoId.hashCode() : 0;
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getMongoId() {
-        return mongoId;
-    }
-
-    public void setMongoId(String mongoId) {
-        this.mongoId = mongoId;
-    }
-
-    public Integer getCoachId() {
-        return coachId;
-    }
-
-    public void setCoachId(Integer coachId) {
-        this.coachId = coachId;
-    }
-
-    public String getLongName() {
-        return longName;
-    }
-
-    public void setLongName(String longName) {
-        this.longName = longName;
-    }
-
-    public String getNationalityName() {
-        return nationalityName;
-    }
-
-    public void setNationalityName(String nationalityName) {
-        this.nationalityName = nationalityName;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-
 }

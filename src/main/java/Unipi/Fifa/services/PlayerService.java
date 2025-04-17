@@ -2,8 +2,6 @@ package Unipi.Fifa.services;
 
 import Unipi.Fifa.models.Player;
 import Unipi.Fifa.repositories.PlayerRepository;
-import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -54,7 +52,7 @@ public class PlayerService {
         return playerRepository.findByLongName(playerName);
     }
 
-    public List<Document> findTop10PlayersManagedByCoach(Integer coachId) {
+    public List<Map<String, Object>> findTop10PlayersManagedByCoach(Integer coachId) {
         return playerRepository.findTop10PlayersManagedByCoach(coachId);
     }
 

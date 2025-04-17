@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 import static Unipi.Fifa.services.UserNodeService.getLoggedInUsername;
 
@@ -47,8 +48,8 @@ public class PlayerController {
     }
 
     @GetMapping("/top-by-coach/{coachId}")
-    public ResponseEntity<List<Document>> getTopPlayersByCoach(@PathVariable Integer coachId) {
-        List<Document> topPlayers = playerService.findTop10PlayersManagedByCoach(coachId);
+    public ResponseEntity<List<Map<String, Object>>> getTopPlayersByCoach(@PathVariable Integer coachId) {
+        List<Map<String, Object>> topPlayers = playerService.findTop10PlayersManagedByCoach(coachId);
         return ResponseEntity.ok(topPlayers);
     }
 
