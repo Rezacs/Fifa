@@ -4,12 +4,15 @@ import Unipi.Fifa.models.Club;
 import Unipi.Fifa.models.ClubNode;
 import Unipi.Fifa.models.CoachNode;
 import Unipi.Fifa.models.PlayerNode;
+import Unipi.Fifa.objects.ClubAverageRatingDTO;
 import Unipi.Fifa.repositories.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.bson.Document;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ClubService {
@@ -144,5 +147,16 @@ public class ClubService {
     public void deleClubNodeByMongoId(String mongoId) {
         ClubNode target = clubNodeRepository.findNodeByMongoId(mongoId);
         clubNodeRepository.deleteClubNodeById(target.getId());
+    }
+
+    public List<ClubAverageRatingDTO> getTop10ByAverageOverall() {
+        List<Document> documents = clubRepository.getTop10ClubsByAverageOverall();
+
+        return documents.stream()
+                .map(doc -> new ClubAverageRatingDTO(
+                        doc.getString("_id"), // "_id" is the team name
+                        doc.getDouble("averageOverall")
+                ))
+                .collect(Collectors.toList());
     }
 }

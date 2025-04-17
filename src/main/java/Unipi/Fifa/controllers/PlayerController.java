@@ -7,6 +7,7 @@ import Unipi.Fifa.services.PlayerNodeService;
 import Unipi.Fifa.services.PlayerService;
 import Unipi.Fifa.services.UserNodeService;
 import lombok.RequiredArgsConstructor;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +44,12 @@ public class PlayerController {
     @GetMapping("/{playerName}")
     public ResponseEntity<List<Player>> getByPlayerName(@PathVariable String playerName){
         return ResponseEntity.ok(playerService.getPlayerByLongName(playerName));
+    }
+
+    @GetMapping("/top-by-coach/{coachId}")
+    public ResponseEntity<List<Document>> getTopPlayersByCoach(@PathVariable Integer coachId) {
+        List<Document> topPlayers = playerService.findTop10PlayersManagedByCoach(coachId);
+        return ResponseEntity.ok(topPlayers);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

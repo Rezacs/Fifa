@@ -1,6 +1,7 @@
 package Unipi.Fifa.controllers;
 
 import Unipi.Fifa.models.*;
+import Unipi.Fifa.objects.ClubAverageRatingDTO;
 import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.repositories.UserNodeRepository;
 import Unipi.Fifa.services.CNCNService;
@@ -124,4 +125,10 @@ public class ClubController {
         }
         return ResponseEntity.badRequest().build();
     }
+
+    @GetMapping("/top10-overall")
+    public List<ClubAverageRatingDTO> getTop10ClubsByOverall() {
+        return clubService.getTop10ByAverageOverall();
+    }
+
 }
