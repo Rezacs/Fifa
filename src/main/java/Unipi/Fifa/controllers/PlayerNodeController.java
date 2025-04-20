@@ -36,18 +36,22 @@ public class PlayerNodeController {
     }
 
     @PostMapping("/followByMongoId")
-    public String linkPlayerToUser(@RequestBody PlayerFollowRequest request) {
+    public String linkPlayerToUser(@RequestBody PlayerFollowRequest request , Principal principal) {
+        String username = principal.getName();
         String mongoId = request.getMongoId();
         Integer fifaVersion = request.getFifaVersion();
 
-        playerNodeService.linkPlayerToLoggedInUser(mongoId, fifaVersion);
+        playerNodeService.linkPlayerToLoggedInUser(mongoId, fifaVersion, username);
         return "Player linked to logged-in User successfully";
     }
 
     @PostMapping("/unfollowByMongoId")
-    public String unlinkPlayerFromUser(@RequestBody PlayerFollowRequest request){
+    public String unlinkPlayerFromUser(@RequestBody PlayerFollowRequest request , Principal principal){
+        String username = principal.getName();
         String mongoId = request.getMongoId();
-        playerNodeService.unlinkPlayerToLoggedInUser(mongoId);
+        Integer fifaVersion = request.getFifaVersion();
+
+        playerNodeService.unlinkPlayerToLoggedInUser(mongoId, fifaVersion, username);
         return "Player unlinked to logged-in User successfully";
     }
 

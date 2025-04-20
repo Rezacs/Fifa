@@ -17,8 +17,8 @@ public class FollowsPlayer {
     @Property("fifa_version")
     private Integer fifaVersion;
 
-    @Property("date_joined_club")
-    private String dateJoinedClub;
+    @Property("date_follow_player")
+    private String dateFollowPlayer;
 
     @TargetNode
     private PlayerNode player;

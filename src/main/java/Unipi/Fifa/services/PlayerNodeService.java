@@ -99,12 +99,10 @@ public class PlayerNodeService {
     }
 
 
-    public void linkPlayerToLoggedInUser(String mongoId, Integer fifaVersion) {
-        // Get the username of the logged-in user from Spring Security
-        String loggedInUsername = getLoggedInUsername();
+    public void linkPlayerToLoggedInUser(String mongoId, Integer fifaVersion , String username) {
 
         // Find the user by the username
-        UserNode userNode = userNodeRepository.findByUsername(loggedInUsername);
+        UserNode userNode = userNodeRepository.findByUsername(username);
         if (userNode == null) {
             throw new IllegalArgumentException("User not found");
         }
@@ -124,7 +122,7 @@ public class PlayerNodeService {
             FollowsPlayer follows = new FollowsPlayer();
             follows.setPlayer(playerNode);
             follows.setFifaVersion(fifaVersion);
-            follows.setDateJoinedClub(java.time.LocalDate.now().toString());
+            follows.setDateFollowPlayer(java.time.LocalDate.now().toString());
 
             userNode.getPlayerNodes().add(follows);
             userNodeRepository.save(userNode);
@@ -133,31 +131,36 @@ public class PlayerNodeService {
 
 
 
-    public void unlinkPlayerToLoggedInUser(String mongoId) {
-        String loggedInUsername = getLoggedInUsername();
-        UserNode userNode = userNodeRepository.findByUsername(loggedInUsername);
+    public void unlinkPlayerToLoggedInUser(String mongoId,Integer fifaVersion, String username) {
+        // Find the user by the username
+        UserNode userNode = userNodeRepository.findByUsername(username);
         if (userNode == null) {
             throw new IllegalArgumentException("User not found");
         }
+
+        // Find the PlayerNode by mongoId
         PlayerNode playerNode = playerNodeRepository.findByMongoId(mongoId);
         if (playerNode == null) {
             throw new IllegalArgumentException("PlayerNode not found");
         }
-        if (!userNode.getPlayerNodes().contains(playerNode)) {
-            userNode.getPlayerNodes().remove(playerNode);  // Add the player node to the user's player nodes list
-            userNodeRepository.save(userNode);  // Save the user with the updated list of player nodes
+
+        // Find the relationship (FollowsPlayer) between the user and player
+        FollowsPlayer follows = userNode.getPlayerNodes().stream()
+                .filter(f -> f.getPlayer().getMongoId().equals(mongoId))
+                .findFirst()
+                .orElse(null);
+
+        if (follows != null) {
+            // Remove the relationship from the userNode
+            userNode.getPlayerNodes().remove(follows);
+
+            // Save the userNode with the updated player nodes list
+            userNodeRepository.save(userNode);
+        } else {
+            throw new IllegalArgumentException("No relationship found between the user and player");
         }
     }
 
-
-//    private String getLoggedInUsername() {
-//        // Retrieve the logged-in username from the security context
-//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        if (principal instanceof UserDetails) {
-//            return ((UserDetails) principal).getUsername();
-//        }
-//        return null; // Or throw an exception if no user is logged in
-//    }
 
     private String getLoggedInUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/p/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/auth/me", "/api/v1/enrolments/**").authenticated()
+                        .requestMatchers("/api/v1/**", "/api/v1/enrolments/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .httpBasic(Customizer.withDefaults());
