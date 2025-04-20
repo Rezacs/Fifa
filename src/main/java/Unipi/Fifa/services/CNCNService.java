@@ -1,6 +1,7 @@
 package Unipi.Fifa.services;
 
 import Unipi.Fifa.models.*;
+import Unipi.Fifa.relations.ManagesClub;
 import Unipi.Fifa.repositories.ClubNodeRepository;
 import Unipi.Fifa.repositories.ClubRepository;
 import Unipi.Fifa.repositories.CoachNodeRepository;
@@ -42,6 +43,7 @@ public class CNCNService {
                 for (ClubNode club : clubs) {
                     // Step 2.3: Find the corresponding club in MongoDB
                     Club mongoClub = clubRepository.findById(club.getMongoId()).orElse(null);
+                    ClubNode clubNode = clubNodeRepository.findNodeByMongoId(club.getMongoId());
 
                     if (mongoClub != null && mongoClub.getMergedVersions() != null) {
                         // Step 2.4: Iterate over all FIFA stats versions for this club
@@ -52,9 +54,13 @@ public class CNCNService {
                             // Step 2.5: Check if the coach was managing this club in this FIFA version
                             if (fifaStats.getCoachId() != null && fifaStats.getCoachId().equals(coach.getCoachId())) {
                                 // Step 3: Create multiple relationships (one per FIFA version)
-                                coachNodeRepository.createManagingRelationship(
-                                        coach.getCoachId(), club.getTeamId(), fifaVersion
-                                );
+//                                coachNodeRepository.createManagingRelationship(
+//                                        coach.getCoachId(), club.getTeamId(), fifaVersion
+//                                );
+                                ManagesClub manage = new ManagesClub();
+                                manage.setClubNode(clubNode);
+                                manage.setFifaVersion(fifaVersion);
+
 
                                 System.out.println("Created relationship for Coach " + coachNode.getId() +
                                         " with Club " + club.getTeamName() + " for FIFA Version " + fifaVersion);

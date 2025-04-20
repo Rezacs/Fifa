@@ -1,5 +1,7 @@
 package Unipi.Fifa.models;
 
+import Unipi.Fifa.relations.ManagesClub;
+import Unipi.Fifa.relations.PlaysForClub;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,8 +11,11 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
+import org.springframework.data.neo4j.core.schema.Relationship;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -49,4 +54,7 @@ public class Coach {
 
     @Field("gender")
     private String gender;
+
+    @Relationship(type = "MANAGES_CLUB", direction = Relationship.Direction.OUTGOING)
+    private List<ManagesClub> clubNodes = new ArrayList<>();
 }

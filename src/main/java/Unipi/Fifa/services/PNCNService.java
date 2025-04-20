@@ -4,6 +4,7 @@ import Unipi.Fifa.models.Club;
 import Unipi.Fifa.models.ClubNode;
 import Unipi.Fifa.models.Player;
 import Unipi.Fifa.models.PlayerNode;
+import Unipi.Fifa.relations.PlaysForClub;
 import Unipi.Fifa.repositories.ClubNodeRepository;
 import Unipi.Fifa.repositories.ClubRepository;
 import Unipi.Fifa.repositories.PlayerNodeRepository;
@@ -62,7 +63,15 @@ public class PNCNService {
                             if (clubNode != null) {
                                 // Step 4: Create relationship (BELONGS_TO) with the year the player joined the club
                                 Integer yearJoined = clubJoinedDate.getYear();
-                                playerNodeRepository.createBelongsToRelationship(playerNode.getPlayerId(), clubNode.getTeamId(), yearJoined, fifaVersion);
+                                String dateJoined = clubJoinedDate.toString();
+//                                playerNodeRepository.createBelongsToRelationship(playerNode.getPlayerId(), clubNode.getTeamId(), yearJoined, fifaVersion);
+                                PlaysForClub plays = new PlaysForClub();
+                                plays.setClubNode(clubNode);
+                                plays.setFifaVersion(fifaVersion);
+                                plays.setDateJoinedClub(dateJoined);
+
+                                playerNode.getClubNodes().add(plays);
+                                playerNodeRepository.save(playerNode);
 
                                 System.out.println("Created relationship for Player " + playerNode.getId() +
                                         " with Club " + clubNode.getTeamName() + " for year " + yearJoined + " (FIFA Version: " + fifaVersion + ")");
