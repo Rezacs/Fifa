@@ -1,11 +1,16 @@
 package Unipi.Fifa.models;
 
+import Unipi.Fifa.relations.ManagesClub;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.Relationship;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -35,4 +40,7 @@ public class CoachNode {
     public int hashCode() {
         return mongoId != null ? mongoId.hashCode() : 0;
     }
+
+    @Relationship(type = "MANAGES_CLUB", direction = Relationship.Direction.OUTGOING)
+    private List<ManagesClub> clubNodes = new ArrayList<>();
 }

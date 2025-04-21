@@ -53,6 +53,17 @@ public class ClubNodeController {
         }
     }
 
+    @PostMapping("/create/{clubId}")
+    public String createPlayerClubRelationshipsForClub(@PathVariable("clubId") Integer clubId) {
+        try {
+            pncnService.createPlayerClubRelationshipsForClub(clubId); // A method to create relationships for a specific club
+            return String.format("Player-club relationships created successfully for clubId: %d", clubId);
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
+        }
+    }
+
+
     @PostMapping("/create/edited")
     public String createEditedPlayerClubRelationships(@RequestParam PlayerNode player) {
         try {

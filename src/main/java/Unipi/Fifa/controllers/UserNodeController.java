@@ -5,6 +5,7 @@ import Unipi.Fifa.models.*;
 import Unipi.Fifa.objects.*;
 import Unipi.Fifa.queryresults.PlayerFollowQueryResult;
 import Unipi.Fifa.queryresults.UserFollowQueryResult;
+import Unipi.Fifa.relations.FollowsPlayer;
 import Unipi.Fifa.repositories.*;
 import Unipi.Fifa.requests.*;
 import Unipi.Fifa.services.PlayerFollowingService;
@@ -24,10 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.authentication.AuthenticationManager;
 
 import java.security.Principal;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static Unipi.Fifa.services.UserNodeService.getLoggedInUsername;
@@ -191,15 +189,17 @@ public class UserNodeController {
 
 
     @GetMapping("/followingPlayers")
-    public ResponseEntity<List<PlayerNode>> followings(Principal principal) {
+    public ResponseEntity<List<FollowsPlayer>> followings(Principal principal) {
+        UserNode user = userNodeService.FindUser(principal.getName());
         List<PlayerNode> playerNodes = userNodeService.findPlayersByUsername(principal.getName());
+        List<FollowsPlayer> followingPlayers = user.getPlayerNodes();
+        
+//        if (playerNodes.isEmpty()) {
+//            System.out.println("No players found for user: " + principal.getName());
+//            return ResponseEntity.ok(Collections.emptyList());
+//        }
 
-        if (playerNodes.isEmpty()) {
-            System.out.println("No players found for user: " + principal.getName());
-            return ResponseEntity.ok(Collections.emptyList());
-        }
-
-        return ResponseEntity.ok(playerNodes);
+        return ResponseEntity.ok(followingPlayers);
     }
 
 
@@ -219,30 +219,6 @@ public class UserNodeController {
 
         // Return the DTO list wrapped in a ResponseEntity
         return ResponseEntity.ok(userDTOs);
-    }
-
-    @PostMapping("/followPlayer")
-    public ResponseEntity<PlayerFollowDTO> followPlayer(@RequestBody PlayerFollowRequest request, Principal principal) {
-        // The logged-in user's username (extracted from the Principal)
-        String loggedInUsername = principal.getName();
-
-        // The playerId to follow, provided in the request body
-        String mongoId = request.getMongoId();
-        Integer fifaVersion = request.getFifaVersion();
-
-        // Call the service to create the follow relationship between the user and the player
-        PlayerFollowQueryResult followResult = userNodeService.followPlayer(loggedInUsername, request.getMongoId(), fifaVersion);
-
-        // Create a DTO to return with player follow details
-        PlayerFollowDTO responseFollow = new PlayerFollowDTO(
-                followResult.getUser().getUsername(),
-                followResult.getPlayerNode().getMongoId(),
-                fifaVersion
-
-        );
-
-        // Return the PlayerFollowDTO wrapped in a ResponseEntity with CREATED status
-        return new ResponseEntity<>(responseFollow, HttpStatus.CREATED);
     }
 
     @PostMapping("followPlayerEasy")

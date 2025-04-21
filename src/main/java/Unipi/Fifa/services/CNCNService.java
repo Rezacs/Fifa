@@ -60,7 +60,8 @@ public class CNCNService {
                                 ManagesClub manage = new ManagesClub();
                                 manage.setClubNode(clubNode);
                                 manage.setFifaVersion(fifaVersion);
-
+                                coachNode.getClubNodes().add(manage);
+                                coachNodeRepository.save(coachNode);
 
                                 System.out.println("Created relationship for Coach " + coachNode.getId() +
                                         " with Club " + club.getTeamName() + " for FIFA Version " + fifaVersion);
@@ -79,48 +80,55 @@ public class CNCNService {
 
     @Transactional
     public void createEditedCoachClubRelationships(CoachNode coach) {
-        // Step 1: Find the current CoachNode in the database to ensure relationships are loaded
-        CoachNode existingCoachNode = coachNodeRepository.findById(coach.getId())
-                .orElseThrow(() -> new IllegalArgumentException("CoachNode not found with ID: " + coach.getId()));
 
-        // Step 2: Remove all current relationships using a Cypher query
-        coachNodeRepository.deleteAllRelationships(coach.getId()); // Delete existing relationships
-
-        // Step 3: Fetch clubs based on the coach's gender
-        String gender = coach.getGender(); // Assuming this returns "MALE" or "FEMALE"
-        List<ClubNode> clubs = "MALE".equals(gender)
-                ? clubNodeRepository.findNodeByGender(PlayerNode.Gender.MALE)
-                : clubNodeRepository.findNodeByGender(PlayerNode.Gender.FEMALE);
-
-        // Step 4: Iterate through clubs and establish new relationships
+        List<ClubNode> clubs =  clubNodeRepository.findClubsConnectedToCoach(coach.getId());
         for (ClubNode club : clubs) {
-            // Step 4.1: Fetch the corresponding Club document from MongoDB
-            Club mongoClub = clubRepository.findById(club.getMongoId()).orElse(null);
-
-            if (mongoClub != null) {
-                // Step 4.2: Check if the club contains relevant FIFA stats for this coach
-                Map<String, Club.FIFAStats> mergedVersions = mongoClub.getMergedVersions();
-
-                for (Map.Entry<String, Club.FIFAStats> entry : mergedVersions.entrySet()) {
-                    Club.FIFAStats fifaStats = entry.getValue();
-
-                    // Step 4.3: If this club's FIFA stats match the current coach, create a relationship
-                    if (fifaStats.getCoachId() != null && fifaStats.getCoachId().equals(coach.getCoachId())) {
-                        // Step 4.4: Create the relationship using the Cypher query
-                        Integer fifaVersion = fifaStats.getFifaVersion();
-                        coachNodeRepository.createManagingRelationship(coach.getCoachId(), club.getTeamId(), fifaVersion);
-
-                        // Log success message
-                        System.out.println("Created relationship for Coach " + coach.getId() + " with Club " + club.getTeamName() + " for FIFA Version " + fifaVersion);
-                    }
-                }
-            }
+            createEditedClubCoachRelationships(club);
         }
+//        // Step 1: Find the current CoachNode in the database to ensure relationships are loaded
+//        CoachNode existingCoachNode = coachNodeRepository.findById(coach.getId())
+//                .orElseThrow(() -> new IllegalArgumentException("CoachNode not found with ID: " + coach.getId()));
+//
+//        // Step 2: Remove all current relationships using a Cypher query
+//        coachNodeRepository.deleteAllRelationships(coach.getId()); // Delete existing relationships
+//
+//        // Step 3: Fetch clubs based on the coach's gender
+//        String gender = coach.getGender(); // Assuming this returns "MALE" or "FEMALE"
+//        List<ClubNode> clubs = "MALE".equals(gender)
+//                ? clubNodeRepository.findNodeByGender(PlayerNode.Gender.MALE)
+//                : clubNodeRepository.findNodeByGender(PlayerNode.Gender.FEMALE);
+//
+//        // Step 4: Iterate through clubs and establish new relationships
+//        for (ClubNode club : clubs) {
+//            // Step 4.1: Fetch the corresponding Club document from MongoDB
+//            Club mongoClub = clubRepository.findById(club.getMongoId()).orElse(null);
+//
+//            if (mongoClub != null) {
+//                // Step 4.2: Check if the club contains relevant FIFA stats for this coach
+//                Map<String, Club.FIFAStats> mergedVersions = mongoClub.getMergedVersions();
+//
+//                for (Map.Entry<String, Club.FIFAStats> entry : mergedVersions.entrySet()) {
+//                    Club.FIFAStats fifaStats = entry.getValue();
+//
+//                    // Step 4.3: If this club's FIFA stats match the current coach, create a relationship
+//                    if (fifaStats.getCoachId() != null && fifaStats.getCoachId().equals(coach.getCoachId())) {
+//                        // Step 4.4: Create the relationship using the Cypher query
+//                        Integer fifaVersion = fifaStats.getFifaVersion();
+//                        coachNodeRepository.createManagingRelationship(coach.getCoachId(), club.getTeamId(), fifaVersion);
+//
+//                        // Log success message
+//                        System.out.println("Created relationship for Coach " + coach.getId() + " with Club " + club.getTeamName() + " for FIFA Version " + fifaVersion);
+//                    }
+//                }
+//            }
+//        }
     }
 
 
     @Transactional
     public void createEditedClubCoachRelationships(ClubNode clubNode) {
+
+        clubNodeRepository.deleteIncomingCoachEdgesToClubNode(clubNode.getId());
         // Step 1: Fetch all coaches to iterate over them
         List<Coach> coaches = coachRepository.findByGender(clubNode.getGender()); // You can modify the gender as per your requirement
         List<CoachNode> coachNodes = coachNodeRepository.findByGender(clubNode.getGender());
@@ -150,7 +158,12 @@ public class CNCNService {
                             Integer fifaVersion = fifaStats.getFifaVersion();
                             Integer yearManaged = fifaStats.getFifaVersion(); // Assuming the version year is equivalent to the management year
 
-                            coachNodeRepository.createManagingRelationship(coachNode.getCoachId(), clubNode.getTeamId(), fifaVersion);
+//                            coachNodeRepository.createManagingRelationship(coachNode.getCoachId(), clubNode.getTeamId(), fifaVersion);
+                            ManagesClub manage = new ManagesClub();
+                            manage.setClubNode(clubNode);
+                            manage.setFifaVersion(fifaVersion);
+                            coachNode.getClubNodes().add(manage);
+                            coachNodeRepository.save(coachNode);
 
 
                             // Step 5: Save the updated coach with the new relationship

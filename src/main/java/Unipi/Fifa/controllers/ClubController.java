@@ -63,6 +63,7 @@ public class ClubController {
         // Find the existing club in MongoDB
         Club existingClub = clubService.getClubbyId(mongoId);
         if (existingClub == null) {
+            System.out.println("Club not found with mongoId: " + mongoId);
             return ResponseEntity.notFound().build();
         }
 

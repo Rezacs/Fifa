@@ -100,7 +100,6 @@ public class PlayerNodeService {
 
 
     public void linkPlayerToLoggedInUser(String mongoId, Integer fifaVersion , String username) {
-
         // Find the user by the username
         UserNode userNode = userNodeRepository.findByUsername(username);
         if (userNode == null) {
@@ -109,8 +108,27 @@ public class PlayerNodeService {
 
         // Find the PlayerNode by mongoId
         PlayerNode playerNode = playerNodeRepository.findByMongoId(mongoId);
+        Player player = playerRepository.findByPlayerId(playerNode.getPlayerId());
         if (playerNode == null) {
             throw new IllegalArgumentException("PlayerNode not found");
+        }
+
+        List<Integer> fifaVersions = new ArrayList<>();
+
+        for (Map.Entry<String, Player.FifaStats> entry : player.getMergedVersions().entrySet()) {
+            Player.FifaStats fifaStats = entry.getValue();
+            Player.Stats stats = fifaStats.getStats();
+
+            if (stats != null) {
+                Integer fifaaVersion = stats.getFifaVersion();
+                if (fifaaVersion != null) {
+                    fifaVersions.add(fifaaVersion);
+                }
+            }
+        }
+
+        if (!fifaVersions.contains(fifaVersion)) {
+            throw new IllegalArgumentException("FIFA version " + fifaVersion + " is not present in the player's merged versions.");
         }
 
         // Check if already follows

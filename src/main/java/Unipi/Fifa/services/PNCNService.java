@@ -95,6 +95,10 @@ public class PNCNService {
         }
     }
 
+    public void createPlayerClubRelationshipsForClub(Integer clubId) {
+        
+    }
+
     @Transactional
     public void createPlayerClubRelationshipsForPlayerNode(PlayerNode playerNode) {
         if (playerNode == null) {
@@ -169,61 +173,62 @@ public class PNCNService {
 
     @Transactional
     public void createEditedPlayerClubRelationships(PlayerNode playerNode) {
-        // Validate the PlayerNode
-        if (playerNode == null) {
-            throw new IllegalArgumentException("Invalid player or missing club team ID or FIFA version");
+        if (playerNode == null || playerNode.getMongoId() == null) {
+            throw new IllegalArgumentException("Invalid player node");
         }
 
-        // Step 1: Get the player document from MongoDB based on the player's mongoId
+        // Step 1: Remove all existing Club relationships (PlaysForClub) for the player
+        playerNode.getClubNodes().clear();
+        playerNodeRepository.save(playerNode); // Persist the removal
+
+        // Step 2: Fetch the Player from MongoDB using the mongoId stored in the PlayerNode
         Player player = playerRepository.findById(playerNode.getMongoId()).orElse(null);
+
         if (player == null) {
-            System.out.println("Player not found in MongoDB for PlayerNode: " + playerNode.getId());
+            throw new IllegalArgumentException("Player from MongoDB not found for mongoId: " + playerNode.getMongoId());
+        }
+
+        if (player.getMergedVersions() == null || player.getMergedVersions().isEmpty()) {
+            System.out.println("No mergedVersions found for player with ID: " + player.getId());
             return;
         }
 
-        // Step 2: Loop over all FIFA versions for the player
-        List<Player.FifaStats> fifaStatsList = player.getFifaVersions();
-
-        for (Player.FifaStats fifaStats : fifaStatsList) {
-            // Step 3: Extract club information from the FIFA stats for the current version
+        // Step 3: Loop over mergedVersions to recreate Club relationships
+        for (Map.Entry<String, Player.FifaStats> entry : player.getMergedVersions().entrySet()) {
+            Player.FifaStats fifaStats = entry.getValue();
             Player.Stats stats = fifaStats.getStats();
-            Integer clubTeamId = stats.getClubTeamId();
-            String clubName = stats.getClubName();
-            PlayerNode.Gender gender = playerNode.getGender();
-            Integer fifaVersion = stats.getFifaVersion(); // Ensure this is the correct version based on your model
-            LocalDate clubJoinedDate = stats.getClubJoinedDate();
 
-            // Step 4: Validate club information
-            if (clubTeamId != null && clubName != null && clubJoinedDate != null) {
-                // Step 5: Find the corresponding ClubNode in Neo4j based on the clubTeamId, FIFA version, and gender
-                Optional<Club> club = clubRepository.findByTeamIdAndGenderAndMergedVersionsContaining(clubTeamId, String.valueOf(gender), fifaVersion  // Constructing FIFA version key
-                );
-                ClubNode clubNode = clubNodeRepository.findByTeamIdAndGender(
-                        clubTeamId, String.valueOf(gender)  // Constructing FIFA version key
-                );
+            if (stats != null) {
+                Integer clubTeamId = stats.getClubTeamId();
+                Integer fifaVersion = stats.getFifaVersion();
+                LocalDate clubJoinedDate = stats.getClubJoinedDate();
 
-                if (clubNode != null) {
-                    // Step 6: Create the relationship (BELONGS_TO) with the year the player joined the club
-                    Integer yearJoined = clubJoinedDate.getYear();  // Extract year from clubJoinedDate
+                if (clubTeamId != null && clubJoinedDate != null) {
+                    ClubNode clubNode = clubNodeRepository.findByTeamIdAndGender(clubTeamId, String.valueOf(playerNode.getGender()));
 
-                    // Set the relationship between playerNode and clubNode
-                    playerNodeRepository.createBelongsToRelationship(playerNode.getPlayerId(), clubNode.getTeamId(), yearJoined, fifaVersion);
+                    if (clubNode != null) {
+                        PlaysForClub plays = new PlaysForClub();
+                        plays.setClubNode(clubNode);
+                        plays.setFifaVersion(fifaVersion);
+                        plays.setDateJoinedClub(clubJoinedDate.toString());
 
-                    // Step 7: Save the updated playerNode with the new relationship
-                    playerNodeRepository.save(playerNode);
-
-                    System.out.println("Created/Updated relationship for Player "
-                            + playerNode.getLongName() + " with Club " + clubNode.getTeamName()
-                            + " for year " + yearJoined + " (FIFA Version: " + fifaVersion + ")");
+                        playerNode.getClubNodes().add(plays);
+                        System.out.println("Re-created relationship: Player " + playerNode.getId() + " -> Club " + clubNode.getTeamName());
+                    } else {
+                        System.out.println("No matching ClubNode found for teamId " + clubTeamId + " and gender " + playerNode.getGender());
+                    }
                 } else {
-                    System.out.println("No matching ClubNode found for PlayerNode: "
-                            + playerNode.getLongName() + " in FIFA Version " + fifaVersion);
+                    System.out.println("Missing clubTeamId or clubJoinedDate for Player " + player.getId() + " in FIFA version " + fifaVersion);
                 }
             } else {
-                System.out.println("Missing club information for PlayerNode: " + playerNode.getLongName());
+                System.out.println("Missing stats in FIFA version entry for Player " + player.getId());
             }
         }
+
+        // Step 4: Save the updated PlayerNode with new relationships
+        playerNodeRepository.save(playerNode);
     }
+
 
 
     @Transactional
@@ -275,8 +280,6 @@ public class PNCNService {
             }
         }
     }
-
-
 
 
 

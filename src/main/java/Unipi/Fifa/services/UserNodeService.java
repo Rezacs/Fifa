@@ -6,6 +6,7 @@ import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.models.UserNode;
 import Unipi.Fifa.queryresults.PlayerFollowQueryResult;
 import Unipi.Fifa.queryresults.UserFollowQueryResult;
+import Unipi.Fifa.relations.FollowsPlayer;
 import Unipi.Fifa.repositories.CoachNodeRepository;
 import Unipi.Fifa.repositories.PlayerNodeRepository;
 import Unipi.Fifa.repositories.PlayerRepository;
@@ -86,20 +87,6 @@ public class UserNodeService {
 
         // Return the follow information as a DTO or other format you require
         return new UserFollowQueryResult(loggedInUserNode, targetUserNode, new Date());
-    }
-
-    public PlayerFollowQueryResult followPlayer(String loggedInUsername, String mongoId, Integer fifaVersion) {
-        UserNode loggedInUserNode = userNodeRepository.findByUsername(loggedInUsername);
-        PlayerNode targetPlayer = playerNodeRepository.findByMongoId(mongoId);
-
-        if (loggedInUserNode == null || targetPlayer == null) {
-            throw new IllegalArgumentException("User or followingPlayer not found.");
-        }
-
-        // Create the relationship using the repository method
-        userNodeRepository.createUserPlayerInteraction(loggedInUsername, targetPlayer.getPlayerId(), fifaVersion);
-
-        return new PlayerFollowQueryResult(loggedInUserNode, targetPlayer);
     }
 
 

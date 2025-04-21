@@ -54,7 +54,4 @@ public class Coach {
 
     @Field("gender")
     private String gender;
-
-    @Relationship(type = "MANAGES_CLUB", direction = Relationship.Direction.OUTGOING)
-    private List<ManagesClub> clubNodes = new ArrayList<>();
 }
