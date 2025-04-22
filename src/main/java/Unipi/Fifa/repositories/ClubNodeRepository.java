@@ -31,4 +31,6 @@ public interface ClubNodeRepository extends Neo4jRepository<ClubNode, Long> {
 
 
     boolean existsByMongoId(String id);
+
+    List<ClubNode> findByTeamId(Integer clubId);
 }

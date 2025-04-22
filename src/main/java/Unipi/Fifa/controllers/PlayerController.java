@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -79,7 +80,10 @@ public class PlayerController {
         playerService.savePlayer(existingPlayer);
         playerNodeService.transferOneDataToNeo4j(mongoId);
         PlayerNode node = playerNodeService.getPlayerByMongoId(mongoId);
-        pncnService.createPlayerClubRelationshipsForPlayerNode(node);
+        // Create a list and add the PlayerNode to it
+        List<PlayerNode> playerNodes = new ArrayList<>();
+        playerNodes.add(node);
+        pncnService.createPlayerClubRelationships(playerNodes);
         playerNodeService.checkUserEdges(node);
         return ResponseEntity.ok("Player updated successfully!");
     }

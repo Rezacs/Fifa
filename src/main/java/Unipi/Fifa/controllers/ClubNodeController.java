@@ -3,6 +3,8 @@ package Unipi.Fifa.controllers;
 
 import Unipi.Fifa.models.ClubNode;
 import Unipi.Fifa.models.PlayerNode;
+import Unipi.Fifa.repositories.ClubNodeRepository;
+import Unipi.Fifa.repositories.PlayerNodeRepository;
 import Unipi.Fifa.services.ClubService;
 import Unipi.Fifa.services.PNCNService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,10 @@ public class ClubNodeController {
 
     @Autowired
     private PNCNService pncnService;
+    @Autowired
+    private PlayerNodeRepository playerNodeRepository;
+    @Autowired
+    private ClubNodeRepository clubNodeRepository;
 
     @GetMapping("/{clubId}")
     public List<ClubNode> findClubById(@PathVariable Long clubId) {
@@ -43,25 +49,54 @@ public class ClubNodeController {
         return ResponseEntity.ok(clubService.getClubNodeByMongoId(mongoId));
     }
 
-    @PostMapping("/create")
-    public String createPlayerClubRelationships(@RequestParam("gender") PlayerNode.Gender gender) {
+//    @PostMapping("/create")
+//    public String createPlayerClubRelationships(@RequestParam(value = "gender", required = false) PlayerNode.Gender gender,
+//                                                @RequestParam(value = "playerId", required = false) Integer playerId) {
+//        try {
+//            if (gender != null) {
+//                // If gender is provided, create player-club relationships based on gender
+//                List<PlayerNode> playerNodes = playerNodeRepository.findByGender(gender);
+//                pncnService.createPlayerClubRelationships(playerNodes);
+//                return String.format("Player-club relationships created successfully for gender: %s", gender);
+//            } else if (playerId != null) {
+//                // If clubId is provided, create player-club relationships for the specific club
+//                List<PlayerNode> playerNodes = playerNodeRepository.findByPlayerId(playerId);
+//                pncnService.createPlayerClubRelationships(playerNodes);
+//                return String.format("Player-club relationships created successfully for clubId: %d", playerId);
+//            } else {
+//                // If neither gender nor clubId is provided, return an error
+//                return "Error: Either 'gender' or 'clubId' must be provided.";
+//            }
+//        } catch (Exception e) {
+//            return "Error: " + e.getMessage();
+//        }
+//    }
+
+
+    @PostMapping("/createNEW")
+    public String createPlayerClubRelationshipsVer2(@RequestParam(value = "gender", required = false) PlayerNode.Gender gender,
+                                                @RequestParam(value = "clubId", required = false) Integer clubId) {
         try {
-            pncnService.createPlayerClubRelationships(gender);
-            return String.format("Player-club relationships created successfully for gender: %s", gender);
+            if (gender != null) {
+                // If gender is provided, create player-club relationships based on gender
+                List<PlayerNode> playerNodes = playerNodeRepository.findByGender(gender);
+                pncnService.createPlayerClubRelationships(playerNodes);
+                return String.format("Player-club relationships created successfully for gender: %s", gender);
+            } else if (clubId != null) {
+                // If clubId is provided, create player-club relationships for the specific club
+                List<ClubNode> clubNodes = clubNodeRepository.findByTeamId(clubId);  // Retrieve the specific club(s) by clubId
+                pncnService.createPlayerClubRelationshipsForClubs(clubNodes);
+                return String.format("Player-club relationships created successfully for clubId: %d", clubId);
+            } else {
+                // If neither gender nor clubId is provided, return an error
+                return "Error: Either 'gender' or 'clubId' must be provided.";
+            }
         } catch (Exception e) {
             return "Error: " + e.getMessage();
         }
     }
 
-    @PostMapping("/create/{clubId}")
-    public String createPlayerClubRelationshipsForClub(@PathVariable("clubId") Integer clubId) {
-        try {
-            pncnService.createPlayerClubRelationshipsForClub(clubId); // A method to create relationships for a specific club
-            return String.format("Player-club relationships created successfully for clubId: %d", clubId);
-        } catch (Exception e) {
-            return "Error: " + e.getMessage();
-        }
-    }
+
 
 
     @PostMapping("/create/edited")
