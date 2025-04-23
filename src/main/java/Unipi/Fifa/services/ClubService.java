@@ -2,7 +2,6 @@ package Unipi.Fifa.services;
 
 import Unipi.Fifa.models.Club;
 import Unipi.Fifa.models.ClubNode;
-import Unipi.Fifa.models.CoachNode;
 import Unipi.Fifa.models.PlayerNode;
 import Unipi.Fifa.objects.ClubAverageRatingDTO;
 import Unipi.Fifa.repositories.*;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import org.bson.Document;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,6 +38,21 @@ public class ClubService {
     public Club getClubbyId(String id) {
         return clubRepository.findById(id).orElse(null);
     }
+
+    public Optional<List<Club>> GetClubByTeamIdAndGenderAndMergedVersionsContaining(
+            Integer teamId,
+            PlayerNode.Gender gender,
+            Integer fifaVersion
+    ) {
+        String fifaVersionKey = "fifa_stats_" + fifaVersion;
+        return clubRepository.findClubsByTeamIdAndGenderAndFifaVersionKey(
+                teamId,
+                gender.toString(),
+                fifaVersionKey,
+                fifaVersion
+        );
+    }
+
 
     public List<Club> getClubbyName(String name) {
         return clubRepository.findByTeamName(name);

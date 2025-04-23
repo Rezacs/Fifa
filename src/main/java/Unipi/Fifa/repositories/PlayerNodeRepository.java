@@ -40,15 +40,8 @@ public interface PlayerNodeRepository extends Neo4jRepository<PlayerNode, Long> 
             "RETURN player, club")
     String createPlayerClubRelationship(Integer playerId, Integer teamId, Integer fifaVersion);
 
-    @Query("""
-    MATCH (p:PlayerNode {playerId: $playerId}), (c:ClubNode {teamId: $teamId})
-    MERGE (p)-[r:BELONGS_TO {yearJoined: $yearJoined, fifaVersion: $fifaVersion}]->(c)
-    RETURN r
-    """)
-    void createBelongsToRelationship(@Param("playerId") int playerId,
-                                     @Param("teamId") int teamId,
-                                     @Param("yearJoined") int yearJoined,
-                                     @Param("fifaVersion") int fifaVersion);
+
+
     @Query("MATCH (u:UserNode)-[:INTERACTS_WITH]->(p:PlayerNode) " +
             "WHERE u.username = $loggedInUsername " +
             "RETURN p")

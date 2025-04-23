@@ -25,5 +25,13 @@ public interface ClubRepository extends MongoRepository<Club, String>, ClubRepos
     Optional<Club> findByTeamNameAndMergedVersionsContaining(String teamName, Integer fifaVersion, @Param("mergedKey") String mergedKey);
 
 
-    Optional<Club> findByTeamIdAndGenderAndMergedVersionsContaining(Integer teamId, String gender, Integer fifaVersion);
+    @Query(value = "{ 'team_id': ?0, 'gender': ?1, 'merged_versions.?2.fifa_version': ?3 }")
+    Optional<List<Club>> findClubsByTeamIdAndGenderAndFifaVersionKey(
+            Integer teamId,
+            String gender,
+            String fifaVersionKey,
+            Integer fifaVersion
+    );
+
+
 }

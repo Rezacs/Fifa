@@ -4,6 +4,8 @@ import Unipi.Fifa.models.PlayerNode;
 import lombok.*;
 import org.springframework.data.neo4j.core.schema.*;
 
+import java.util.Objects;
+
 @RelationshipProperties
 @Data
 @NoArgsConstructor
@@ -22,4 +24,19 @@ public class FollowsPlayer {
 
     @TargetNode
     private PlayerNode player;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FollowsPlayer)) return false;
+        FollowsPlayer that = (FollowsPlayer) o;
+        return Objects.equals(fifaVersion, that.fifaVersion) &&
+                Objects.equals(player != null ? player.getMongoId() : null,
+                        that.player != null ? that.player.getMongoId() : null);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fifaVersion, player != null ? player.getMongoId() : null);
+    }
 }

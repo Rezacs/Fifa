@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static Unipi.Fifa.services.UserNodeService.getLoggedInUsername;
 
@@ -24,6 +25,8 @@ import static Unipi.Fifa.services.UserNodeService.getLoggedInUsername;
 public class ClubController {
     @Autowired
     private ClubService clubService;
+
+
 
     @Autowired
     private CNCNService cncnService;
@@ -45,6 +48,16 @@ public class ClubController {
     public Club findClubByMongoId(@PathVariable String ClubMongoId) {
         return ResponseEntity.ok(clubService.getClubbyId(ClubMongoId)).getBody();
     }
+
+    @GetMapping("/SearchForClub/")
+    public Optional<List<Club>> findByTeamIdAndGenderAndMergedVersionsContaining(
+            @RequestParam Integer teamId,
+            @RequestParam PlayerNode.Gender gender,
+            @RequestParam Integer fifaVersion
+    ) {
+        return clubService.GetClubByTeamIdAndGenderAndMergedVersionsContaining(teamId, gender, fifaVersion);
+    }
+
 
     @GetMapping("/Mongo/club")
     public Club findClubByClubName(@RequestParam String clubName , @RequestParam Integer fifa_version) {

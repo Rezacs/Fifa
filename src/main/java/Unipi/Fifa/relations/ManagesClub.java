@@ -5,6 +5,8 @@ import Unipi.Fifa.models.PlayerNode;
 import lombok.*;
 import org.springframework.data.neo4j.core.schema.*;
 
+import java.util.Objects;
+
 @RelationshipProperties
 @Data
 @NoArgsConstructor
@@ -20,4 +22,19 @@ public class ManagesClub {
 
     @TargetNode
     private ClubNode clubNode;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ManagesClub)) return false;
+        ManagesClub that = (ManagesClub) o;
+        return Objects.equals(fifaVersion, that.fifaVersion) &&
+                Objects.equals(clubNode != null ? clubNode.getTeamId() : null,
+                        that.clubNode != null ? that.clubNode.getTeamId() : null);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fifaVersion, clubNode != null ? clubNode.getTeamId() : null);
+    }
 }

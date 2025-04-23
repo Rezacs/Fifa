@@ -69,6 +69,11 @@ public class PlayerService {
         return playerRepository.findTop10PlayersManagedByCoach(coachId);
     }
 
+    public List<Player> getPlayersByClubTeamId(Integer clubTeamId) {
+        return playerRepository.findPlayersByClubTeamIdInAnyVersion(clubTeamId);
+    }
+
+
     public void accessFifaStatsVersions(String playerId) {
         // Step 1: Retrieve the Player document from the repository by playerId
         Player playerDocument = playerRepository.findById(playerId).orElse(null);

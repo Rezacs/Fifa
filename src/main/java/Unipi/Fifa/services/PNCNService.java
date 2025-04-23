@@ -71,17 +71,25 @@ public class PNCNService {
                                 // Step 4: Create relationship (BELONGS_TO) with the year the player joined the club
                                 Integer yearJoined = clubJoinedDate.getYear();
                                 String dateJoined = clubJoinedDate.toString();
-//                                playerNodeRepository.createBelongsToRelationship(playerNode.getPlayerId(), clubNode.getTeamId(), yearJoined, fifaVersion);
                                 PlaysForClub plays = new PlaysForClub();
                                 plays.setClubNode(clubNode);
                                 plays.setFifaVersion(fifaVersion);
                                 plays.setDateJoinedClub(dateJoined);
 
-                                playerNode.getClubNodes().add(plays);
-                                playerNodeRepository.save(playerNode);
+                                if (!playerNode.getClubNodes().contains(plays)) {
+                                    playerNode.getClubNodes().add(plays);
+                                    playerNodeRepository.save(playerNode);
+                                    System.out.println("Created relationship...");
+                                } else {
+                                    System.out.println("Relationship already exists...");
+                                }
+
+//                                playerNode.getClubNodes().add(plays);
+//                                playerNodeRepository.save(playerNode);
 
                                 System.out.println("Created relationship for Player " + playerNode.getId() +
                                         " with Club " + clubNode.getTeamName() + " for year " + yearJoined + " (FIFA Version: " + fifaVersion + ")");
+
                             } else {
                                 System.out.println("No matching club found for Player " + playerNode.getId() + " in FIFA version " + fifaVersion);
                             }
@@ -106,9 +114,8 @@ public class PNCNService {
     public void createPlayerClubRelationshipsForClubs(List<ClubNode> clubNodes) {
         // Step 1: Iterate over each ClubNode in the input list
         for (ClubNode clubNode : clubNodes) {
-            // Step 2: Find all Player documents for this club
-//            List<Player> players = playerService.getPlayersByClubTeamIdAndGender(clubNode.getTeamId() , String.valueOf(clubNode.getGender()));
-            List<Player> players = playerRepository.findByGender(clubNode.getGender());
+//            List<Player> players = playerRepository.findByGender(clubNode.getGender());
+            List<Player> players = playerService.getPlayersByClubTeamId(clubNode.getTeamId());
             System.out.println("Found " + players.size() + " players for club " + clubNode.getTeamId() + " Gender " + clubNode.getGender().name());
 
 
@@ -226,59 +233,5 @@ public class PNCNService {
         // Step 4: Save the updated PlayerNode with new relationships
         playerNodeRepository.save(playerNode);
     }
-
-
-
-    @Transactional
-    public void createEditedClubPlayerRelationships(ClubNode clubNode) {
-        // Step 1: Fetch the Club document using its MongoDB ID
-        Club club = clubRepository.findById(clubNode.getMongoId()).orElse(null);
-
-        // Validate the Club document
-        if (club == null || club.getTeamId() == null) {
-            throw new IllegalArgumentException("Invalid club or missing club team ID");
-        }
-
-        // Step 2: Loop through each FIFA version in the club document's mergedVersions
-        for (Map.Entry<String, Club.FIFAStats> entry : club.getMergedVersions().entrySet()) {
-            Integer fifaVersion = entry.getValue().getFifaVersion(); // Get the FIFA version from the club’s merged versions
-            String gender = clubNode.getGender().toString();
-
-            if (fifaVersion == null) {
-                continue; // Skip if FIFA version is null
-            }
-
-            // Step 3: Find Player documents matching the clubTeamId, gender, and FIFA version using the custom query
-            List<Player> playerDocuments = playerRepository.findByClubTeamIdAndGenderAndFifaVersion(
-                    club.getTeamId(),
-                    gender,
-                    fifaVersion
-            );
-
-            // Step 4: Process players if any matching players are found
-            if (!playerDocuments.isEmpty()) {
-                for (Player playerDocument : playerDocuments) {
-                    PlayerNode playerNode = playerNodeRepository.findByMongoId(playerDocument.getId());
-
-                    // Step 5: Create or update the relationship between PlayerNode and ClubNode
-                    playerNodeRepository.createBelongsToRelationship(playerNode.getPlayerId(), clubNode.getTeamId(), 2012, fifaVersion);
-
-                    // Step 6: Save the updated playerNode with the new relationship
-                    playerNodeRepository.save(playerNode);
-
-                    // Print a log for the created/updated relationship
-                    System.out.println("Created/Updated relationship for Player "
-                            + playerNode.getLongName() + " with Club "
-                            + club.getTeamName() + " and FIFA Version " + fifaVersion);
-                }
-            } else {
-                // If no players are found for the given club and FIFA version
-                System.out.println("No matching PlayerNodes found for Club "
-                        + club.getTeamName() + " in FIFA Version " + fifaVersion);
-            }
-        }
-    }
-
-
 
 }
