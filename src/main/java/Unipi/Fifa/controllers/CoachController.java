@@ -2,6 +2,7 @@ package Unipi.Fifa.controllers;
 
 
 import Unipi.Fifa.models.*;
+import Unipi.Fifa.relations.ManagesClub;
 import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.services.CNCNService;
 import Unipi.Fifa.services.CoachService;
@@ -9,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static Unipi.Fifa.services.UserNodeService.getLoggedInUsername;
 
@@ -40,7 +44,8 @@ public class CoachController {
     @PostMapping("/create")
     public String createCoachClubRelationships(@RequestParam("gender") PlayerNode.Gender gender) {
         try {
-            cncnService.createCoachClubRelationships(gender);
+            List<CoachNode> coachNodes = coachService.getCoachNodeByGender(gender);
+            cncnService.createCoachClubRelationships(coachNodes);
             return String.format("Player-club relationships created successfully for gender: %s", gender);
         } catch (Exception e) {
             return "Error: " + e.getMessage();
@@ -50,9 +55,12 @@ public class CoachController {
     @PutMapping("/edit/{mongoId}")
     public ResponseEntity<String> editCoach(@PathVariable String mongoId, @RequestBody Coach updatedCoach) {
         Coach existingCoach = coachService.getCoachById(mongoId);
+        CoachNode existingCoachNode = coachService.getCoachNodeByMongoId(mongoId);
+        List<ManagesClub> clubs = existingCoachNode.getClubNodes();
         if (existingCoach == null) {
             return ResponseEntity.notFound().build(); // Return 404 if coach is not found
         }
+        coachService.deletePreviousEdges(existingCoach.getId());
 
         // Update the fields of the existing coach with the new values
         existingCoach.setCoachId(updatedCoach.getCoachId());
@@ -68,7 +76,9 @@ public class CoachController {
         // Save the updated coach
         coachService.saveCoach(existingCoach);
         CoachNode cd = coachService.TransferOneDataToNeo4j(mongoId);
-        cncnService.createEditedCoachClubRelationships(cd);
+        List<CoachNode> coachNodes = new ArrayList<>();
+        coachNodes.add(cd);
+        cncnService.createCoachClubRelationships(coachNodes);
 
         return ResponseEntity.ok("Coach updated successfully!");
     }
@@ -97,7 +107,7 @@ public class CoachController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Coach not found");
             }
 
-            coachService.deletePreviousEdges(coachId);
+            coachService.deletePreviousEdges(targetCoach.getId());
             coachService.deleteCoachNodeById(coachId);
             coachService.deleteCoachById(coachId);
             return ResponseEntity.ok("coach deleted successfully");
@@ -114,6 +124,12 @@ public class CoachController {
             return ResponseEntity.notFound().build(); // 404 if not found
         }
 
+        return ResponseEntity.ok(coach);
+    }
+
+    @GetMapping("/getById/{Id}")
+    public ResponseEntity<Coach> getCoachById(@PathVariable String Id) {
+        Coach coach = coachService.getCoachById(Id);
         return ResponseEntity.ok(coach);
     }
 

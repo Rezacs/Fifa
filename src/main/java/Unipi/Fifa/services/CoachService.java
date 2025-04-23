@@ -86,8 +86,8 @@ public class CoachService {
         return coachRepository.save(coach);
     }
 
-    public void deletePreviousEdges(Integer coachId) {
-        CoachNode coachNode = coachNodeRepository.findByCoachId(coachId);
+    public void deletePreviousEdges(String Id) {
+        CoachNode coachNode = coachNodeRepository.findByMongoId(Id);
 
         coachNodeRepository.deleteAllRelationships(coachNode.getId());
         coachNodeRepository.save(coachNode);
@@ -106,4 +106,7 @@ public class CoachService {
         }
     }
 
+    public List<CoachNode> getCoachNodeByGender(PlayerNode.Gender gender) {
+        return coachNodeRepository.findByGender(gender);
+    }
 }

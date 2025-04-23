@@ -24,7 +24,7 @@ public interface ClubNodeRepository extends Neo4jRepository<ClubNode, Long> {
     @Query("MATCH (c:CoachNode)-[r]->(club:ClubNode) WHERE ID(club) = $nodeId DELETE r")
     void deleteIncomingCoachEdgesToClubNode(@Param("nodeId") Long nodeId);
 
-    @Query("MATCH (coach:CoachNode)-[:WORKS_FOR|TRAINS|ANY_RELATIONSHIP]->(club:ClubNode) WHERE ID(coach) = $coachId RETURN club")
+    @Query("MATCH (coach:CoachNode)-[r]->(club:ClubNode) WHERE ID(coach) = $coachId RETURN club")
     List<ClubNode> findClubsConnectedToCoach(@Param("coachId") Long coachId);
 
 
@@ -32,5 +32,5 @@ public interface ClubNodeRepository extends Neo4jRepository<ClubNode, Long> {
 
     boolean existsByMongoId(String id);
 
-    List<ClubNode> findByTeamId(Integer clubId);
+    ClubNode findByTeamId(Integer clubId);
 }

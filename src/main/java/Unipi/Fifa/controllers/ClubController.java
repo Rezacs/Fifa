@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static Unipi.Fifa.services.UserNodeService.getLoggedInUsername;
@@ -88,7 +89,9 @@ public class ClubController {
 
         // Recreate coach and player relationships
         cncnService.createEditedClubCoachRelationships(clubNode);
-        pncnService.createEditedClubPlayerRelationships(clubNode);
+        List<ClubNode> clubNodes = new ArrayList<>();
+        clubNodes.add(clubNode);
+        pncnService.createPlayerClubRelationshipsForClubs(clubNodes);
 
         return ResponseEntity.ok("Club updated successfully!");
     }

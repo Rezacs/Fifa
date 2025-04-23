@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -75,18 +76,20 @@ public class ClubNodeController {
 
     @PostMapping("/createNEW")
     public String createPlayerClubRelationshipsVer2(@RequestParam(value = "gender", required = false) PlayerNode.Gender gender,
-                                                @RequestParam(value = "clubId", required = false) Integer clubId) {
+                                                    @RequestParam(value = "clubId", required = false) Integer clubId) {
         try {
-            if (gender != null) {
+            if (clubId != null) {
+                // If clubId is provided, create player-club relationships for the specific club
+                ClubNode clubNodes = clubService.getClubNodesByTeamId(clubId);  // Retrieve the specific club(s) by clubId
+                List<ClubNode> clubNodeList = new ArrayList<>();
+                clubNodeList.add(clubNodes);
+                pncnService.createPlayerClubRelationshipsForClubs(clubNodeList);
+                return String.format("Player-club relationships created successfully for clubId: %d", clubId);
+            } else if (gender != null) {
                 // If gender is provided, create player-club relationships based on gender
                 List<PlayerNode> playerNodes = playerNodeRepository.findByGender(gender);
                 pncnService.createPlayerClubRelationships(playerNodes);
                 return String.format("Player-club relationships created successfully for gender: %s", gender);
-            } else if (clubId != null) {
-                // If clubId is provided, create player-club relationships for the specific club
-                List<ClubNode> clubNodes = clubNodeRepository.findByTeamId(clubId);  // Retrieve the specific club(s) by clubId
-                pncnService.createPlayerClubRelationshipsForClubs(clubNodes);
-                return String.format("Player-club relationships created successfully for clubId: %d", clubId);
             } else {
                 // If neither gender nor clubId is provided, return an error
                 return "Error: Either 'gender' or 'clubId' must be provided.";
@@ -95,6 +98,7 @@ public class ClubNodeController {
             return "Error: " + e.getMessage();
         }
     }
+
 
 
 

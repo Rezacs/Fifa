@@ -12,10 +12,11 @@ import java.util.Optional;
 
 public interface CoachNodeRepository extends Neo4jRepository<CoachNode, Long> {
 
-    @Query("MATCH (n)-[r]->(coach:CoachNode) " +
-            "WHERE coach.id = $id AND NOT n:Users " +
+    @Query("MATCH (coach:CoachNode)-[r]->(club:ClubNode) " +
+            "WHERE ID(coach) = $id " +
             "DELETE r")
     void deleteAllRelationships(Long id);
+
 
 
     CoachNode findByCoachId(Integer id);

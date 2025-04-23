@@ -30,6 +30,9 @@ public class PNCNService {
     private PlayerRepository playerRepository;
 
     @Autowired
+    private PlayerService playerService;
+
+    @Autowired
     private ClubNodeRepository clubNodeRepository;
 
     @Autowired
@@ -104,7 +107,10 @@ public class PNCNService {
         // Step 1: Iterate over each ClubNode in the input list
         for (ClubNode clubNode : clubNodes) {
             // Step 2: Find all Player documents for this club
-            List<Player> players = playerRepository.findAll();  // Retrieve all players from MongoDB (you may want to filter based on other criteria)
+//            List<Player> players = playerService.getPlayersByClubTeamIdAndGender(clubNode.getTeamId() , String.valueOf(clubNode.getGender()));
+            List<Player> players = playerRepository.findByGender(clubNode.getGender());
+            System.out.println("Found " + players.size() + " players for club " + clubNode.getTeamId() + " Gender " + clubNode.getGender().name());
+
 
             // Step 3: Iterate over all players
             for (Player player : players) {

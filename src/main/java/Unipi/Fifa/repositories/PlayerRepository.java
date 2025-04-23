@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public interface PlayerRepository extends MongoRepository<Player, String> {
+public interface PlayerRepository extends MongoRepository<Player, String> , PlayerRepositoryCustom{
+
+
     Player findByPlayerId(Integer playerid);
     List<Player> findByGender(PlayerNode.Gender gender);
     List<Player> findByLongName(String longName);
@@ -48,10 +50,5 @@ public interface PlayerRepository extends MongoRepository<Player, String> {
                     "} }"
     })
     List<Map<String, Object>> findTop10PlayersManagedByCoach(Integer coachId);
-
-//    findTop10PlayersManagedByCoach
-
-
-
 
 }

@@ -149,6 +149,10 @@ public class ClubService {
         clubNodeRepository.deleteClubNodeById(target.getId());
     }
 
+    public ClubNode getClubNodesByTeamId(Integer clubId) {
+        return clubNodeRepository.findByTeamId(clubId);
+    }
+
     public List<ClubAverageRatingDTO> getTop10ByAverageOverall() {
         List<Document> documents = clubRepository.getTop10ClubsByAverageOverall();
 

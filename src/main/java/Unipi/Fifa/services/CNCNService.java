@@ -27,9 +27,14 @@ public class CNCNService {
 
 
     @Transactional
-    public void createCoachClubRelationships(PlayerNode.Gender gender) {
+    public void createCoachClubRelationships(List<CoachNode> coachNodes) {
         // Step 1: Get all coaches of the given gender
-        List<Coach> coaches = coachRepository.findByGender(gender);
+        PlayerNode.Gender gender = PlayerNode.Gender.valueOf(coachNodes.get(0).getGender());
+        List<Coach> coaches = new ArrayList<>();
+        for (CoachNode coachNode : coachNodes) {
+            coaches.add(coachRepository.findByCoachId(coachNode.getCoachId()));
+        }
+//        List<Coach> coaches = coachRepository.findByGender(gender);
 
         // Step 2: Iterate over each coach to establish relationships with clubs
         for (Coach coach : coaches) {
@@ -136,10 +141,11 @@ public class CNCNService {
         // Step 2: Iterate over each coach to find corresponding CoachNode and create relationships
         for (Coach coach : coaches) {
             // Step 2.1: Find the corresponding CoachNode from Neo4j using the coach's mongoId
-            CoachNode coachNode = coachNodes.stream()
-                    .filter(cn -> cn.getMongoId().equals(coach.getId()))
-                    .findFirst()
-                    .orElse(null);
+//            CoachNode coachNode = coachNodes.stream()
+//                    .filter(cn -> cn.getMongoId().equals(coach.getId()))
+//                    .findFirst()
+//                    .orElse(null);
+            CoachNode coachNode = coachNodeRepository.findByMongoId(coach.getId());
 
             if (coachNode != null) {
                 // Step 2.2: Fetch the corresponding FIFA stats for the current club from MongoDB

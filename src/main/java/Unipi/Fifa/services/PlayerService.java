@@ -2,14 +2,27 @@ package Unipi.Fifa.services;
 
 import Unipi.Fifa.models.Player;
 import Unipi.Fifa.repositories.PlayerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.MongoExpression;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.stereotype.Service;
+import java.util.Arrays;
+import java.util.List;
 
 import java.util.List;
 import java.util.Map;
+import org.bson.Document;
+
 
 @Service
 //@RequiredArgsConstructor
 public class PlayerService {
+
 
 
     public PlayerService(PlayerRepository playerRepository) {
@@ -78,5 +91,9 @@ public class PlayerService {
         } else {
             System.out.println("Player with ID " + playerId + " not found.");
         }
+    }
+
+    public List<Player> getPlayersByClubTeamIdAndGender(Integer clubTeamId, String gender) {
+        return playerRepository.findByClubTeamIdAndGender(clubTeamId, gender);
     }
 }
