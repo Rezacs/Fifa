@@ -10,7 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.bson.Document;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -177,5 +180,24 @@ public class ClubService {
                         doc.getDouble("averageOverall")
                 ))
                 .collect(Collectors.toList());
+    }
+
+    public List<Club> findClubsManagedByCoach(Integer coachId) {
+        List<Club> allClubs = clubRepository.findAll(); // Fetch all clubs
+        List<Club> result = new ArrayList<>();
+
+        for (Club club : allClubs) {
+            if (club.getMergedVersions() != null) {
+                for (Map.Entry<String, Club.FIFAStats> entry : club.getMergedVersions().entrySet()) {
+                    Club.FIFAStats fifaStats = entry.getValue();
+                    if (fifaStats != null && coachId.equals(fifaStats.getCoachId())) {
+                        result.add(club);
+                        break; // Once found in one version, no need to check more versions for this club
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 }

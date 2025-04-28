@@ -148,4 +148,9 @@ public class ClubController {
         return clubService.getTop10ByAverageOverall();
     }
 
+    @GetMapping("/CoachHistoryClubs/{coachId}")
+    public List<Club> getCoachClubHistory(@PathVariable Integer coachId) {
+        return clubService.findClubsManagedByCoach(coachId);
+    }
+
 }

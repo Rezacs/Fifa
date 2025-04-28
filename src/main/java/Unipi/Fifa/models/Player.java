@@ -13,6 +13,8 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Getter
+@Setter
 @Document(collection = "OPlayers")
 public class Player {
 
@@ -63,6 +65,8 @@ public class Player {
     @NoArgsConstructor
     @AllArgsConstructor
     @Data
+    @Getter
+    @Setter
     public static class Stats {
 
         @Field("fifa_version")

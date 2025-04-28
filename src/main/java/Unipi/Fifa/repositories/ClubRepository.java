@@ -21,9 +21,6 @@ public interface ClubRepository extends MongoRepository<Club, String>, ClubRepos
     // Custom query to retrieve clubs by FIFA version and overall rating
     List<Club> findByMergedVersionsOverall(Integer overall);
 
-    @Query(value = "{ 'team_name': ?0, '#mergedKey.fifa_version': ?1 }")
-    Optional<Club> findByTeamNameAndMergedVersionsContaining(String teamName, Integer fifaVersion, @Param("mergedKey") String mergedKey);
-
 
     @Query(value = "{ 'team_id': ?0, 'gender': ?1, 'merged_versions.?2.fifa_version': ?3 }")
     Optional<List<Club>> findClubsByTeamIdAndGenderAndFifaVersionKey(
@@ -32,6 +29,4 @@ public interface ClubRepository extends MongoRepository<Club, String>, ClubRepos
             String fifaVersionKey,
             Integer fifaVersion
     );
-
-
 }

@@ -96,9 +96,14 @@ public class PlayerController {
         try{
             player.setId(null);
             Player createdPlayer = playerService.savePlayer(player);
-//            editPlayer(createdPlayer.getId(), player);
+            //editPlayer(createdPlayer.getId(), player);
             PlayerNode node = playerNodeService.transferOneDataToNeo4j(createdPlayer.getId());
-            pncnService.createEditedPlayerClubRelationships(node);
+            // Create a list
+            List<PlayerNode> nodeList = new ArrayList<>();
+            // Add the single node to the list
+            nodeList.add(node);
+            // Pass the list to the service
+            pncnService.createPlayerClubRelationships(nodeList);
             return ResponseEntity.ok(createdPlayer);
         } catch (Exception e){
             return ResponseEntity.badRequest().build();

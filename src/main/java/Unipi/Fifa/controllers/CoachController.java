@@ -3,8 +3,10 @@ package Unipi.Fifa.controllers;
 
 import Unipi.Fifa.models.*;
 import Unipi.Fifa.relations.ManagesClub;
+import Unipi.Fifa.repositories.ClubRepository;
 import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.services.CNCNService;
+import Unipi.Fifa.services.ClubService;
 import Unipi.Fifa.services.CoachService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,10 @@ public class CoachController {
 
     @Autowired
     private CNCNService cncnService;
+    @Autowired
+    private ClubRepository clubRepository;
+    @Autowired
+    private ClubService clubService;
 
     @PostMapping("/transfer-to-neo4j/{gender}")
     public ResponseEntity<String> transferToNeo4j(@PathVariable PlayerNode.Gender gender) {
@@ -131,6 +137,11 @@ public class CoachController {
     public ResponseEntity<Coach> getCoachById(@PathVariable String Id) {
         Coach coach = coachService.getCoachById(Id);
         return ResponseEntity.ok(coach);
+    }
+
+    @GetMapping("CoachHistoryClubs/{coachId}")
+    public List<Club> getCoachClubHistory(@PathVariable Integer coachId) {
+        return clubService.findClubsManagedByCoach(coachId);
     }
 
 

@@ -1,24 +1,31 @@
 package Unipi.Fifa.services;
 
+import Unipi.Fifa.models.Club;
 import Unipi.Fifa.models.Coach;
 import Unipi.Fifa.models.CoachNode;
 import Unipi.Fifa.models.PlayerNode;
+import Unipi.Fifa.objects.CoachClubHistoryDTO;
+import Unipi.Fifa.repositories.ClubRepository;
 import Unipi.Fifa.repositories.CoachNodeRepository;
 import Unipi.Fifa.repositories.CoachRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class CoachService {
     private final CoachNodeRepository coachNodeRepository;
     private final CoachRepository coachRepository;
+    private final ClubRepository clubRepository;
 
 
-    public CoachService(CoachRepository coachRepository, CoachNodeRepository coachNodeRepository) {
+    public CoachService(CoachRepository coachRepository, CoachNodeRepository coachNodeRepository, ClubRepository clubRepository) {
         this.coachRepository = coachRepository;
         this.coachNodeRepository = coachNodeRepository;
+        this.clubRepository = clubRepository;
     }
 
     public Coach getCoachById(String id){

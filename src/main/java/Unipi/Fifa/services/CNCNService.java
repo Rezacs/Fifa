@@ -58,18 +58,19 @@ public class CNCNService {
 
                             // Step 2.5: Check if the coach was managing this club in this FIFA version
                             if (fifaStats.getCoachId() != null && fifaStats.getCoachId().equals(coach.getCoachId())) {
-                                // Step 3: Create multiple relationships (one per FIFA version)
-//                                coachNodeRepository.createManagingRelationship(
-//                                        coach.getCoachId(), club.getTeamId(), fifaVersion
-//                                );
+
                                 ManagesClub manage = new ManagesClub();
                                 manage.setClubNode(clubNode);
                                 manage.setFifaVersion(fifaVersion);
-                                coachNode.getClubNodes().add(manage);
-                                coachNodeRepository.save(coachNode);
 
-                                System.out.println("Created relationship for Coach " + coachNode.getId() +
-                                        " with Club " + club.getTeamName() + " for FIFA Version " + fifaVersion);
+                                if (!coachNode.getClubNodes().contains(manage)) {
+                                    coachNode.getClubNodes().add(manage);
+                                    coachNodeRepository.save(coachNode);
+                                    System.out.println("Created relationship for Coach " + coachNode.getId() +
+                                            " with Club " + club.getTeamName() + " for FIFA Version " + fifaVersion);
+                                } else {
+                                    System.out.println("Relationship already exists...");
+                                }
                             }
                         }
                     }
