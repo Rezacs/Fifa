@@ -2,12 +2,14 @@ package Unipi.Fifa.controllers;
 
 
 import Unipi.Fifa.models.*;
+import Unipi.Fifa.objects.TopPlayersByCoach;
 import Unipi.Fifa.relations.ManagesClub;
 import Unipi.Fifa.repositories.ClubRepository;
 import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.services.CNCNService;
 import Unipi.Fifa.services.ClubService;
 import Unipi.Fifa.services.CoachService;
+import Unipi.Fifa.services.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +33,7 @@ public class CoachController {
     @Autowired
     private CNCNService cncnService;
     @Autowired
-    private ClubRepository clubRepository;
+    private PlayerService playerService;
     @Autowired
     private ClubService clubService;
 
@@ -144,5 +146,9 @@ public class CoachController {
         return clubService.findClubsManagedByCoach(coachId);
     }
 
+    @GetMapping("/top-by-coach/{coachId}")
+    public List<TopPlayersByCoach> getTopPlayersByCoach(@PathVariable int coachId) {
+        return playerService.getTopPlayersManagedByCoach(coachId);
+    }
 
 }

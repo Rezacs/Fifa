@@ -1,6 +1,8 @@
 package Unipi.Fifa.controllers;
 
 import Unipi.Fifa.models.*;
+import Unipi.Fifa.objects.DreamTeamPlayer;
+import Unipi.Fifa.objects.PlayerBasicInfo;
 import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.services.PNCNService;
 import Unipi.Fifa.services.PlayerNodeService;
@@ -134,5 +136,21 @@ public class PlayerController {
     public Map<String, List<Integer>> findTeammates(@PathVariable int playerId) {
         return playerService.findTeammatesByPlayerId(playerId);
     }
+
+    @GetMapping("/dream-team")
+    public List<DreamTeamPlayer> getDreamTeam(
+            @RequestParam int fifaVersion,
+            @RequestParam PlayerNode.Gender gender
+    ) {
+        return playerService.getDreamTeamByFifaVersion(fifaVersion, String.valueOf(gender));
+    }
+
+    @GetMapping("/by-fifa-version/{version}/gender/{gender}")
+    public List<PlayerBasicInfo> getPlayersByFifaVersionAndGender(
+            @PathVariable int version,
+            @PathVariable PlayerNode.Gender gender) {
+        return playerService.getPlayersByFifaVersionAndGender(version, String.valueOf(gender));
+    }
+
 
 }
