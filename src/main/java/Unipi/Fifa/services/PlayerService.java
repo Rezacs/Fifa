@@ -8,6 +8,7 @@ import Unipi.Fifa.repositories.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -295,34 +296,38 @@ public class PlayerService {
 
 
     public List<PlayerFifaVersionClubInfo> getPlayerFifaVersionsAndClubs(int playerId) {
-        // Aggregation pipeline
-        Aggregation aggregation = Aggregation.newAggregation(
-                // Project merged_versions as an array of key-value pairs (FIFA version and stats)
-                Aggregation.project()
-                        .and("player_id").as("playerId")
-                        .and("long_name").as("longName")
-                        .and("gender").as("gender")
-                        .and("merged_versions").as("mergedVersions"),
+        // Find the player document by playerId
+        Query query = new Query(Criteria.where("player_id").is(playerId));
+        Player player = mongoTemplate.findOne(query, Player.class);
 
-                // Unwind the mergedVersions field to process each FIFA version separately
-                Aggregation.unwind("mergedVersions"),
+        // Check if the player exists
+        if (player == null) {
+            return Collections.emptyList(); // Return empty list if player is not found
+        }
 
-                // Match by playerId
-                Aggregation.match(Criteria.where("playerId").is(playerId)),
+        List<PlayerFifaVersionClubInfo> fifaVersionClubInfoList = new ArrayList<>();
 
-                // Project the necessary fields, extract FIFA version and clubTeamId for each FIFA version
-                Aggregation.project()
-                        .and("playerId").as("playerId")
-                        .and("mergedVersions.k").as("fifaVersion")  // Extract FIFA version key
-                        .and("mergedVersions.v.stats.club_team_id").as("clubId") // Extract club_id for each version
-        );
+        // Iterate over the merged_versions field (which is now a Map<String, FifaStats>)
+        for (Map.Entry<String, Player.FifaStats> entry : player.getMergedVersions().entrySet()) {
+            String fifaVersionKey = entry.getKey();  // FIFA version key (e.g., fifa_stats_22, fifa_stats_21, etc.)
+            Player.FifaStats stats = entry.getValue(); // FifaStats object for this version
 
-        // Execute the aggregation
-        AggregationResults<PlayerFifaVersionClubInfo> results = mongoTemplate.aggregate(
-                aggregation, "OPlayers", PlayerFifaVersionClubInfo.class
-        );
+            // Extract club_team_id from stats
+            Integer clubId = stats.getStats().getClubTeamId();  // Assuming getClubTeamId() is the correct method for accessing the club ID
 
-        // Return the list of results (PlayerFifaVersionClubInfo objects)
-        return results.getMappedResults();
+            // Create a PlayerFifaVersionClubInfo object for this version
+            PlayerFifaVersionClubInfo fifaVersionClubInfo = new PlayerFifaVersionClubInfo();
+            fifaVersionClubInfo.setPlayerId(playerId);
+            fifaVersionClubInfo.setFifaVersion(fifaVersionKey);
+            fifaVersionClubInfo.setClubId(clubId);
+
+            // Add it to the list
+            fifaVersionClubInfoList.add(fifaVersionClubInfo);
+        }
+
+        // Return the list of PlayerFifaVersionClubInfo
+        return fifaVersionClubInfoList;
     }
+
+
 }
