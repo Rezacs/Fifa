@@ -5,12 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class PlayerBasicInfo {
+@NoArgsConstructor
+public class PlayerFifaVersionClubInfo {
+
     private int playerId;
-    private String longName;
-    private String gender;
-    private String position;
-    private Integer overall;
+    private String fifaVersion;
+    private Integer clubId;
 }

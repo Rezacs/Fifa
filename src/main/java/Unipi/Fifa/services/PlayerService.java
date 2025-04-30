@@ -1,28 +1,21 @@
 package Unipi.Fifa.services;
 
 import Unipi.Fifa.models.Player;
-import Unipi.Fifa.models.PlayerNode;
-import Unipi.Fifa.objects.DreamTeamPlayer;
 import Unipi.Fifa.objects.PlayerBasicInfo;
+import Unipi.Fifa.objects.PlayerFifaVersionClubInfo;
 import Unipi.Fifa.objects.TopPlayersByCoach;
 import Unipi.Fifa.repositories.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.MongoExpression;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.stereotype.Service;
-import org.springframework.data.mongodb.core.aggregation.ConvertOperators;
 
 
 import java.util.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.bson.Document;
 
@@ -31,6 +24,7 @@ import org.bson.Document;
 //@RequiredArgsConstructor
 public class PlayerService {
 
+    @Autowired
     private final MongoTemplate mongoTemplate;
 
     public PlayerService(PlayerRepository playerRepository , MongoTemplate mongoTemplate) {
@@ -223,82 +217,42 @@ public class PlayerService {
         return results.getMappedResults();
     }
 
-    public List<DreamTeamPlayer> getDreamTeamByFifaVersion(int fifaVersion, String gender) {
-        List<String> dreamTeamPositions = Arrays.asList("GK", "RB", "CB", "LB", "CDM", "CM", "CAM", "RW", "LW", "ST");
-
-        String versionKey = String.valueOf(fifaVersion);
-
-        Aggregation aggregation = Aggregation.newAggregation(
-                // Step 1: Filter by gender
-                Aggregation.match(Criteria.where("gender").is(gender)),
-
-                // Step 2: Convert merged_versions map to array
-                context -> new Document("$project", new Document()
-                        .append("playerId", "$player_id")
-                        .append("longName", "$long_name")
-                        .append("position", "$position")
-                        .append("versions", new Document("$objectToArray", "$merged_versions"))
-                ),
-
-                // Step 3: Unwind versions array
-                Aggregation.unwind("versions"),
-
-                // Step 4: Match the target FIFA version and valid position
-                Aggregation.match(new Criteria().andOperator(
-                        Criteria.where("versions.k").is(versionKey),
-                        Criteria.where("position").in(dreamTeamPositions)
-                )),
-
-                // Step 5: Project necessary stats
-                Aggregation.project()
-                        .and("playerId").as("playerId")
-                        .and("longName").as("playerName")
-                        .and("position").as("position")
-                        .and("versions.k").as("fifaVersion")
-                        .and("versions.v.stats.overall").as("overall"),
-
-                // Step 6: Sort descending by overall
-                Aggregation.sort(Sort.by(Sort.Direction.DESC, "overall")),
-
-                // Step 7: Group by position (top player per position)
-                Aggregation.group("position")
-                        .first("playerId").as("playerId")
-                        .first("playerName").as("playerName")
-                        .first("fifaVersion").as("fifaVersion")
-                        .first("overall").as("overall")
-                        .first("_id").as("position"),
-
-                // Step 8: Final projection
-                Aggregation.project("playerId", "playerName", "fifaVersion", "overall", "position")
+    public List<PlayerBasicInfo> getDreamTeamByFifaVersionAndGender(int fifaVersion, String gender) {
+        List<String> dreamTeamPositions = Arrays.asList(
+                "GK", "RB", "CB", "LB",
+                "CDM", "CM", "CAM",
+                "RW", "LW", "ST"
         );
 
-        AggregationResults<DreamTeamPlayer> results = mongoTemplate.aggregate(
-                aggregation,
-                "OPlayers",
-                DreamTeamPlayer.class
-        );
-
-        return results.getMappedResults();
-    }
-
-
-    public List<PlayerBasicInfo> getPlayersByFifaVersionAndGender(int fifaVersion, String gender) {
         Aggregation aggregation = Aggregation.newAggregation(
                 context -> new Document("$project", new Document()
                         .append("playerId", "$player_id")
                         .append("longName", "$long_name")
                         .append("gender", "$gender")
+                        .append("position", "$position")
                         .append("versions", new Document("$objectToArray", "$merged_versions"))
                 ),
                 Aggregation.unwind("versions"),
                 Aggregation.match(new Criteria().andOperator(
                         Criteria.where("versions.v.stats.fifa_version").is(fifaVersion),
-                        Criteria.where("gender").is(gender)
+                        Criteria.where("gender").is(gender),
+                        Criteria.where("position").in(dreamTeamPositions)
                 )),
                 Aggregation.project()
                         .and("playerId").as("playerId")
                         .and("longName").as("longName")
                         .and("gender").as("gender")
+                        .and("position").as("position")
+                        .and("versions.v.stats.overall").as("overall"),
+
+                // Group by position, take top player by highest overall
+                Aggregation.sort(Sort.by(Sort.Direction.DESC, "overall")),
+                Aggregation.group("position")
+                        .first("playerId").as("playerId")
+                        .first("longName").as("longName")
+                        .first("gender").as("gender")
+                        .first("position").as("position")
+                        .first("overall").as("overall")
         );
 
         AggregationResults<PlayerBasicInfo> results = mongoTemplate.aggregate(
@@ -310,4 +264,65 @@ public class PlayerService {
 
 
 
+    public List<PlayerBasicInfo> getPlayersByFifaVersionAndGender(int fifaVersion, String gender) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                context -> new Document("$project", new Document()
+                        .append("playerId", "$player_id")
+                        .append("longName", "$long_name")
+                        .append("gender", "$gender")
+                        .append("position", "$position")
+                        .append("versions", new Document("$objectToArray", "$merged_versions"))
+                ),
+                Aggregation.unwind("versions"),
+                Aggregation.match(new Criteria().andOperator(
+                        Criteria.where("versions.v.stats.fifa_version").is(fifaVersion),
+                        Criteria.where("gender").is(gender)
+                )),
+                Aggregation.project()
+                        .and("playerId").as("playerId")
+                        .and("longName").as("longName")
+                        .and("gender").as("gender")
+                        .and("position").as("position")
+                        .and("versions.v.stats.overall").as("overall")
+        );
+
+        AggregationResults<PlayerBasicInfo> results = mongoTemplate.aggregate(
+                aggregation, "OPlayers", PlayerBasicInfo.class
+        );
+
+        return results.getMappedResults();
+    }
+
+
+    public List<PlayerFifaVersionClubInfo> getPlayerFifaVersionsAndClubs(int playerId) {
+        // Aggregation pipeline
+        Aggregation aggregation = Aggregation.newAggregation(
+                // Project merged_versions as an array of key-value pairs (FIFA version and stats)
+                Aggregation.project()
+                        .and("player_id").as("playerId")
+                        .and("long_name").as("longName")
+                        .and("gender").as("gender")
+                        .and("merged_versions").as("mergedVersions"),
+
+                // Unwind the mergedVersions field to process each FIFA version separately
+                Aggregation.unwind("mergedVersions"),
+
+                // Match by playerId
+                Aggregation.match(Criteria.where("playerId").is(playerId)),
+
+                // Project the necessary fields, extract FIFA version and clubTeamId for each FIFA version
+                Aggregation.project()
+                        .and("playerId").as("playerId")
+                        .and("mergedVersions.k").as("fifaVersion")  // Extract FIFA version key
+                        .and("mergedVersions.v.stats.club_team_id").as("clubId") // Extract club_id for each version
+        );
+
+        // Execute the aggregation
+        AggregationResults<PlayerFifaVersionClubInfo> results = mongoTemplate.aggregate(
+                aggregation, "OPlayers", PlayerFifaVersionClubInfo.class
+        );
+
+        // Return the list of results (PlayerFifaVersionClubInfo objects)
+        return results.getMappedResults();
+    }
 }

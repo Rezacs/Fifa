@@ -1,15 +1,14 @@
 package Unipi.Fifa.controllers;
 
 import Unipi.Fifa.models.*;
-import Unipi.Fifa.objects.DreamTeamPlayer;
 import Unipi.Fifa.objects.PlayerBasicInfo;
+import Unipi.Fifa.objects.PlayerFifaVersionClubInfo;
 import Unipi.Fifa.repositories.UserRepository;
 import Unipi.Fifa.services.PNCNService;
 import Unipi.Fifa.services.PlayerNodeService;
 import Unipi.Fifa.services.PlayerService;
 import Unipi.Fifa.services.UserNodeService;
 import lombok.RequiredArgsConstructor;
-import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -138,11 +137,11 @@ public class PlayerController {
     }
 
     @GetMapping("/dream-team")
-    public List<DreamTeamPlayer> getDreamTeam(
+    public List<PlayerBasicInfo> getDreamTeam(
             @RequestParam int fifaVersion,
             @RequestParam PlayerNode.Gender gender
     ) {
-        return playerService.getDreamTeamByFifaVersion(fifaVersion, String.valueOf(gender));
+        return playerService.getDreamTeamByFifaVersionAndGender(fifaVersion, String.valueOf(gender));
     }
 
     @GetMapping("/by-fifa-version/{version}/gender/{gender}")
@@ -150,6 +149,11 @@ public class PlayerController {
             @PathVariable int version,
             @PathVariable PlayerNode.Gender gender) {
         return playerService.getPlayersByFifaVersionAndGender(version, String.valueOf(gender));
+    }
+
+    @GetMapping("/{playerId}/fifa-versions-clubs")
+    public List<PlayerFifaVersionClubInfo> getPlayerFifaVersionsAndClubs(@PathVariable int playerId) {
+        return playerService.getPlayerFifaVersionsAndClubs(playerId);
     }
 
 
