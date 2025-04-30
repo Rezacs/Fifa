@@ -15,9 +15,6 @@ public interface ClubRepository extends MongoRepository<Club, String>, ClubRepos
     Optional<Club> findById(String id);
     List<Club> findByGender(String gender);
 
-    // Custom query for retrieving clubs based on FIFA version and overall rating
-    List<Club> findByMergedVersionsContaining(String fifaVersion);
-
     // Custom query to retrieve clubs by FIFA version and overall rating
     List<Club> findByMergedVersionsOverall(Integer overall);
 

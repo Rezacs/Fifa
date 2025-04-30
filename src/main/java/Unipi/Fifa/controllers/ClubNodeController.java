@@ -50,29 +50,6 @@ public class ClubNodeController {
         return ResponseEntity.ok(clubService.getClubNodeByMongoId(mongoId));
     }
 
-//    @PostMapping("/create")
-//    public String createPlayerClubRelationships(@RequestParam(value = "gender", required = false) PlayerNode.Gender gender,
-//                                                @RequestParam(value = "playerId", required = false) Integer playerId) {
-//        try {
-//            if (gender != null) {
-//                // If gender is provided, create player-club relationships based on gender
-//                List<PlayerNode> playerNodes = playerNodeRepository.findByGender(gender);
-//                pncnService.createPlayerClubRelationships(playerNodes);
-//                return String.format("Player-club relationships created successfully for gender: %s", gender);
-//            } else if (playerId != null) {
-//                // If clubId is provided, create player-club relationships for the specific club
-//                List<PlayerNode> playerNodes = playerNodeRepository.findByPlayerId(playerId);
-//                pncnService.createPlayerClubRelationships(playerNodes);
-//                return String.format("Player-club relationships created successfully for clubId: %d", playerId);
-//            } else {
-//                // If neither gender nor clubId is provided, return an error
-//                return "Error: Either 'gender' or 'clubId' must be provided.";
-//            }
-//        } catch (Exception e) {
-//            return "Error: " + e.getMessage();
-//        }
-//    }
-
 
     @PostMapping("/createNEW")
     public String createPlayerClubRelationshipsVer2(@RequestParam(value = "gender", required = false) PlayerNode.Gender gender,

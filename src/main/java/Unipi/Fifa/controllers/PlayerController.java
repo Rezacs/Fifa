@@ -130,4 +130,9 @@ public class PlayerController {
         }
     }
 
+    @GetMapping("/teammates/{playerId}")
+    public Map<String, List<Integer>> findTeammates(@PathVariable int playerId) {
+        return playerService.findTeammatesByPlayerId(playerId);
+    }
+
 }
